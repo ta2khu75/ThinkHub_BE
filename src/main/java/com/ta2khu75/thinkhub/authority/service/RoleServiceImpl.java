@@ -1,0 +1,82 @@
+package com.ta2khu75.thinkhub.authority.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.ta2khu75.thinkhub.authority.RoleDto;
+import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.entity.Role;
+import com.ta2khu75.thinkhub.authority.mapper.RoleMapper;
+import com.ta2khu75.thinkhub.authority.repository.RoleRepository;
+import com.ta2khu75.thinkhub.authority.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
+import com.ta2khu75.thinkhub.shared.service.BaseService;
+
+import jakarta.validation.Valid;
+
+@Service
+public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, RoleMapper> implements RoleService {
+
+	protected RoleServiceImpl(RoleRepository repository, RoleMapper mapper) {
+		super(repository, mapper);
+	}
+
+	@Override
+	public RoleResponse create(@Valid RoleRequest request) {
+		Role role = mapper.toEntity(request);
+		role = repository.save(role);
+		return mapper.toResponse(role);
+	}
+
+	@Override
+	public RoleResponse update(Long id, @Valid RoleRequest request) {
+		Role role = this.readEntity(id);
+		mapper.update(request, role);
+		role = repository.save(role);
+		return mapper.toResponse(role);
+	}
+
+	@Override
+	public RoleResponse read(Long id) {
+		Role role = this.readEntity(id);
+		return mapper.toResponse(role);
+	}
+
+	@Override
+	public void delete(Long id) {
+		repository.deleteById(id);
+	}
+
+	@Override
+	public RoleResponse readByName(String roleName) {
+		Role role = repository.findByName(roleName)
+				.orElseThrow(() -> new NotFoundException("Could not find Role with name: " + roleName));
+		return mapper.toResponse(role);
+	}
+
+	@Override
+	public List<RoleResponse> readAll() {
+		return repository.findAll().stream().map(mapper::toResponse).toList();
+	}
+
+	@Override
+	public boolean exists(Long id) {
+		return repository.existsById(id);
+	}
+
+	@Override
+	public RoleDto readDtoByName(String name) {
+		Role role = repository.findByName(name)
+				.orElseThrow(() -> new NotFoundException("Could not find Role with name: " + name));
+		return mapper.toDto(role);
+	}
+
+	@Override
+	public RoleDto readDto(Long id) {
+		Role role = this.readEntity(id);
+		return mapper.toDto(role);
+	}
+
+}
