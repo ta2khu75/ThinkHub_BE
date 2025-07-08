@@ -1,5 +1,9 @@
 package com.ta2khu75.thinkhub.authority.service;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.authority.PermissionService;
@@ -8,11 +12,14 @@ import com.ta2khu75.thinkhub.authority.mapper.PermissionMapper;
 import com.ta2khu75.thinkhub.authority.repository.PermissionRepository;
 import com.ta2khu75.thinkhub.authority.request.PermissionRequest;
 import com.ta2khu75.thinkhub.authority.response.PermissionResponse;
+import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 import jakarta.validation.Valid;
+
 @Service
-public class PermissionServiceImpl extends BaseService<Permission, Long, PermissionRepository, PermissionMapper> implements PermissionService {
+public class PermissionServiceImpl extends BaseService<Permission, Long, PermissionRepository, PermissionMapper>
+		implements PermissionService {
 
 	protected PermissionServiceImpl(PermissionRepository repository, PermissionMapper mapper) {
 		super(repository, mapper);
@@ -42,6 +49,21 @@ public class PermissionServiceImpl extends BaseService<Permission, Long, Permiss
 	@Override
 	public void delete(Long id) {
 		repository.deleteById(id);
+	}
+
+	@Override
+	public Set<PermissionResponse> readAllBySummary(Set<String> summaries) {
+		return repository.findAllBySummaryIn(summaries).stream().map(mapper::toResponse).collect(Collectors.toSet());
+	}
+
+	@Override
+	public PermissionResponse readBySummary(String summary) {
+		return mapper.toResponse(repository.findBySummary(summary).orElseThrow(()->new NotFoundException("Could not find Permission with summary: " + summary)));
+	}
+	@Override
+	public Optional<PermissionResponse> findBySummary(String summary) {
+		
+		return repository.findBySummary(summary).map(mapper::toResponse);
 	}
 
 }

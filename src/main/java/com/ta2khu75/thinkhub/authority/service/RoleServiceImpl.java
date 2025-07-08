@@ -1,11 +1,13 @@
 package com.ta2khu75.thinkhub.authority.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.entity.Permission;
 import com.ta2khu75.thinkhub.authority.entity.Role;
 import com.ta2khu75.thinkhub.authority.mapper.RoleMapper;
 import com.ta2khu75.thinkhub.authority.repository.RoleRepository;
@@ -34,6 +36,11 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	public RoleResponse update(Long id, @Valid RoleRequest request) {
 		Role role = this.readEntity(id);
 		mapper.update(request, role);
+		role.setPermissions(request.permissionIds().stream().map(permissionId -> {
+			Permission permission = new Permission();
+			permission.setId(permissionId);
+			return permission;
+		}).collect(Collectors.toSet()));
 		role = repository.save(role);
 		return mapper.toResponse(role);
 	}
@@ -77,6 +84,12 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	public RoleDto readDto(Long id) {
 		Role role = this.readEntity(id);
 		return mapper.toDto(role);
+	}
+
+	@Override
+	public boolean existsByName(String name) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

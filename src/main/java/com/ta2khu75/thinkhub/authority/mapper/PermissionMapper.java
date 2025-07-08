@@ -2,18 +2,18 @@ package com.ta2khu75.thinkhub.authority.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.authority.entity.Permission;
 import com.ta2khu75.thinkhub.authority.request.PermissionRequest;
 import com.ta2khu75.thinkhub.authority.response.PermissionResponse;
-import com.ta2khu75.thinkhub.shared.anotation.MappingConfig;
+import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 
-@Mapper(config = MappingConfig.class)
-public interface PermissionMapper extends BaseMapper<PermissionRequest, PermissionResponse, Permission> {
+@Mapper(config = MapperSpringConfig.class)
+public interface PermissionMapper extends Converter<Permission, PermissionResponse>,
+		BaseMapper<PermissionRequest, PermissionResponse, Permission> {
 	@Override
-	@Named("toPermissionResponse")
 	PermissionResponse toResponse(Permission entity);
 
 	@Override
@@ -21,5 +21,5 @@ public interface PermissionMapper extends BaseMapper<PermissionRequest, Permissi
 
 	@Override
 	void update(PermissionRequest request, @MappingTarget Permission entity);
-
+	
 }

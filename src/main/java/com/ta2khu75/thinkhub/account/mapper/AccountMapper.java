@@ -13,11 +13,11 @@ import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
 import com.ta2khu75.thinkhub.account.response.AccountProfileResponse;
 import com.ta2khu75.thinkhub.account.response.AccountResponse;
 import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
-import com.ta2khu75.thinkhub.shared.anotation.MappingConfig;
+import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 
-@Mapper(config = MappingConfig.class)
+@Mapper(config = MapperSpringConfig.class)
 public interface AccountMapper extends BaseMapper<AccountRequest, AccountResponse, Account>, PageMapper<Account, AccountResponse>{
 	// Profile
 	AccountProfile toEntity(AccountProfileRequest request);

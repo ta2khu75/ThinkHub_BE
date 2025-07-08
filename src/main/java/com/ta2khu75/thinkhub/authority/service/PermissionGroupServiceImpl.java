@@ -1,6 +1,8 @@
 package com.ta2khu75.thinkhub.authority.service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,7 @@ public class PermissionGroupServiceImpl
 			Permission permission = new Permission();
 			permission.setId(permissionId);
 			return permission;
-		}).toList());
+		}).collect(Collectors.toList()));
 		permissionGroup = repository.save(permissionGroup);
 		return mapper.toResponse(permissionGroup);
 	}
@@ -62,5 +64,10 @@ public class PermissionGroupServiceImpl
 	@Override
 	public List<PermissionGroupResponse> readAll() {
 		return repository.findAll().stream().map(mapper::toResponse).toList();
+	}
+
+	@Override
+	public Optional<PermissionGroupResponse> findByName(String name) {
+		return repository.findByName(name).map(mapper::toResponse);
 	}
 }

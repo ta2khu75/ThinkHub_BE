@@ -14,21 +14,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountStatus {
+	public AccountStatus() {
+		this.nonLocked = true;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
-    boolean enabled; 
-    boolean nonLocked = true;
+	boolean enabled;
+	boolean nonLocked;
 	@LastModifiedDate
 	@Column(insertable = false)
 	Instant updatedAt;

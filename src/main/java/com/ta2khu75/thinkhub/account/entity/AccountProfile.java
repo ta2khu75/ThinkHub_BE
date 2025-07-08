@@ -1,6 +1,7 @@
 package com.ta2khu75.thinkhub.account.entity;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -36,9 +37,8 @@ public class AccountProfile {
 	@Column(nullable = false)
 	String lastName;
 	@Column(nullable = false)
-	Instant birthday;
+	LocalDate birthday;
 	@LastModifiedDate
 	@Column(insertable = false)
 	Instant updatedAt;
-
 }

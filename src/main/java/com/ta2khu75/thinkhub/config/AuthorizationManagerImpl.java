@@ -9,13 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
-import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
 import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.shared.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
 import com.ta2khu75.thinkhub.shared.service.RedisService;
-import com.ta2khu75.thinkhub.shared.service.RedisService.NameModel;
 import com.ta2khu75.thinkhub.shared.service.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
@@ -42,8 +40,8 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 	private boolean isAllowedEndpoint(RoleDto role, String requestPath, String httpMethod) {
 
 		return role.permissions().stream().anyMatch(permission -> {
-			boolean resultHppt = httpMethod.equals(permission.requestMethod());
-			boolean pathResult = pathMatcher.match(permission.path(), requestPath);
+			boolean resultHppt = httpMethod.equals(permission.requestMethod().name());
+			boolean pathResult = pathMatcher.match(permission.pattern(), requestPath);
 			return resultHppt && pathResult;
 		});
 	}

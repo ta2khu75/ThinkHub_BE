@@ -6,9 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
-import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 
-public abstract class BaseService<T, ID, R extends JpaRepository<T, ID>, M extends BaseMapper<?,?,T>> {
+public abstract class BaseService<T, ID, R extends JpaRepository<T, ID>, M> {
 	@SuppressWarnings("unchecked")
 	protected BaseService(R repository, M mapper) {
 		super();

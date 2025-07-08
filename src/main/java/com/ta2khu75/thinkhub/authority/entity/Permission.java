@@ -28,7 +28,7 @@ public class Permission {
 	String summary;
 	String description;
 	@Column(nullable = false)
-	String path;
+	String pattern;
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	RequestMethod requestMethod;

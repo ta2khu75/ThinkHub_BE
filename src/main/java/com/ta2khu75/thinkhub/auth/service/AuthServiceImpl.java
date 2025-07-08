@@ -2,21 +2,19 @@ package com.ta2khu75.thinkhub.auth.service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ta2khu75.thinkhub.account.AccountDto;
 import com.ta2khu75.thinkhub.account.AccountService;
+import com.ta2khu75.thinkhub.account.listener.AccountListener;
 import com.ta2khu75.thinkhub.auth.AuthResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.LoginRequest;
@@ -26,13 +24,10 @@ import com.ta2khu75.thinkhub.auth.model.Auth;
 import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
-import com.ta2khu75.thinkhub.shared.exception.NotMatchesException;
 import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
 import com.ta2khu75.thinkhub.shared.service.JwtService;
 import com.ta2khu75.thinkhub.shared.service.RedisService;
 import com.ta2khu75.thinkhub.shared.service.RedisService.RedisKeyBuilder;
-
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -41,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
 	private final AccountService accountService;
 	private final RoleService roleService;
 	private final AuthenticationManager authenticationManager;
+	private final ApplicationEventPublisher events;
 	private final JwtService jwtService;
 	private final RedisService redisService;
 
@@ -54,14 +50,15 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public void register(RegisterRequest request) throws MessagingException {
-
+	@Transactional
+	public void register(RegisterRequest request) {
+		events.publishEvent(request);
 	}
 
 	@Override
+	@Transactional
 	public void changePassword(ChangePasswordRequest request) {
-		// TODO Auto-generated method stub
-
+		events.publishEvent(request);
 	}
 
 	@Override
@@ -87,44 +84,6 @@ public class AuthServiceImpl implements AuthService {
 		redisService.setValue(RedisKeyBuilder.refreshToken(id), String.class, ttl);
 
 	}
-
-//	@Override
-//	public void changePassword(ChangePasswordRequest request) {
-//		if (!request.newPassword().equals(request.confirmPassword()))
-//			throw new NotMatchesException("New password and confirm password not matches");
-//		AccountDto account = account
-//		if (!passwordEncoder.matches(request.getPassword(), account.getPassword()))
-//			throw new NotMatchesException("Password not matches");
-//		account.setPassword(passwordEncoder.encode(request.getNewPassword()));
-//		account = repository.save(account);
-//	}
-//
-//	@Override
-//	public void register(AccountRequest request) throws MessagingException {
-//		if (!request.getPassword().equals(request.getConfirmPassword()))
-//			throw new NotMatchesException("password and confirm password not matches");
-//		if (repository.existsByEmail(request.getEmail()))
-//			throw new ExistingException("Email already exists");
-//		AccountProfile profile = mapper.toEntity(request.getProfile());
-//		profile.setDisplayName(profile.getFirstName() + " " + profile.getLastName());
-//		Role role = FunctionUtil.findOrThrow(RoleDefault.USER.name(), Role.class, roleRepository::findByName);
-//		AccountStatus status = new AccountStatus();
-//		status.setRole(role);
-//		status.setCodeVerify(UUID.randomUUID().toString());
-//
-//		Account account = new Account();
-//		account.setEmail(request.getEmail().toLowerCase());
-//		account.setPassword(passwordEncoder.encode(request.getPassword()));
-//		account.setProfile(profile);
-//		account.setStatus(status);
-//		try {
-//			account = repository.save(account);
-//		} catch (DataIntegrityViolationException e) {
-//			throw new ExistingException("Email already exists");
-//		}
-//		sendMailScheduling.addMail(account.getEmail(), "Confirm your email",
-//				EmailTemplateUtil.getVerify(status.getCodeVerify()), true);
-//	}
 
 	private AuthResponse makeAuthResponse(Auth auth) {
 		AccountDto account = auth.getAccount();

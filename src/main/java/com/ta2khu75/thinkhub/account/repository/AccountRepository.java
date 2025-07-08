@@ -9,7 +9,7 @@ import com.ta2khu75.thinkhub.account.entity.Account;
 
 public interface AccountRepository extends JpaRepository<Account, String> {
 	boolean existsByEmail(String email);
-
+	
 	@EntityGraph(attributePaths = { "profile", "status" })
 	Optional<Account> findByEmail(String email);
 }

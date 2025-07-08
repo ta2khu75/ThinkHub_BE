@@ -37,11 +37,12 @@ public class SecurityConfig {
 	private final AuthorizationManager<HttpServletRequest> authorizationManager;
 	private final AuthenticationEntryPoint authenticationEntryPoint;
 	private final JwtProviderFactory jwtProviderFactory;
-	private final UserDetailsService userDetailsService;
 	private final PasswordEncoder passwordEncoder;
+	private final AccountService accountService;
+	private final RoleService roleService;
 
 	@Bean
-	UserDetailsService userDetailsService(AccountService accountService, RoleService roleService) {
+	UserDetailsService userDetailsService() {
 		return email -> {
 			try {
 				AccountDto account = accountService.readDtoByEmail(email);
@@ -71,7 +72,7 @@ public class SecurityConfig {
 	AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
 		AuthenticationManagerBuilder authenticationManagerBuilder = http
 				.getSharedObject(AuthenticationManagerBuilder.class);
-		authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+		authenticationManagerBuilder.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder);
 		return authenticationManagerBuilder.build();
 	}
 

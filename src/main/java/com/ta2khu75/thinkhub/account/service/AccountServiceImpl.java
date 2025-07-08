@@ -24,8 +24,11 @@ import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
 import com.ta2khu75.thinkhub.account.response.AccountProfileResponse;
 import com.ta2khu75.thinkhub.account.response.AccountResponse;
 import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
+import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.RegisterRequest;
 import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.shared.RoleDefault;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.exception.ExistingException;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
@@ -67,12 +70,9 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 			throw new ExistingException("Email already exists");
 		AccountProfile profile = mapper.toEntity(request.profile());
 		profile.setDisplayName(profile.getFirstName() + " " + profile.getLastName());
-		AccountStatus status = new AccountStatus();
-		if (roleService.exists(request.roleId()))
-			status.setRoleId(request.roleId());
-		else
-			throw new NotFoundException("Could not find role with id: " + request.roleId());
-		status.setEnabled(true);
+		AccountStatus status = mapper.toEntity(request.status());
+		if (!roleService.exists(status.getRoleId()))
+			throw new NotFoundException("Could not find role with id: " + status.getRoleId());
 		Account account = new Account();
 		account.setEmail(request.email().toLowerCase());
 		account.setPassword(passwordEncoder.encode(request.password()));
@@ -88,8 +88,9 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 	}
 
 	@Override
-	public AccountProfileResponse readProfile(Long id) {
-		AccountProfile profile = FunctionUtil.findOrThrow(id, AccountProfile.class, profileRepository::findById);
+	public AccountProfileResponse readProfile(String accountId) {
+		AccountProfile profile = FunctionUtil.findOrThrow(accountId, AccountProfile.class,
+				profileRepository::findByAccountId);
 		return mapper.toResponse(profile);
 	}
 
@@ -161,8 +162,37 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 	}
 
 	@Override
-	public AccountResponse register(RegisterRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+	public void changePassword(ChangePasswordRequest request) {
+		if (!request.newPassword().equals(request.confirmPassword()))
+			throw new NotMatchesException("New password and confirm password not matches");
+		Account account = this.readEntity(SecurityUtil.getCurrentAccountId());
+		if (!passwordEncoder.matches(request.newPassword(), account.getPassword()))
+			throw new NotMatchesException("Password not matches");
+		account.setPassword(passwordEncoder.encode(request.newPassword()));
+		account = repository.save(account);
+	}
+
+	@Override
+	public void register(RegisterRequest request) {
+		if (!request.password().equals(request.confirmPassword()))
+			throw new NotMatchesException("password and confirm password not matches");
+		if (repository.existsByEmail(request.email()))
+			throw new ExistingException("Email already exists");
+		RoleResponse role = roleService.readByName(RoleDefault.USER.name());
+		AccountProfile profile = mapper.toEntity(request.profile());
+		profile.setDisplayName(profile.getFirstName() + " " + profile.getLastName());
+		AccountStatus status = new AccountStatus();
+		status.setRoleId(role.id());
+		Account account = new Account();
+		account.setEmail(request.email().toLowerCase());
+		account.setPassword(passwordEncoder.encode(request.password()));
+		account.setProfile(profile);
+		account.setStatus(status);
+		try {
+			account = repository.save(account);
+		} catch (DataIntegrityViolationException e) {
+			e.printStackTrace();
+			throw new ExistingException(e.getMessage());
+		}
 	}
 }

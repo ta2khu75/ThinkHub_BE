@@ -1,5 +1,7 @@
 package com.ta2khu75.thinkhub.authority;
 
-public record PermissionDto(Long id, String summary, String description, String path, String requestMethod) {
+import org.springframework.web.bind.annotation.RequestMethod;
+
+public record PermissionDto(Long id, String summary, String description, String pattern, RequestMethod requestMethod) {
 
 }

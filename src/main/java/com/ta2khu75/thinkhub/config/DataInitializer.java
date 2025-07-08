@@ -2,19 +2,27 @@ package com.ta2khu75.thinkhub.config;
 
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.scheduling.quartz.LocalDataSourceJobStore;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.ta2khu75.thinkhub.account.AccountService;
@@ -24,17 +32,22 @@ import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
 import com.ta2khu75.thinkhub.authority.PermissionGroupService;
 import com.ta2khu75.thinkhub.authority.PermissionService;
 import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.request.PermissionGroupRequest;
+import com.ta2khu75.thinkhub.authority.request.PermissionRequest;
 import com.ta2khu75.thinkhub.authority.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.authority.response.PermissionResponse;
 import com.ta2khu75.thinkhub.authority.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 
+@Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataInitializer implements ApplicationRunner {
@@ -42,7 +55,6 @@ public class DataInitializer implements ApplicationRunner {
 	RoleService roleService;
 	PermissionService permissionService;
 	PermissionGroupService permissionGroupService;
-	PasswordEncoder passwordEncoder;
 	ApplicationContext applicationContext;
 	PublicEndpointRegistry publicEndpointRegistry;
 
@@ -53,66 +65,69 @@ public class DataInitializer implements ApplicationRunner {
 				.orElseThrow(() -> new NotFoundException("Not found role name ADMIN")).id();
 	}
 
-	private Set<PermissionResponse> initPermission() {
-		Set<PermissionResponse> permissionPublic = new HashSet<>();
-		Set<String> publicPostEndpoint = publicEndpointRegistry.getPublicEndpoint(RequestMethod.POST);
-		Set<String> publicGetEndpoint = publicEndpointRegistry.getPublicEndpoint(RequestMethod.GET);
-		Map<String, RequestMappingHandlerMapping> requestMappingMap = applicationContext
+	private Set<Long> initPermission() {
+		Set<Long> permissionPublic = new HashSet<>();
+		Map<RequestMethod, Set<String>> publicEndpoints = Map.of(RequestMethod.GET,
+				publicEndpointRegistry.getPublicEndpoint(RequestMethod.GET), RequestMethod.POST,
+				publicEndpointRegistry.getPublicEndpoint(RequestMethod.POST), RequestMethod.PUT,
+				publicEndpointRegistry.getPublicEndpoint(RequestMethod.PUT), RequestMethod.PATCH,
+				publicEndpointRegistry.getPublicEndpoint(RequestMethod.PATCH), RequestMethod.DELETE,
+				publicEndpointRegistry.getPublicEndpoint(RequestMethod.DELETE));
+
+		Map<PermissionGroupRequest, Set<Long>> permissionGroupMap = new HashMap<>();
+		Map<String, RequestMappingHandlerMapping> handlerMappingMap = applicationContext
 				.getBeansOfType(RequestMappingHandlerMapping.class);
-		for (RequestMappingHandlerMapping handlerMapping : requestMappingMap.values()) {
-			handlerMapping.getHandlerMethods().forEach((requestMappingInfo, handlerMethod) -> {
+		for (RequestMappingHandlerMapping handlerMapping : handlerMappingMap.values()) {
+			Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
+			for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
+				RequestMappingInfo mappingInfo = entry.getKey();
+				HandlerMethod handlerMethod = entry.getValue();
 				Method method = handlerMethod.getMethod();
-				if (method.isAnnotationPresent(Opera.class)) {
-					EndpointMapping endpointMapping = method.getAnnotation(EndpointMapping.class);
-					RequestMethod httpMethod = requestMappingInfo.getMethodsCondition().getMethods().iterator().next();
-					String path = requestMappingInfo.getPathPatternsCondition().getPatternValues().iterator().next();
-					String permissionGroupName = StringUtil
-							.convertCamelCaseToReadable(method.getDeclaringClass().getSimpleName());
-					PermissionGroup permissionGroup = permissionGroupRepository.findByName(permissionGroupName);
-					if (permissionGroup == null) {
-						permissionGroup = permissionGroupRepository
-								.save(PermissionGroup.builder().name(permissionGroupName).build());
-					}
-					Permission permission = permissionRepository.findByName(endpointMapping.name());
-					if (permission != null) {
-						permission.setPath(path);
-						permission.setHttpMethod(httpMethod);
-						permission.setDescription(endpointMapping.description());
-						permission.setPermissionGroup(permissionGroup);
-					} else {
-						permission = Permission.builder().name(endpointMapping.name())
-								.description(endpointMapping.description()).path(path).httpMethod(httpMethod)
-								.permissionGroup(permissionGroup).build();
-					}
-					permission = permissionRepository.save(permission);
-					switch (httpMethod) {
-					case GET: {
-						endpointUtil.getPublicEndpoint(httpMethod);
-						if (publicGetEndpoint.contains(path))
-							permissions.add(permission);
-						break;
-					}
-					case POST: {
-						if (publicPostEndpoint.contains(path))
-							permissions.add(permission);
-						break;
-					}
-					case PUT: {
-						break;
-					}
-					case PATCH: {
-						break;
-					}
-					case DELETE: {
-						break;
-					}
-					default:
-						throw new IllegalArgumentException("Unexpected value: " + httpMethod);
-					}
+				Class<?> controllerClass = handlerMethod.getBeanType();
+				if (!isValidHandler(controllerClass, method, mappingInfo))
+					continue;
+				Tag tag = controllerClass.getAnnotation(Tag.class);
+				Operation operation = method.getAnnotation(Operation.class);
+				PermissionGroupRequest permissionGroupRequest = new PermissionGroupRequest(tag.name(),
+						tag.description(), Set.of());
+
+				RequestMethod requestMethod = mappingInfo.getMethodsCondition().getMethods().iterator().next();
+				String pattern = mappingInfo.getPathPatternsCondition().getPatternValues().iterator().next();
+				PermissionRequest permissionRequest = new PermissionRequest(operation.summary(),
+						operation.description(), pattern, requestMethod);
+//				createOrUpdatePermission(permissionRequest);
+				PermissionResponse permission = createOrUpdatePermission(permissionRequest);
+				permissionGroupMap.computeIfAbsent(permissionGroupRequest, k -> new HashSet<>()).add(permission.id());
+				if (publicEndpoints.getOrDefault(requestMethod, Set.of()).contains(pattern)) {
+					permissionPublic.add(permission.id());
 				}
-			});
+
+			}
 		}
-		return permissions;
+		for (Map.Entry<PermissionGroupRequest, Set<Long>> entry : permissionGroupMap.entrySet()) {
+			PermissionGroupRequest request = entry.getKey();
+			PermissionGroupRequest permissionGroupRequest = new PermissionGroupRequest(request.name(),
+					request.description(), entry.getValue());
+			Optional<PermissionGroupResponse> optional = permissionGroupService.findByName(entry.getKey().name());
+			if (optional.isPresent()) {
+				Integer id = optional.get().id();
+				permissionGroupService.update(id, permissionGroupRequest);
+			} else {
+				permissionGroupService.create(permissionGroupRequest);
+			}
+		}
+		return permissionPublic;
+	}
+
+	private boolean isValidHandler(Class<?> controllerClass, Method method, RequestMappingInfo mappingInfo) {
+		return controllerClass.isAnnotationPresent(Tag.class) && method.isAnnotationPresent(Operation.class)
+				&& !mappingInfo.getMethodsCondition().getMethods().isEmpty()
+				&& !mappingInfo.getPathPatternsCondition().getPatternValues().isEmpty();
+	}
+
+	private PermissionResponse createOrUpdatePermission(PermissionRequest request) {
+		return permissionService.findBySummary(request.summary()).map(p -> permissionService.update(p.id(), request))
+				.orElseGet(() -> permissionService.create(request));
 	}
 
 	@Transactional
@@ -120,18 +135,13 @@ public class DataInitializer implements ApplicationRunner {
 	public void run(ApplicationArguments args) throws Exception {
 		if (accountService.count() == 0) {
 			AccountStatusRequest status = new AccountStatusRequest(true, true, initRole());
-			AccountProfileRequest profile = new AccountProfileRequest("admin", "admin", Instant.now(), "ta2khu75");
-			AccountRequest account = new AccountRequest("admin@g.com", passwordEncoder.encode("123456"), profile, status)
-					Account.builder().email("admin@g.com").password(passwordEncoder.encode("123"))
-					.status(status).profile(profile).build();
-			accountRepository.save(account);
+			AccountProfileRequest profile = new AccountProfileRequest("admin", "admin", LocalDate.now(), "ta2khu75");
+			AccountRequest account = new AccountRequest("admin@g.com", "123456", "123456", profile, status);
+			accountService.create(account);
 		}
-		Set<Permission> permissionSet = initPermission();
-		Role role = roleRepository.findByName(RoleDefault.ANONYMOUS.name())
-				.orElseThrow(() -> new NotFoundException("Could not find role name " + RoleDefault.ANONYMOUS.name()));
-		if (role.getPermissions().isEmpty()) {
-			role.setPermissions(permissionSet);
-		}
+		Set<Long> permissionSet = initPermission();
+		RoleResponse role = roleService.readByName(RoleDefault.ANONYMOUS.name());
+		roleService.update(role.id(), new RoleRequest(role.name(), Stream.concat(role.permissionIds().stream(), permissionSet.stream()).collect(Collectors.toSet())));
 
 	}
 

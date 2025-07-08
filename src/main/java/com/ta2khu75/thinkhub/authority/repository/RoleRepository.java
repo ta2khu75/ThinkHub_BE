@@ -10,4 +10,5 @@ import com.ta2khu75.thinkhub.authority.entity.Role;
 public interface RoleRepository extends JpaRepository<Role, Long> {
 	@EntityGraph(attributePaths = { "permissions" })
 	Optional<Role> findByName(String name);
+	boolean existsByName(String name);
 }
