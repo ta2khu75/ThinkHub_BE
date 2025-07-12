@@ -1,9 +1,11 @@
 package com.ta2khu75.thinkhub.auth;
 
-import jakarta.validation.constraints.Email;
+import com.ta2khu75.thinkhub.shared.anotation.ValidIdentifier;
+
 import jakarta.validation.constraints.NotBlank;
 
 public record LoginRequest(
-		@NotBlank(message = "Email must not be blank") @Email(message = "Email should be a valid email address") String email,
+		@ValidIdentifier
+		 String identifier,
 		@NotBlank(message = "Password must not be blank") String password) {
 }

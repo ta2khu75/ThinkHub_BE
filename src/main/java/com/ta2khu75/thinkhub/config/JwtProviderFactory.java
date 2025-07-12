@@ -30,11 +30,12 @@ public class JwtProviderFactory {
 
 	public JwtDecoder getDecoder(TokenType type) {
 		String secret = jwtProperties.getSecretByType(type);
-		return NimbusJwtDecoder.withSecretKey(decodeSecret(secret)).macAlgorithm(MacAlgorithm.HS512).build();
+		return NimbusJwtDecoder.withSecretKey(decodeSecret(secret)).macAlgorithm(JWT_ALGORITHM).build();
 	}
+	
 
 	private SecretKey decodeSecret(String base64Secret) {
 		byte[] keyBytes = Base64.from(base64Secret).decode();
-		return new SecretKeySpec(keyBytes, MacAlgorithm.HS512.getName());
+		return new SecretKeySpec(keyBytes, JWT_ALGORITHM.getName());
 	}
 }

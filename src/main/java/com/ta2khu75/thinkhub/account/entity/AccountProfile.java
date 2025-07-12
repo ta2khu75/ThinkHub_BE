@@ -30,7 +30,7 @@ public class AccountProfile {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
-	@Column(unique = true, nullable = false)
+	@Column(nullable = false)
 	String displayName;
 	@Column(nullable = false)
 	String firstName;

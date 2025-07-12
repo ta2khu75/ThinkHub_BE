@@ -5,17 +5,20 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityString;
+import com.ta2khu75.thinkhub.config.IdProperties.IdType;
+import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 
 @Data
 @Entity
 @ToString(exclude = { "status", "profile", "password" })
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EntityListeners(AuditingEntityListener.class)
 @EqualsAndHashCode(callSuper = true, exclude = { "status", "profile" })
-public class Account extends BaseEntityString {
+public class Account extends BaseEntityLong implements IdConfigProvider {
+	@Column(unique = true, nullable = false, updatable = false)
+	String username;
 	@Column(unique = true, nullable = false)
 	String email;
 	@Column(nullable = false)
@@ -26,4 +29,21 @@ public class Account extends BaseEntityString {
 	AccountProfile profile;
 	@CreatedBy
 	String createdBy;
+
+	@PrePersist
+	@PreUpdate
+	public void lowercase() {
+		if (username != null) {
+			username = username.toLowerCase();
+		}
+		if (email != null) {
+			email = email.toLowerCase();
+		}
+	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.ACCOUNT;
+	}
+
 }

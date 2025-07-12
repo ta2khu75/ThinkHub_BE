@@ -26,8 +26,8 @@ public class ApplicationConfig implements WebMvcConfigurer {
 	}
 
 	@Bean
-	AuditorAware<String> auditorAware() {
-		return new ApplicationAuditAware();
+	AuditorAware<String> auditorProvider() {
+		return new AuditorAwareImpl();
 	}
 
 	@Override

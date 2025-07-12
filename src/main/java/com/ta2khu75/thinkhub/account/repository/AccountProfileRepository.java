@@ -11,5 +11,5 @@ import io.lettuce.core.dynamic.annotation.Param;
 
 public interface AccountProfileRepository extends JpaRepository<AccountProfile, Long> {
 	@Query("SELECT a.profile FROM Account a WHERE a.id = :accountId")
-	Optional<AccountProfile> findByAccountId(@Param("accountId") String accountId);
+	Optional<AccountProfile> findByAccountId(@Param("accountId") Long accountId);
 }

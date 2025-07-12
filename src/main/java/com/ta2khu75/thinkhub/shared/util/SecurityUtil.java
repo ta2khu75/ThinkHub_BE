@@ -1,13 +1,12 @@
 package com.ta2khu75.thinkhub.shared.util;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import com.ta2khu75.thinkhub.account.entity.AccountProfile;
-import com.ta2khu75.thinkhub.shared.RoleDefault;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
 
 public final class SecurityUtil {
@@ -15,9 +14,12 @@ public final class SecurityUtil {
 		throw new IllegalStateException("Utility class");
 	}
 
+	private static Authentication getAuthentication() {
+		return SecurityContextHolder.getContext().getAuthentication();
+	}
+
 	private static Jwt getJwtToken() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+		if (getAuthentication() instanceof JwtAuthenticationToken jwtAuth) {
 			return jwtAuth.getToken();
 		}
 		throw new UnAuthenticatedException("You must be login");
@@ -32,37 +34,38 @@ public final class SecurityUtil {
 		return claim;
 	}
 
-	public static String getCurrentAccountId() {
-		return getJwtToken().getSubject();
-	}
-
-	public static Long getCurrentProfileId() {
-		return getClaim("profileId", Long.class);
-	}
-
-	public static Long getCurrentStatusId() {
-		return getClaim("statusId", Long.class);
-	}
-
-	public static AccountProfile getCurrentProfile() {
-		AccountProfile profile = new AccountProfile();
-		profile.setId(getClaim("profileId", Long.class));
-		return profile;
-	}
-
 	private static String extractAuthorities(Authentication authentication) {
 		return authentication.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
 	}
 
-	public static String getCurrentRole() {
-		SecurityContext securityContext = SecurityContextHolder.getContext();
-		return extractAuthorities(securityContext.getAuthentication());
+	public static String getCurrentUsername() {
+		return getClaim("username", String.class);
 	}
 
-	public static boolean isAuthor(Long id) {
+	public static String getCurrentAccountId() {
+		return getJwtToken().getSubject();
+	}
+
+	public static Long getCurrentAccountIdDecode() {
+		return IdConverterUtil.decode(getCurrentAccountId(), IdConfig.ACCOUNT);
+	}
+
+	public static String getCurrentRole() {
+		return extractAuthorities(getAuthentication());
+	}
+
+	public static boolean isAuthor(String id) {
 		try {
-			Long accountId = getCurrentProfileId();
+			String accountId = getCurrentAccountId();
 			return accountId.equals(id);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	public static boolean isAuthorDecode(String id) {
+		try {
+			Long accountId = getCurrentAccountIdDecode();
+			return accountId.equals(IdConverterUtil.decode(id, IdConfig.ACCOUNT));
 		} catch (Exception e) {
 			return false;
 		}

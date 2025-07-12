@@ -28,22 +28,24 @@ import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.RegisterRequest;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.authority.response.RoleResponse;
-import com.ta2khu75.thinkhub.shared.RoleDefault;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.ExistingException;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.exception.NotMatchesException;
+import com.ta2khu75.thinkhub.shared.service.BaseConvertService;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
-import com.ta2khu75.thinkhub.shared.service.RedisService;
-import com.ta2khu75.thinkhub.shared.service.RedisService.RedisKeyBuilder;
+import com.ta2khu75.thinkhub.shared.service.clazz.IdConverterService;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.FunctionUtil;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AccountServiceImpl extends BaseService<Account, String, AccountRepository, AccountMapper>
+public class AccountServiceImpl extends BaseConvertService<Account, Long, AccountRepository, AccountMapper>
 		implements AccountService {
 	AccountProfileRepository profileRepository;
 	AccountStatusReporitory statusRepository;
@@ -51,16 +53,27 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 	RedisService redisService;
 	RoleService roleService;
 
-	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper,
+	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper, IdConverterService converter,
 			AccountProfileRepository profileRepository, AccountStatusReporitory statusRepository,
 			PasswordEncoder passwordEncoder, RedisService redisService, RoleService roleService) {
-		super(repository, mapper);
+		super(repository, mapper, converter);
 		this.profileRepository = profileRepository;
 		this.statusRepository = statusRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.redisService = redisService;
 		this.roleService = roleService;
 	}
+
+//	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper,
+//			AccountProfileRepository profileRepository, AccountStatusReporitory statusRepository,
+//			PasswordEncoder passwordEncoder, RedisService redisService, RoleService roleService) {
+//		super(repository, mapper);
+//		this.profileRepository = profileRepository;
+//		this.statusRepository = statusRepository;
+//		this.passwordEncoder = passwordEncoder;
+//		this.redisService = redisService;
+//		this.roleService = roleService;
+//	}
 
 	@Override
 	public AccountResponse create(AccountRequest request) {
@@ -88,21 +101,21 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 	}
 
 	@Override
-	public AccountProfileResponse readProfile(String accountId) {
+	public AccountProfileResponse readProfile(Long accountId) {
 		AccountProfile profile = FunctionUtil.findOrThrow(accountId, AccountProfile.class,
 				profileRepository::findByAccountId);
 		return mapper.toResponse(profile);
 	}
 
 	@Override
-	public void delete(String id) {
+	public void delete(Long id) {
 		repository.deleteById(id);
 	}
 
 	@Override
-	public AccountStatusResponse updateStatus(String accountId, AccountStatusRequest request) {
-		Account account = this.readEntity(accountId);
-		AccountStatus status = account.getStatus();
+	public AccountStatusResponse updateStatus(Long accountId, AccountStatusRequest request) {
+		AccountStatus status = FunctionUtil.findOrThrow(accountId, AccountStatus.class,
+				statusRepository::findByAccountId);
 		mapper.update(request, status);
 		if (!status.getRoleId().equals(request.roleId())) {
 			if (roleService.exists(request.roleId()))
@@ -120,11 +133,11 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 	}
 
 	@Override
-	public AccountProfileResponse updateProfile(String accountId, AccountProfileRequest request) {
-		if (!SecurityUtil.getCurrentAccountId().equals(accountId))
+	public AccountProfileResponse updateProfile(Long accountId, AccountProfileRequest request) {
+		if (!this.decodeAccountId(SecurityUtil.getCurrentAccountId()).equals(accountId))
 			throw new InvalidDataException("You can't update other's profile");
-		Account account = this.readEntity(accountId);
-		AccountProfile profile = account.getProfile();
+		AccountProfile profile = FunctionUtil.findOrThrow(accountId, AccountProfile.class,
+				profileRepository::findByAccountId);
 		mapper.update(request, profile);
 		return mapper.toResponse(profile);
 	}
@@ -145,13 +158,12 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 
 	@Override
 	public AccountDto readDtoByEmail(String email) {
-		Account account = repository.findByEmail(email)
+		return repository.findByEmail(email).map(mapper::toDto)
 				.orElseThrow(() -> new NotFoundException("Could not find account with email: " + email));
-		return mapper.toDto(account);
 	}
 
 	@Override
-	public AccountDto readDto(String id) {
+	public AccountDto readDto(Long id) {
 		Account account = this.readEntity(id);
 		return mapper.toDto(account);
 	}
@@ -165,8 +177,8 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 	public void changePassword(ChangePasswordRequest request) {
 		if (!request.newPassword().equals(request.confirmPassword()))
 			throw new NotMatchesException("New password and confirm password not matches");
-		Account account = this.readEntity(SecurityUtil.getCurrentAccountId());
-		if (!passwordEncoder.matches(request.newPassword(), account.getPassword()))
+		Account account = this.readEntity(this.decodeAccountId(SecurityUtil.getCurrentAccountId()));
+		if (!passwordEncoder.matches(request.password(), account.getPassword()))
 			throw new NotMatchesException("Password not matches");
 		account.setPassword(passwordEncoder.encode(request.newPassword()));
 		account = repository.save(account);
@@ -185,6 +197,7 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 		status.setRoleId(role.id());
 		Account account = new Account();
 		account.setEmail(request.email().toLowerCase());
+		account.setUsername(request.username().toLowerCase());
 		account.setPassword(passwordEncoder.encode(request.password()));
 		account.setProfile(profile);
 		account.setStatus(status);
@@ -194,5 +207,11 @@ public class AccountServiceImpl extends BaseService<Account, String, AccountRepo
 			e.printStackTrace();
 			throw new ExistingException(e.getMessage());
 		}
+	}
+
+	@Override
+	public AccountDto readDtoByUsername(String username) {
+		return repository.findByUsername(username).map(mapper::toDto)
+				.orElseThrow(() -> new NotFoundException("Could not find account with username: " + username));
 	}
 }

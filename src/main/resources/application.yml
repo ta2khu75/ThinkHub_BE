@@ -1,0 +1,84 @@
+# Conversion to YAML from Properties formar report
+# Warnings:
+# - The yaml file had comments which are lost in the refactoring!
+app:
+  api-prefix: /api/v1
+spring:
+  application:
+    name: thinkhub
+  devtools:
+    restart:
+      enabled: true
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/think_hub
+    username: root
+    password: Hoaim3965@ 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: boomkings474@gmail.com
+    password: plvy vcph ixtr fxec
+    properties:
+      mail:
+        smpt:
+          auth: true
+        smtp:
+          starttls:
+            enable: true
+  data:
+    redis:
+      host: singapore-keyvalue.render.com
+      port: 6379
+      username: ${redis.username}
+      password: ${redis.password}
+      ssl:
+        enabled: true
+#				###### Jackson ######
+#				###### Loai bo cac truong co gia tri la null
+#				spring.jackson.default-property-inclusion=non-null
+#				###### Bo qua cac truong khong co trong class
+#				spring.jackson.deserialization.fail-on-unknown-properties=false
+#				###### Cac thuoc tinh tra ve se la kieu snake_case viet thuong
+#				spring.jackson.property-naming-strategy=SNAKE_CASE
+#				###### Tra ve kieu json theo format dep
+#				spring.jackson.serialization.indent-output=true
+  jackson:
+    default-property-inclusion: non-null
+    deserialization:
+      fail-on-unknown-properties: false
+    property-naming-strategy: SNAKE_CASE
+    serialization:
+      indent-output: true
+firebase:
+  storage-bucket: blog-exam-master.appspot.com
+  adminsdk: firebase-adminsdk.json
+jwt:
+  access:
+    secret: QKuAdmm4EATXnd7RqmGFg7ccqhh_bslrrKC_sYuDNcS7TS-heA4jic5CBQ4k-uqQ-TD48704FTm1VzDgbujNqA
+    expiration: 7749
+  refresh:
+    secret: J5uUvKodanwEbMy5nPAue-RmwlwX5bgfWVC-M74Lq-V-AT2dG8BDimAFWHanyiZYick3rho8Wg2eyXvmIiTAlw
+    expiration: 2592000
+id:
+  quiz:
+    salted: 11
+    offset: 23
+    alphabet: OIdwbWQ3NYkfD5ZLn7qGtMzKjA8isHUcSaTCBx2h0VPRX9oJ4eu1rgyElpv6Fm
+  account:
+    salted: 97
+    offset: 79
+    alphabet: DHMKlP6QeukgvjwCFAqmipnT0WGJEIBR572NbYaUV8rS3hOyZst4xdzX1cL9fo
+  post:
+    salted: 59
+    offset: 41
+    alphabet: lN3JRfS2jh0IeGyFYribK1LO5BqM4DCQEa9vPUkVW8zXZgt7mHwxnusdpcTA6o

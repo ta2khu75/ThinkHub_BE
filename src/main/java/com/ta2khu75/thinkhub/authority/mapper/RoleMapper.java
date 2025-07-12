@@ -17,11 +17,19 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = MapperSpringConfig.class)
 public interface RoleMapper extends Converter<Role, RoleResponse>, BaseMapper<RoleRequest, RoleResponse, Role> {
 	@Override
+	@Mapping(target = "permissionIds", ignore = true)
+	RoleResponse convert(Role role);
+	
+	@Override
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "permissions", ignore = true)
 	Role toEntity(RoleRequest request);
 
 	RoleDto toDto(Role role);
 
 	@Override
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "permissions", ignore = true)
 	void update(RoleRequest request, @MappingTarget Role role);
 
 	@Override

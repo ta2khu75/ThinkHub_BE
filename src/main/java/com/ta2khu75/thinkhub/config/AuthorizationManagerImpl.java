@@ -5,16 +5,17 @@ import java.util.function.Supplier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
 import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
-import com.ta2khu75.thinkhub.shared.RoleDefault;
+import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
-import com.ta2khu75.thinkhub.shared.service.RedisService;
-import com.ta2khu75.thinkhub.shared.service.RedisService.RedisKeyBuilder;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,13 +46,19 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 			return resultHppt && pathResult;
 		});
 	}
-
 	@Override
 	public AuthorizationDecision check(Supplier<Authentication> authentication, HttpServletRequest object) {
+	    // Tối thiểu, để tránh lỗi biên dịch
+	    // Có thể ném UnsupportedOperationException nếu bạn không muốn dùng nó
+	    throw new UnsupportedOperationException("Use authorize() instead");
+	}
+
+	@Override
+	public AuthorizationResult authorize(Supplier<Authentication> authentication, HttpServletRequest object) {
 		String requestUrl = object.getRequestURI();
 		String httpMethod = object.getMethod();
 		try {
-			String accountId = SecurityUtil.getCurrentAccountId();
+			Long accountId = SecurityUtil.getCurrentAccountIdDecode();
 			boolean exists = redisService.exists(RedisKeyBuilder.accountLock(accountId));
 			if (exists) {
 				throw new AccessDeniedException("Account locked");
@@ -70,6 +77,7 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 		if (isAllowed) {
 			return new AuthorizationDecision(true);
 		}
-		throw new AccessDeniedException("Access denied");
+		return new AuthorizationDecision(false);
 	}
+
 }

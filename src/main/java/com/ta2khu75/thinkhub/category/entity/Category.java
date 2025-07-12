@@ -1,0 +1,26 @@
+package com.ta2khu75.thinkhub.category.entity;
+
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+
+import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@Entity
+@EqualsAndHashCode(callSuper = true)
+public class Category extends BaseEntityLong {
+	@Column(nullable = false, unique = true)
+	String name;
+	String description;
+	@CreatedBy
+	@Column(updatable = false, nullable = false)
+	String createdBy;
+	@Column(insertable = false)
+	@LastModifiedBy
+	String updatedBy;
+}

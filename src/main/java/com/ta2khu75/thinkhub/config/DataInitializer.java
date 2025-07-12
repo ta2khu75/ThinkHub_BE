@@ -1,14 +1,12 @@
 package com.ta2khu75.thinkhub.config;
 
 import java.lang.reflect.Method;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,7 +15,6 @@ import java.util.stream.Stream;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.quartz.LocalDataSourceJobStore;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,7 +35,7 @@ import com.ta2khu75.thinkhub.authority.request.RoleRequest;
 import com.ta2khu75.thinkhub.authority.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.authority.response.PermissionResponse;
 import com.ta2khu75.thinkhub.authority.response.RoleResponse;
-import com.ta2khu75.thinkhub.shared.RoleDefault;
+import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -136,7 +133,7 @@ public class DataInitializer implements ApplicationRunner {
 		if (accountService.count() == 0) {
 			AccountStatusRequest status = new AccountStatusRequest(true, true, initRole());
 			AccountProfileRequest profile = new AccountProfileRequest("admin", "admin", LocalDate.now(), "ta2khu75");
-			AccountRequest account = new AccountRequest("admin@g.com", "123456", "123456", profile, status);
+			AccountRequest account = new AccountRequest("admin", "123456", "123456", "admin@g.com", profile, status);
 			accountService.create(account);
 		}
 		Set<Long> permissionSet = initPermission();

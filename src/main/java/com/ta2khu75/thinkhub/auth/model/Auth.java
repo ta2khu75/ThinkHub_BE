@@ -27,8 +27,8 @@ public class Auth implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(String.format("ROLE_%s", role.name())));
-		authorities.addAll(role.permissions().stream()
-				.map(permission -> new SimpleGrantedAuthority(permission.summary())).toList());
+//		authorities.addAll(role.permissions().stream()
+//				.map(permission -> new SimpleGrantedAuthority(permission.summary())).toList());
 		return authorities;
 	}
 
@@ -39,7 +39,6 @@ public class Auth implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return account.email();
+		return account.username();
 	}
-
 }

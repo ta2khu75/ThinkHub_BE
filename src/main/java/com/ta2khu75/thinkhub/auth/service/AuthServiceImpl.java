@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ta2khu75.thinkhub.account.AccountDto;
 import com.ta2khu75.thinkhub.account.AccountService;
-import com.ta2khu75.thinkhub.account.listener.AccountListener;
 import com.ta2khu75.thinkhub.auth.AuthResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.LoginRequest;
@@ -25,9 +24,9 @@ import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
-import com.ta2khu75.thinkhub.shared.service.JwtService;
-import com.ta2khu75.thinkhub.shared.service.RedisService;
-import com.ta2khu75.thinkhub.shared.service.RedisService.RedisKeyBuilder;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,8 +41,8 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public AuthResponse login(LoginRequest request) {
-		Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(request.identifier().toLowerCase(), request.password()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		Auth account = (Auth) authentication.getPrincipal();
 		return this.makeAuthResponse(account);
@@ -65,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponse refreshToken(String token) {
 		Jwt jwt = jwtService.validateToken(token, TokenType.REFRESH);
 		String id = jwt.getId().toString();
-		String accountId = jwt.getSubject();
+		Long accountId = Long.valueOf(jwt.getSubject());
 		boolean exists = redisService.exists(RedisKeyBuilder.refreshToken(id));
 		if (exists) {
 			throw new UnAuthenticatedException("");

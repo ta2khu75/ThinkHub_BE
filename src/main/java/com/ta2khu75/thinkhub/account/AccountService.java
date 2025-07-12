@@ -14,22 +14,25 @@ import com.ta2khu75.thinkhub.shared.service.SearchService;
 public interface AccountService extends SearchService<AccountResponse, AccountSearch> {
 	AccountResponse create(AccountRequest request);
 
-	AccountProfileResponse updateProfile(String accountId, AccountProfileRequest request);
+	AccountProfileResponse updateProfile(Long accountId, AccountProfileRequest request);
 
-	AccountStatusResponse updateStatus(String accountId, AccountStatusRequest request);
+	AccountStatusResponse updateStatus(Long accountId, AccountStatusRequest request);
 
-	AccountProfileResponse readProfile(String accountId);
+	AccountProfileResponse readProfile(Long accountId);
 
 	AccountResponse readByEmail(String email);
 
 	long count();
 
-	void delete(String id);
+	void delete(Long id);
 
 	AccountDto readDtoByEmail(String email);
 
-	AccountDto readDto(String id);
+	AccountDto readDtoByUsername(String username);
+
+	AccountDto readDto(Long id);
 
 	void register(RegisterRequest request);
+
 	void changePassword(ChangePasswordRequest request);
 }

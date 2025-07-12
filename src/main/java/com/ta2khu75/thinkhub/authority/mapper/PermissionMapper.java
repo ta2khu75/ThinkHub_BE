@@ -1,6 +1,7 @@
 package com.ta2khu75.thinkhub.authority.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
@@ -14,12 +15,17 @@ import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 public interface PermissionMapper extends Converter<Permission, PermissionResponse>,
 		BaseMapper<PermissionRequest, PermissionResponse, Permission> {
 	@Override
+	PermissionResponse convert(Permission entity);
+
+	@Override
 	PermissionResponse toResponse(Permission entity);
 
 	@Override
+	@Mapping(target = "id", ignore = true)
 	Permission toEntity(PermissionRequest request);
 
 	@Override
+	@Mapping(target = "id", ignore = true)
 	void update(PermissionRequest request, @MappingTarget Permission entity);
-	
+
 }

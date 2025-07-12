@@ -40,16 +40,16 @@ public class AccountController extends BaseController<AccountService> {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
 	}
 
-	@DeleteMapping
+	@DeleteMapping("{id}")
 	@Operation(summary = "Delete an account", description = "Delete an existing user account by its ID.")
-	ResponseEntity<Void> delete(@PathVariable String id) {
+	ResponseEntity<Void> delete(@PathVariable Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("{accountId}/profile")
 	@Operation(summary = "Get account profile", description = "Retrieve the profile details of a specific user account.")
-	ResponseEntity<AccountProfileResponse> read(@PathVariable String accountId) {
+	ResponseEntity<AccountProfileResponse> read(@PathVariable Long accountId) {
 		return ResponseEntity.ok(service.readProfile(accountId));
 	}
 
@@ -61,14 +61,14 @@ public class AccountController extends BaseController<AccountService> {
 
 	@PutMapping("{accountId}/profile")
 	@Operation(summary = "Update account profile", description = "Update the profile information of a specific user account.")
-	public ResponseEntity<AccountProfileResponse> updateProfile(@PathVariable String accountId,
+	public ResponseEntity<AccountProfileResponse> updateProfile(@PathVariable Long accountId,
 			@Valid @RequestBody AccountProfileRequest request) {
 		return ResponseEntity.ok(service.updateProfile(accountId, request));
 	}
 
 	@PutMapping("{accountId}/status")
 	@Operation(summary = "Update account status", description = "Enable, disable, or lock/unlock a specific user account.")
-	public ResponseEntity<AccountStatusResponse> updateStatus(@PathVariable String accountId,
+	public ResponseEntity<AccountStatusResponse> updateStatus(@PathVariable Long accountId,
 			@Valid @RequestBody AccountStatusRequest request) {
 		return ResponseEntity.ok(service.updateStatus(accountId, request));
 	}

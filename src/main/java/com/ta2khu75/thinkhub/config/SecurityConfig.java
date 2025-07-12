@@ -43,9 +43,14 @@ public class SecurityConfig {
 
 	@Bean
 	UserDetailsService userDetailsService() {
-		return email -> {
+		return identifier -> {
 			try {
-				AccountDto account = accountService.readDtoByEmail(email);
+				AccountDto account;
+				if (identifier.contains("@")) {
+					account = accountService.readDtoByEmail(identifier);
+				} else {
+					account = accountService.readDtoByUsername(identifier);
+				}
 				RoleDto role = roleService.readDto(account.status().roleId());
 				return new Auth(account, role);
 			} catch (Exception e) {
