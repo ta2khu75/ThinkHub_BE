@@ -138,7 +138,12 @@ public class DataInitializer implements ApplicationRunner {
 		}
 		Set<Long> permissionSet = initPermission();
 		RoleResponse role = roleService.readByName(RoleDefault.ANONYMOUS.name());
-		roleService.update(role.id(), new RoleRequest(role.name(), Stream.concat(role.permissionIds().stream(), permissionSet.stream()).collect(Collectors.toSet())));
+		if (role.permissionIds() == null) {
+			roleService.update(role.id(), new RoleRequest(role.name(), permissionSet));
+		} else {
+			roleService.update(role.id(), new RoleRequest(role.name(),
+					Stream.concat(role.permissionIds().stream(), permissionSet.stream()).collect(Collectors.toSet())));
+		}
 
 	}
 

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
@@ -15,6 +17,8 @@ import com.ta2khu75.thinkhub.quiz.enums.QuestionType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = { "answers" })
+@EqualsAndHashCode(exclude = { "answers" })
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Question {
 	@Id
@@ -27,6 +31,7 @@ public class Question {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	QuestionType type;
-	@OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "question_id")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Answer> answers;
 }

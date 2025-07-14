@@ -13,10 +13,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class QuizSearch extends Search {
 	private List<QuizLevel> levels;
-	private List<Long> categories;
+	private List<Long> categoryIds;
+	private List<Long> tagIds;
 	private Integer minDuration;
 	private Integer maxDuration;
-	private Long authorId;
+	private String authorId;
+	private Long authorIdQuery;
 	private Boolean completed;
 	private AccessModifier accessModifier;
 }

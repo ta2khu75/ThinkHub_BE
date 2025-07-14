@@ -10,10 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
+import com.google.api.gax.rpc.UnauthenticatedException;
 import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
-import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
@@ -46,11 +46,12 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 			return resultHppt && pathResult;
 		});
 	}
+
 	@Override
 	public AuthorizationDecision check(Supplier<Authentication> authentication, HttpServletRequest object) {
-	    // Tối thiểu, để tránh lỗi biên dịch
-	    // Có thể ném UnsupportedOperationException nếu bạn không muốn dùng nó
-	    throw new UnsupportedOperationException("Use authorize() instead");
+		// Tối thiểu, để tránh lỗi biên dịch
+		// Có thể ném UnsupportedOperationException nếu bạn không muốn dùng nó
+		throw new UnsupportedOperationException("Use authorize() instead");
 	}
 
 	@Override
@@ -63,7 +64,7 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 			if (exists) {
 				throw new AccessDeniedException("Account locked");
 			}
-		} catch (UnAuthenticatedException e) {
+		} catch (UnauthenticatedException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();

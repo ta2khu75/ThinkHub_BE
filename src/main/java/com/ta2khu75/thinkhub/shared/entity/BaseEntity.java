@@ -12,18 +12,20 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.time.Instant;
+
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public abstract class BaseEntity<T> {
+public abstract class BaseEntity<T extends Serializable> implements IdEntity<T> {
 	@CreatedDate
 	@Column(updatable = false, nullable = false)
 	Instant createdAt;
 	@LastModifiedDate
 	@Column(insertable = false)
 	Instant updatedAt;
-	public abstract T getId();
-    public abstract void setId(T id);
+
+	public abstract void setId(T id);
 }

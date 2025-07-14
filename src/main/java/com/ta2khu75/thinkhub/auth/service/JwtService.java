@@ -19,7 +19,7 @@ import com.ta2khu75.thinkhub.config.JwtProperties;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenConfig;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 import com.ta2khu75.thinkhub.config.JwtProviderFactory;
-import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
+import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,37 +31,37 @@ public class JwtService {
 
 	public String createAccessToken(AccountDto account, RoleDto role) {
 		Instant now = Instant.now();
-		TokenConfig tokenConfig=jwtProperties.getConfigByType(TokenType.ACCESS);
+		TokenConfig tokenConfig = jwtProperties.getConfigByType(TokenType.ACCESS);
 		JwtEncoder jwtEncoder = jwtProviderFactory.getEncoder(TokenType.ACCESS);
 		Instant validity = now.plus(tokenConfig.expiration(), ChronoUnit.SECONDS);
 		JwtClaimsSet claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity)
-				.subject(account.id())
-				.claim("username", account.username())
-				.claim("scope", "ROLE_" + role.name()).build();
+				.subject(account.id()).claim("username", account.username()).claim("scope", "ROLE_" + role.name())
+				.build();
 		JwsHeader jwsHeader = JwsHeader.with(JwtProviderFactory.JWT_ALGORITHM).build();
 		return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
 	}
 
 	public TokenResponse createRefreshToken(AccountDto account) {
 		Instant now = Instant.now();
-		TokenConfig tokenConfig=jwtProperties.getConfigByType(TokenType.REFRESH);
+		TokenConfig tokenConfig = jwtProperties.getConfigByType(TokenType.REFRESH);
 		JwtEncoder jwtEncoder = jwtProviderFactory.getEncoder(TokenType.REFRESH);
 		Instant validity = now.plus(tokenConfig.expiration(), ChronoUnit.SECONDS);
-		JwtClaimsSet claims = JwtClaimsSet.builder().id(UUID.randomUUID().toString()).issuer("com.ta2khu75").issuedAt(now).expiresAt(validity)
-				.subject(account.id()).build();
+		JwtClaimsSet claims = JwtClaimsSet.builder().id(UUID.randomUUID().toString()).issuer("com.ta2khu75")
+				.issuedAt(now).expiresAt(validity).subject(account.id()).build();
 		JwsHeader jwsHeader = JwsHeader.with(JwtProviderFactory.JWT_ALGORITHM).build();
-		String token=jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+		String token = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
 		return new TokenResponse(token, validity.toEpochMilli());
 	}
-	
+
 	public Jwt validateToken(String token, TokenType type) {
 		JwtDecoder jwtDecoder = jwtProviderFactory.getDecoder(type);
 		return jwtDecoder.decode(token);
 	}
-	public <T> T getClaim( Jwt jwt,String claimName, Class<T> clazz) {
+
+	public <T> T getClaim(Jwt jwt, String claimName, Class<T> clazz) {
 		T claim = jwt.getClaim(claimName);
 		if (claim == null) {
-			throw new UnAuthenticatedException("Missing claim: " + claimName);
+			throw new UnauthorizedException("Missing claim: " + claimName);
 		}
 		return claim;
 	}

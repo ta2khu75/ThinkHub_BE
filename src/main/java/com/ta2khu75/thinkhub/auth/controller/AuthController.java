@@ -42,7 +42,8 @@ public class AuthController extends BaseController<AuthService> {
 
 	@PostMapping("/change-password")
 	@Operation(summary = "Change password", description = "Allow a logged-in user to change their password.")
-	public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) throws MessagingException {
+	public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request)
+			throws MessagingException {
 		service.changePassword(request);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
@@ -61,7 +62,8 @@ public class AuthController extends BaseController<AuthService> {
 	public ResponseEntity<AuthResponse> refreshToken(@CookieValue(REFRESH_TOKEN) String refreshToken) {
 		AuthResponse response = service.refreshToken(refreshToken);
 		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
-		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString()).body(response);
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString())
+				.body(this.makeAuthResponse(response));
 	}
 
 	@Operation(summary = "Logout", description = "Invalidate the user session and delete authentication tokens.")
@@ -71,7 +73,7 @@ public class AuthController extends BaseController<AuthService> {
 	}
 
 	private AuthResponse makeAuthResponse(AuthResponse auth) {
-		return new AuthResponse(auth.profile(), auth.role(), auth.accessToken(), null);
+		return new AuthResponse(auth.id(), auth.profile(), auth.role(), auth.accessToken(), null);
 	}
 
 	private ResponseCookie createCookie(String name, TokenResponse toke) {

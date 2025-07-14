@@ -13,12 +13,9 @@ import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 
 @Mapper(config = MapperSpringConfig.class)
 public interface PermissionGroupMapper extends Converter<PermissionGroup, PermissionGroupResponse>,
-		BaseMapper<PermissionGroupRequest, PermissionGroupResponse, PermissionGroup> {
+		BaseMapper<PermissionGroupRequest, PermissionGroup> {
 	@Override
 	PermissionGroupResponse convert(PermissionGroup entity);
-
-	@Override
-	PermissionGroupResponse toResponse(PermissionGroup entity);
 
 	@Override
 	@Mapping(target = "id", ignore = true)

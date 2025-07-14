@@ -23,7 +23,9 @@ import com.ta2khu75.thinkhub.auth.model.Auth;
 import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
-import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 
@@ -31,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements AuthService, IdDecodable {
 	private final AccountService accountService;
 	private final RoleService roleService;
 	private final AuthenticationManager authenticationManager;
@@ -49,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	@Transactional
+//	@Transactional
 	public void register(RegisterRequest request) {
 		events.publishEvent(request);
 	}
@@ -64,11 +66,12 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponse refreshToken(String token) {
 		Jwt jwt = jwtService.validateToken(token, TokenType.REFRESH);
 		String id = jwt.getId().toString();
-		Long accountId = Long.valueOf(jwt.getSubject());
+		Long accountId = decodeAccountId(jwt.getSubject());
 		boolean exists = redisService.exists(RedisKeyBuilder.refreshToken(id));
 		if (exists) {
-			throw new UnAuthenticatedException("");
+			throw new UnauthorizedException("Refresh token is invalid or has been revoked");
 		}
+		redisService.setValue(RedisKeyBuilder.refreshToken(id), "", jwt.getExpiresAt());
 		AccountDto account = accountService.readDto(accountId);
 		RoleDto role = roleService.readDto(account.status().id());
 		return this.makeAuthResponse(new Auth(account, role));
@@ -89,6 +92,11 @@ public class AuthServiceImpl implements AuthService {
 		RoleDto role = auth.getRole();
 		TokenResponse refreshToken = jwtService.createRefreshToken(account);
 		String accessToken = jwtService.createAccessToken(account, role);
-		return new AuthResponse(account.profile(), role.name(), accessToken, refreshToken);
+		return new AuthResponse(account.id(),account.profile(), role.name(), accessToken, refreshToken);
+	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.ACCOUNT;
 	}
 }

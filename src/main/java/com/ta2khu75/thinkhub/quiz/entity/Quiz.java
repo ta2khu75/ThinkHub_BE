@@ -11,12 +11,12 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.config.IdProperties.IdType;
 import com.ta2khu75.thinkhub.quiz.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.enums.ResultVisibility;
 import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
-import com.ta2khu75.thinkhub.shared.entity.IdTypeProvider;
+import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 
 @Entity
 @Data
@@ -24,21 +24,22 @@ import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 @ToString(exclude = { "questions" })
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true, exclude = { "questions" })
-public class Quiz extends BaseEntityLong implements IdTypeProvider {
+public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	public Quiz() {
+		super();
 		accessModifier = AccessModifier.PRIVATE;
 		resultVisibility = ResultVisibility.FULL;
 		shuffleQuestion = true;
 	}
 
-	@Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
+	@Column(nullable = false, length = 255)
 	String title;
 	@Column(nullable = false)
 	Integer duration;
-	@Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
+	@Column(nullable = false, length = 255)
 	String description;
 	@Column(nullable = false)
-	String imagePath;
+	String imageUrl;
 	boolean shuffleQuestion = true;
 	boolean deleted;
 	boolean completed;
@@ -51,15 +52,20 @@ public class Quiz extends BaseEntityLong implements IdTypeProvider {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	ResultVisibility resultVisibility;
-	Long accountId;
-	Long blogId;
+
+	@Column(nullable = false)
+	Long authorId;
+	Set<Long> postIds;
+	@Column(nullable = false)
 	Long categoryId;
 	Set<Long> tagIds;
-	@OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "quiz_id")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Question> questions;
 
 	@Override
-	public IdType getIdType() {
-		return IdType.QUIZ;
+	public IdConfig getIdConfig() {
+		return IdConfig.QUIZ;
 	}
+
 }

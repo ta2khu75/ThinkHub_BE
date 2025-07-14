@@ -29,7 +29,7 @@ public class PermissionServiceImpl extends BaseService<Permission, Long, Permiss
 	public PermissionResponse create(@Valid PermissionRequest request) {
 		Permission permission = mapper.toEntity(request);
 		permission = repository.save(permission);
-		return mapper.toResponse(permission);
+		return mapper.convert(permission);
 	}
 
 	@Override
@@ -37,13 +37,13 @@ public class PermissionServiceImpl extends BaseService<Permission, Long, Permiss
 		Permission permission = this.readEntity(id);
 		mapper.update(request, permission);
 		permission = repository.save(permission);
-		return mapper.toResponse(permission);
+		return mapper.convert(permission);
 	}
 
 	@Override
 	public PermissionResponse read(Long id) {
 		Permission permission = this.readEntity(id);
-		return mapper.toResponse(permission);
+		return mapper.convert(permission);
 	}
 
 	@Override
@@ -53,17 +53,19 @@ public class PermissionServiceImpl extends BaseService<Permission, Long, Permiss
 
 	@Override
 	public Set<PermissionResponse> readAllBySummary(Set<String> summaries) {
-		return repository.findAllBySummaryIn(summaries).stream().map(mapper::toResponse).collect(Collectors.toSet());
+		return repository.findAllBySummaryIn(summaries).stream().map(mapper::convert).collect(Collectors.toSet());
 	}
 
 	@Override
 	public PermissionResponse readBySummary(String summary) {
-		return mapper.toResponse(repository.findBySummary(summary).orElseThrow(()->new NotFoundException("Could not find Permission with summary: " + summary)));
+		return mapper.convert(repository.findBySummary(summary)
+				.orElseThrow(() -> new NotFoundException("Could not find Permission with summary: " + summary)));
 	}
+
 	@Override
 	public Optional<PermissionResponse> findBySummary(String summary) {
-		
-		return repository.findBySummary(summary).map(mapper::toResponse);
+
+		return repository.findBySummary(summary).map(mapper::convert);
 	}
 
 }

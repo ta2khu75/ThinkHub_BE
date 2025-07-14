@@ -1,6 +1,7 @@
 package com.ta2khu75.thinkhub.shared.service.clazz;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,9 @@ public class RedisService {
 		redisTemplate.opsForValue().set(key, value, ttl);
 	}
 
+	public <T> void setValue(String key, T value, Instant ttl) {
+		redisTemplate.opsForValue().set(key, value, Duration.between(Instant.now(), ttl));
+	}
 	public <T> void setValue(String key, T value) {
 		redisTemplate.opsForValue().set(key, value);
 	}

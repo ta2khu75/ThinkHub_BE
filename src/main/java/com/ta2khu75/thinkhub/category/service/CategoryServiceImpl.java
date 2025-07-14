@@ -1,13 +1,13 @@
 package com.ta2khu75.thinkhub.category.service;
 
 import org.springframework.stereotype.Service;
-
 import com.ta2khu75.thinkhub.category.CategoryService;
-import com.ta2khu75.thinkhub.category.dto.CategoryRequest;
-import com.ta2khu75.thinkhub.category.dto.CategoryResponse;
+import com.ta2khu75.thinkhub.category.dto.CategoryDto;
 import com.ta2khu75.thinkhub.category.entity.Category;
 import com.ta2khu75.thinkhub.category.mapper.CategoryMapper;
 import com.ta2khu75.thinkhub.category.repository.CategoryRepository;
+import com.ta2khu75.thinkhub.shared.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 import jakarta.validation.Valid;
@@ -21,25 +21,36 @@ public class CategoryServiceImpl extends BaseService<Category, Long, CategoryRep
 	}
 
 	@Override
-	public CategoryResponse create(@Valid CategoryRequest request) {
+	public CategoryDto create(@Valid CategoryDto request) {
 		Category category = mapper.toEntity(request);
-		return mapper.toResponse(repository.save(category));
+		return mapper.convert(repository.save(category));
 	}
 
 	@Override
-	public CategoryResponse update(Long id, @Valid CategoryRequest request) {
-		Category category = this.readEntity(id);
-		mapper.update(request, category);
-		return mapper.toResponse(repository.save(category));
+	public CategoryDto update(Long id, @Valid CategoryDto request) {
+		Category category = mapper.toEntity(request);
+		return mapper.convert(repository.save(category));
 	}
 
 	@Override
-	public CategoryResponse read(Long id) {
-		return mapper.toResponse(this.readEntity(id));
+	public CategoryDto read(Long id) {
+		return mapper.convert(readEntity(id));
 	}
 
 	@Override
 	public void delete(Long id) {
 		repository.deleteById(id);
+	}
+
+	@Override
+	public void checkExists(Long id) {
+		if (!repository.existsById(id)) {
+			throw new NotFoundException("Could not find category with id: " + id);
+		}
+	}
+
+	@Override
+	public EntityType getEntityType() {
+		return EntityType.CATEGORY;
 	}
 }

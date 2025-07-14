@@ -34,7 +34,7 @@ public class PermissionGroupServiceImpl
 			return permission;
 		}).toList());
 		permissionGroup = repository.save(permissionGroup);
-		return mapper.toResponse(permissionGroup);
+		return mapper.convert(permissionGroup);
 	}
 
 	@Override
@@ -47,13 +47,13 @@ public class PermissionGroupServiceImpl
 			return permission;
 		}).collect(Collectors.toList()));
 		permissionGroup = repository.save(permissionGroup);
-		return mapper.toResponse(permissionGroup);
+		return mapper.convert(permissionGroup);
 	}
 
 	@Override
 	public PermissionGroupResponse read(Integer id) {
 		PermissionGroup permissionGroup = this.readEntity(id);
-		return mapper.toResponse(permissionGroup);
+		return mapper.convert(permissionGroup);
 	}
 
 	@Override
@@ -63,11 +63,11 @@ public class PermissionGroupServiceImpl
 
 	@Override
 	public List<PermissionGroupResponse> readAll() {
-		return repository.findAll().stream().map(mapper::toResponse).toList();
+		return repository.findAll().stream().map(mapper::convert).toList();
 	}
 
 	@Override
 	public Optional<PermissionGroupResponse> findByName(String name) {
-		return repository.findByName(name).map(mapper::toResponse);
+		return repository.findByName(name).map(mapper::convert);
 	}
 }

@@ -7,6 +7,8 @@ import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,4 +25,12 @@ public class Category extends BaseEntityLong {
 	@Column(insertable = false)
 	@LastModifiedBy
 	String updatedBy;
+
+	@PreUpdate
+	@PrePersist
+	public void normalizeName() {
+		if (name != null) {
+			name = name.trim().toLowerCase(); // chuẩn hóa
+		}
+	}
 }

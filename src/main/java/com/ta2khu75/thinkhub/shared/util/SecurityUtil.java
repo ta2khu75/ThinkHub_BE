@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
-import com.ta2khu75.thinkhub.shared.exception.UnAuthenticatedException;
+import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 
 public final class SecurityUtil {
 	private SecurityUtil() {
@@ -22,14 +22,14 @@ public final class SecurityUtil {
 		if (getAuthentication() instanceof JwtAuthenticationToken jwtAuth) {
 			return jwtAuth.getToken();
 		}
-		throw new UnAuthenticatedException("You must be login");
+		throw new UnauthorizedException("You must be login");
 	}
 
 	private static <T> T getClaim(String claimName, Class<T> clazz) {
 		Jwt jwt = getJwtToken();
 		T claim = jwt.getClaim(claimName);
 		if (claim == null) {
-			throw new UnAuthenticatedException("Missing claim: " + claimName);
+			throw new UnauthorizedException("Missing claim: " + claimName);
 		}
 		return claim;
 	}
@@ -62,6 +62,7 @@ public final class SecurityUtil {
 			return false;
 		}
 	}
+
 	public static boolean isAuthorDecode(String id) {
 		try {
 			Long accountId = getCurrentAccountIdDecode();

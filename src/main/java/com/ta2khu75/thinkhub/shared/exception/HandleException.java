@@ -30,16 +30,20 @@ import com.ta2khu75.thinkhub.shared.dto.ApiResponse;
 
 @RestControllerAdvice
 public class HandleException implements ResponseBodyAdvice<Object> {
-	@ExceptionHandler(value = { NotMatchesException.class, ExistingException.class, InvalidDataException.class,
-			MissingRequestCookieException.class })
-	public ResponseEntity<ExceptionResponse> handleBadRequest(Exception ex) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(ex.getMessage()));
+	@ExceptionHandler(value = BaseException.class)
+	public ResponseEntity<ExceptionResponse> handleBaseException(BaseException ex) {
+		return ResponseEntity.status(ex.getStatusCode()).body(new ExceptionResponse(ex.getMessage()));
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<ExceptionResponse> handleConstraintViolationException(ConstraintViolationException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(new ExceptionResponse(ex.getConstraintViolations().iterator().next().getMessage()));
+	}
+
+	@ExceptionHandler(MissingRequestCookieException.class)
+	public ResponseEntity<ExceptionResponse> handleMissingRequestCookieException(MissingRequestCookieException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(ex.getMessage()));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -60,8 +64,8 @@ public class HandleException implements ResponseBodyAdvice<Object> {
 		return ResponseEntity.badRequest().body(response);
 	}
 
-	@ExceptionHandler(UnAuthorizedException.class)
-	public ResponseEntity<ExceptionResponse> handleUnauthorizedException(UnAuthorizedException ex) {
+	@ExceptionHandler(ForbiddenException.class)
+	public ResponseEntity<ExceptionResponse> handleUnauthorizedException(ForbiddenException ex) {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ExceptionResponse(ex.getMessage()));
 	}
 
@@ -70,14 +74,14 @@ public class HandleException implements ResponseBodyAdvice<Object> {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse(ex.getMessage()));
 	}
 
-	@ExceptionHandler(value = { DisabledException.class, BadCredentialsException.class })
+	@ExceptionHandler(value = { DisabledException.class, BadCredentialsException.class, UnauthorizedException.class })
 	public ResponseEntity<ExceptionResponse> handleDisabledException(Exception ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionResponse(ex.getMessage()));
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ExceptionResponse> handleException(Exception ex) {
-//		ex.printStackTrace();
+		ex.printStackTrace();
 		return ResponseEntity.internalServerError().body(new ExceptionResponse(ex.getMessage()));
 	}
 

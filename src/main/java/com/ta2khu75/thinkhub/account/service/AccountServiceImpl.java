@@ -2,7 +2,9 @@ package com.ta2khu75.thinkhub.account.service;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,7 @@ import com.ta2khu75.thinkhub.account.entity.Account;
 import com.ta2khu75.thinkhub.account.entity.AccountProfile;
 import com.ta2khu75.thinkhub.account.entity.AccountStatus;
 import com.ta2khu75.thinkhub.account.mapper.AccountMapper;
+import com.ta2khu75.thinkhub.account.projection.Author;
 import com.ta2khu75.thinkhub.account.repository.AccountProfileRepository;
 import com.ta2khu75.thinkhub.account.repository.AccountRepository;
 import com.ta2khu75.thinkhub.account.repository.AccountStatusReporitory;
@@ -29,23 +32,22 @@ import com.ta2khu75.thinkhub.auth.RegisterRequest;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.authority.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
-import com.ta2khu75.thinkhub.shared.exception.ExistingException;
+import com.ta2khu75.thinkhub.shared.exception.AlreadyExistsException;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
+import com.ta2khu75.thinkhub.shared.exception.MismatchException;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
-import com.ta2khu75.thinkhub.shared.exception.NotMatchesException;
-import com.ta2khu75.thinkhub.shared.service.BaseConvertService;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
-import com.ta2khu75.thinkhub.shared.service.clazz.IdConverterService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.FunctionUtil;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
-@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AccountServiceImpl extends BaseConvertService<Account, Long, AccountRepository, AccountMapper>
+public class AccountServiceImpl extends BaseService<Account, Long, AccountRepository, AccountMapper>
 		implements AccountService {
 	AccountProfileRepository profileRepository;
 	AccountStatusReporitory statusRepository;
@@ -53,10 +55,10 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 	RedisService redisService;
 	RoleService roleService;
 
-	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper, IdConverterService converter,
+	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper,
 			AccountProfileRepository profileRepository, AccountStatusReporitory statusRepository,
 			PasswordEncoder passwordEncoder, RedisService redisService, RoleService roleService) {
-		super(repository, mapper, converter);
+		super(repository, mapper);
 		this.profileRepository = profileRepository;
 		this.statusRepository = statusRepository;
 		this.passwordEncoder = passwordEncoder;
@@ -64,29 +66,19 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 		this.roleService = roleService;
 	}
 
-//	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper,
-//			AccountProfileRepository profileRepository, AccountStatusReporitory statusRepository,
-//			PasswordEncoder passwordEncoder, RedisService redisService, RoleService roleService) {
-//		super(repository, mapper);
-//		this.profileRepository = profileRepository;
-//		this.statusRepository = statusRepository;
-//		this.passwordEncoder = passwordEncoder;
-//		this.redisService = redisService;
-//		this.roleService = roleService;
-//	}
-
 	@Override
 	public AccountResponse create(AccountRequest request) {
 		if (!request.password().equals(request.confirmPassword()))
-			throw new NotMatchesException("password and confirm password not matches");
+			throw new MismatchException("password and confirm password not matches");
 		if (repository.existsByEmail(request.email().toLowerCase()))
-			throw new ExistingException("Email already exists");
+			throw new AlreadyExistsException("Email already exists");
 		AccountProfile profile = mapper.toEntity(request.profile());
 		profile.setDisplayName(profile.getFirstName() + " " + profile.getLastName());
 		AccountStatus status = mapper.toEntity(request.status());
 		if (!roleService.exists(status.getRoleId()))
 			throw new NotFoundException("Could not find role with id: " + status.getRoleId());
 		Account account = new Account();
+		account.setUsername(request.username().toLowerCase());
 		account.setEmail(request.email().toLowerCase());
 		account.setPassword(passwordEncoder.encode(request.password()));
 		account.setProfile(profile);
@@ -95,9 +87,9 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 			account = repository.save(account);
 		} catch (DataIntegrityViolationException e) {
 			e.printStackTrace();
-			throw new ExistingException(e.getMessage());
+			throw new AlreadyExistsException(e.getMessage());
 		}
-		return mapper.toResponse(account);
+		return mapper.convert(account);
 	}
 
 	@Override
@@ -134,7 +126,7 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 
 	@Override
 	public AccountProfileResponse updateProfile(Long accountId, AccountProfileRequest request) {
-		if (!this.decodeAccountId(SecurityUtil.getCurrentAccountId()).equals(accountId))
+		if (!SecurityUtil.getCurrentAccountIdDecode().equals(accountId))
 			throw new InvalidDataException("You can't update other's profile");
 		AccountProfile profile = FunctionUtil.findOrThrow(accountId, AccountProfile.class,
 				profileRepository::findByAccountId);
@@ -153,7 +145,7 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 	public AccountResponse readByEmail(String email) {
 		Account account = repository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException("Could not find account with email: " + email));
-		return mapper.toResponse(account);
+		return mapper.convert(account);
 	}
 
 	@Override
@@ -176,20 +168,20 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 	@Override
 	public void changePassword(ChangePasswordRequest request) {
 		if (!request.newPassword().equals(request.confirmPassword()))
-			throw new NotMatchesException("New password and confirm password not matches");
-		Account account = this.readEntity(this.decodeAccountId(SecurityUtil.getCurrentAccountId()));
+			throw new MismatchException("New password and confirm password not matches");
+		Account account = this.readEntity(SecurityUtil.getCurrentAccountIdDecode());
 		if (!passwordEncoder.matches(request.password(), account.getPassword()))
-			throw new NotMatchesException("Password not matches");
+			throw new MismatchException("Password not matches");
 		account.setPassword(passwordEncoder.encode(request.newPassword()));
-		account = repository.save(account);
+		repository.save(account);
 	}
 
 	@Override
 	public void register(RegisterRequest request) {
 		if (!request.password().equals(request.confirmPassword()))
-			throw new NotMatchesException("password and confirm password not matches");
+			throw new MismatchException("password and confirm password not matches");
 		if (repository.existsByEmail(request.email()))
-			throw new ExistingException("Email already exists");
+			throw new AlreadyExistsException("Email already exists");
 		RoleResponse role = roleService.readByName(RoleDefault.USER.name());
 		AccountProfile profile = mapper.toEntity(request.profile());
 		profile.setDisplayName(profile.getFirstName() + " " + profile.getLastName());
@@ -202,10 +194,10 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 		account.setProfile(profile);
 		account.setStatus(status);
 		try {
-			account = repository.save(account);
+			repository.save(account);
 		} catch (DataIntegrityViolationException e) {
 			e.printStackTrace();
-			throw new ExistingException(e.getMessage());
+			throw new AlreadyExistsException(e.getMessage());
 		}
 	}
 
@@ -213,5 +205,30 @@ public class AccountServiceImpl extends BaseConvertService<Account, Long, Accoun
 	public AccountDto readDtoByUsername(String username) {
 		return repository.findByUsername(username).map(mapper::toDto)
 				.orElseThrow(() -> new NotFoundException("Could not find account with username: " + username));
+	}
+
+	@Override
+	public void checkExists(Long id) {
+		if (!repository.existsById(id)) {
+			throw new NotFoundException("Could not find category with id: " + id);
+		}
+	}
+
+	@Override
+	public EntityType getEntityType() {
+		return EntityType.ACCOUNT;
+	}
+
+	@Override
+	public AuthorResponse readAuthor(Long id) {
+		Author author = repository.findAuthorByAccountId(id)
+				.orElseThrow(() -> new NotFoundException("Could not find profile with id: " + id));
+		return mapper.toAuthorResponse(author);
+	}
+
+	@Override
+	public Set<AuthorResponse> readAllAuthorsByAccountIds(Set<Long> accountIds) {
+		return repository.findAllAuthorsByAccountIds(accountIds).stream().map(mapper::toAuthorResponse)
+				.collect(Collectors.toSet());
 	}
 }

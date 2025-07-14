@@ -5,8 +5,9 @@ import java.util.List;
 import com.ta2khu75.thinkhub.authority.request.RoleRequest;
 import com.ta2khu75.thinkhub.authority.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.service.CrudService;
+import com.ta2khu75.thinkhub.shared.service.ExistsService;
 
-public interface RoleService extends CrudService<RoleRequest, RoleResponse, Long> {
+public interface RoleService extends CrudService<RoleRequest, RoleResponse, Long> , ExistsService<Long>{
 	RoleResponse readByName(String name);
 	List<RoleResponse> readAll();
 	boolean exists(Long id);

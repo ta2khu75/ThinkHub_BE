@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ta2khu75.thinkhub.quiz.entity.Quiz;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 
-public interface QuizRepository extends JpaRepository<Quiz, Long>{
+public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryCustom{
 //	@Query("SELECT q FROM Quiz q WHERE "
 //			+ "(:keyword IS NULL OR q.title LIKE %:keyword% OR q.description LIKE %:keyword% OR q.author.displayName LIKE %:keyword% OR q.category.name LIKE %:keyword%) "
 //			+ "AND (:authorId IS NULL OR q.author.id = :authorId) "
@@ -27,9 +27,9 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>{
 //			@Param("accessModifier") AccessModifier accessModifier,
 //			Pageable pageable);
 
-	List<Quiz> findByAuthorIdAndTitleContainingIgnoreCaseAndBlogIsNull(Long authorId, String keyword);
-
-	Long countByAuthorIdAndAccessModifier(Long authorId, AccessModifier accessModifier);
-
-	Optional<Quiz> findByIdAndAuthorId(Long quizId, Long authorId);
+//	List<Quiz> findByAuthorIdAndTitleContainingIgnoreCaseAndBlogIsNull(Long authorId, String keyword);
+//
+//	Long countByAuthorIdAndAccessModifier(Long authorId, AccessModifier accessModifier);
+//
+//	Optional<Quiz> findByIdAndAuthorId(Long quizId, Long authorId);
 }

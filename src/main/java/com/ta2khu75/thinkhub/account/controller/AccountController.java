@@ -21,6 +21,8 @@ import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +30,7 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Account", description = "Manage user accounts, profiles and statuses")
 @ApiController("${app.api-prefix}/accounts")
-public class AccountController extends BaseController<AccountService> {
+public class AccountController extends BaseController<AccountService> implements IdDecodable{
 
 	protected AccountController(AccountService service) {
 		super(service);
@@ -42,15 +44,15 @@ public class AccountController extends BaseController<AccountService> {
 
 	@DeleteMapping("{id}")
 	@Operation(summary = "Delete an account", description = "Delete an existing user account by its ID.")
-	ResponseEntity<Void> delete(@PathVariable Long id) {
-		service.delete(id);
+	ResponseEntity<Void> delete(@PathVariable String id) {
+		service.delete(this.decodeAccountId(id));
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("{accountId}/profile")
 	@Operation(summary = "Get account profile", description = "Retrieve the profile details of a specific user account.")
-	ResponseEntity<AccountProfileResponse> read(@PathVariable Long accountId) {
-		return ResponseEntity.ok(service.readProfile(accountId));
+	ResponseEntity<AccountProfileResponse> read(@PathVariable String accountId) {
+		return ResponseEntity.ok(service.readProfile(this.decodeAccountId(accountId)));
 	}
 
 	@GetMapping
@@ -61,15 +63,20 @@ public class AccountController extends BaseController<AccountService> {
 
 	@PutMapping("{accountId}/profile")
 	@Operation(summary = "Update account profile", description = "Update the profile information of a specific user account.")
-	public ResponseEntity<AccountProfileResponse> updateProfile(@PathVariable Long accountId,
+	public ResponseEntity<AccountProfileResponse> updateProfile(@PathVariable String accountId,
 			@Valid @RequestBody AccountProfileRequest request) {
-		return ResponseEntity.ok(service.updateProfile(accountId, request));
+		return ResponseEntity.ok(service.updateProfile(this.decodeAccountId(accountId), request));
 	}
 
 	@PutMapping("{accountId}/status")
 	@Operation(summary = "Update account status", description = "Enable, disable, or lock/unlock a specific user account.")
-	public ResponseEntity<AccountStatusResponse> updateStatus(@PathVariable Long accountId,
+	public ResponseEntity<AccountStatusResponse> updateStatus(@PathVariable String accountId,
 			@Valid @RequestBody AccountStatusRequest request) {
-		return ResponseEntity.ok(service.updateStatus(accountId, request));
+		return ResponseEntity.ok(service.updateStatus(this.decodeAccountId(accountId), request));
+	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.ACCOUNT;
 	}
 }

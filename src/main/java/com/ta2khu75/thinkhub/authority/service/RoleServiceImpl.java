@@ -13,6 +13,7 @@ import com.ta2khu75.thinkhub.authority.mapper.RoleMapper;
 import com.ta2khu75.thinkhub.authority.repository.RoleRepository;
 import com.ta2khu75.thinkhub.authority.request.RoleRequest;
 import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
@@ -29,7 +30,7 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	public RoleResponse create(@Valid RoleRequest request) {
 		Role role = mapper.toEntity(request);
 		role = repository.save(role);
-		return mapper.toResponse(role);
+		return mapper.convert(role);
 	}
 
 	@Override
@@ -42,13 +43,13 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 			return permission;
 		}).collect(Collectors.toSet()));
 		role = repository.save(role);
-		return mapper.toResponse(role);
+		return mapper.convert(role);
 	}
 
 	@Override
 	public RoleResponse read(Long id) {
 		Role role = this.readEntity(id);
-		return mapper.toResponse(role);
+		return mapper.convert(role);
 	}
 
 	@Override
@@ -60,12 +61,12 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	public RoleResponse readByName(String roleName) {
 		Role role = repository.findByName(roleName)
 				.orElseThrow(() -> new NotFoundException("Could not find Role with name: " + roleName));
-		return mapper.toResponse(role);
+		return mapper.convert(role);
 	}
 
 	@Override
 	public List<RoleResponse> readAll() {
-		return repository.findAll().stream().map(mapper::toResponse).toList();
+		return repository.findAll().stream().map(mapper::convert).toList();
 	}
 
 	@Override
@@ -90,6 +91,18 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	public boolean existsByName(String name) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void checkExists(Long id) {
+		if (!repository.existsById(id)) {
+			throw new NotFoundException("Could not find role with id: " + id);
+		}
+	}
+
+	@Override
+	public EntityType getEntityType() {
+		return EntityType.ROLE;
 	}
 
 }

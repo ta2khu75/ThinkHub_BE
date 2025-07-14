@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 
 import org.springframework.data.annotation.CreatedBy;
 
-import com.ta2khu75.thinkhub.config.IdProperties.IdType;
 import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
 import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;

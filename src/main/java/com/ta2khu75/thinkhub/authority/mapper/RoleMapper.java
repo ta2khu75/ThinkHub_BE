@@ -15,11 +15,7 @@ import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 import org.springframework.core.convert.converter.Converter;
 
 @Mapper(config = MapperSpringConfig.class)
-public interface RoleMapper extends Converter<Role, RoleResponse>, BaseMapper<RoleRequest, RoleResponse, Role> {
-	@Override
-	@Mapping(target = "permissionIds", ignore = true)
-	RoleResponse convert(Role role);
-	
+public interface RoleMapper extends Converter<Role, RoleResponse>, BaseMapper<RoleRequest, Role> {
 	@Override
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "permissions", ignore = true)
@@ -34,7 +30,7 @@ public interface RoleMapper extends Converter<Role, RoleResponse>, BaseMapper<Ro
 
 	@Override
 	@Mapping(target = "permissionIds", source = "permissions")
-	RoleResponse toResponse(Role role);
+	RoleResponse convert(Role role);
 
 	default Long map(Permission permission) {
 		return permission == null ? null : permission.getId();
