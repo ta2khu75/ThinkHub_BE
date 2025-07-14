@@ -53,7 +53,7 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	@Enumerated(EnumType.STRING)
 	ResultVisibility resultVisibility;
 
-	@Column(nullable = false)
+	@Column(nullable = false, updatable = false)
 	Long authorId;
 	Set<Long> postIds;
 	@Column(nullable = false)

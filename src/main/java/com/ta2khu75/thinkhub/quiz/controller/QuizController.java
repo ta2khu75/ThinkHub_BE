@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ta2khu75.thinkhub.quiz.QuizService;
 import com.ta2khu75.thinkhub.quiz.dto.QuizRequest;
 import com.ta2khu75.thinkhub.quiz.dto.QuizResponse;
 import com.ta2khu75.thinkhub.quiz.dto.QuizSearch;
+import com.ta2khu75.thinkhub.result.QuizResultService;
+import com.ta2khu75.thinkhub.result.dto.QuizResultResponse;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
@@ -31,8 +32,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("${app.api-prefix}/quizzes")
 public class QuizController extends BaseController<QuizService> implements IdDecodable {
-	public QuizController(QuizService service, ObjectMapper objectMapper) {
+	private final QuizResultService resultService;
+
+	public QuizController(QuizService service, QuizResultService resultService) {
 		super(service);
+		this.resultService = resultService;
 	}
 
 	@GetMapping
@@ -71,6 +75,12 @@ public class QuizController extends BaseController<QuizService> implements IdDec
 	@Override
 	public IdConfig getIdConfig() {
 		return IdConfig.QUIZ;
+	}
+
+	@PostMapping("{id}/start")
+	public ResponseEntity<QuizResultResponse> take(@PathVariable String id) {
+		QuizResultResponse response = resultService.take(decodeId(id));
+		return ResponseEntity.ok(response);
 	}
 
 //	@GetMapping("mine/{keyword}")

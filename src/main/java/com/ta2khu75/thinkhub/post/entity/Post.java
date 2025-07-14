@@ -45,7 +45,7 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	Set<Long> tagIds;
 	@Column(nullable = false)
 	Long categoryId;
-	@Column(nullable = false)
+	@Column(nullable = false, updatable = false)
 	Long authorId;
 
 	@Override

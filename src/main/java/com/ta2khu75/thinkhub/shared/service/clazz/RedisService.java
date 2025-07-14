@@ -29,6 +29,7 @@ public class RedisService {
 	public <T> void setValue(String key, T value, Instant ttl) {
 		redisTemplate.opsForValue().set(key, value, Duration.between(Instant.now(), ttl));
 	}
+
 	public <T> void setValue(String key, T value) {
 		redisTemplate.opsForValue().set(key, value);
 	}
@@ -146,8 +147,12 @@ public class RedisService {
 			return "account:lock:" + id;
 		}
 
-		public static String quizResult(String id) {
-			return "quiz:result:" + id;
+		public static String quiz(Long id) {
+			return "quiz:" + id;
+		}
+
+		public static String quizResult(Long accountId, Long quizId) {
+			return "quiz:" + quizId + ":account:" + accountId + ":result";
 		}
 	}
 }

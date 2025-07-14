@@ -1,6 +1,12 @@
 package com.ta2khu75.thinkhub.quiz.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
-public record AnswerDto(Long id, @NotBlank String content, boolean correct) {
+@Data
+public class AnswerDto {
+	private Long id;
+	@NotBlank
+	private String content;
+	private boolean correct;
 }
