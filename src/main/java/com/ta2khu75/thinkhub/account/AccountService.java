@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.account;
 
-import java.util.Set;
+import java.util.List;
 
 import com.ta2khu75.thinkhub.account.request.AccountProfileRequest;
 import com.ta2khu75.thinkhub.account.request.AccountRequest;
@@ -11,6 +11,10 @@ import com.ta2khu75.thinkhub.account.response.AccountResponse;
 import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.RegisterRequest;
+import com.ta2khu75.thinkhub.follow.FollowDirection;
+import com.ta2khu75.thinkhub.follow.dto.FollowStatusResponse;
+import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 import com.ta2khu75.thinkhub.shared.service.SearchService;
@@ -41,6 +45,14 @@ public interface AccountService extends SearchService<AccountSearch, AccountResp
 	void changePassword(ChangePasswordRequest request);
 
 	AuthorResponse readAuthor(Long id);
-	
-	Set<AuthorResponse> readAllAuthorsByAccountIds(Set<Long> accountIds);
+
+	List<AuthorResponse> readAllAuthorsByAccountIds(List<Long> accountIds);
+
+	void follow(Long followingId);
+
+	void unFollow(Long followingId);
+
+	FollowStatusResponse isFollowing(Long followingId);
+
+	PageResponse<AuthorResponse> readFollow(Long following, FollowDirection direction, Search search);
 }

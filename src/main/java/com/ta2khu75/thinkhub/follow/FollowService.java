@@ -1,16 +1,16 @@
 package com.ta2khu75.thinkhub.follow;
 
-import org.springframework.data.domain.Pageable;
-
-import com.ta2khu75.quiz.model.response.FollowResponse;
-import com.ta2khu75.quiz.model.response.PageResponse;
+import com.ta2khu75.thinkhub.follow.dto.FollowResponse;
+import com.ta2khu75.thinkhub.follow.dto.FollowStatusResponse;
+import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 
 public interface FollowService {
-	FollowResponse create(Long followingId);
+	void follow(Long followingId);
 
-	void delete(Long followingId);
+	void unFollow(Long followingId);
 
-	FollowResponse read(Long followingId);
+	FollowStatusResponse isFollowing(Long followingId);
 
-	PageResponse<FollowResponse> readPage(Long followingId, Pageable pageable);
+	PageResponse<FollowResponse> readPage(Long followingId, FollowDirection direction, Search search);
 }

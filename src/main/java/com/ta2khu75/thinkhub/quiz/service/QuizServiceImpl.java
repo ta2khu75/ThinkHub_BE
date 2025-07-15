@@ -1,6 +1,8 @@
 package com.ta2khu75.thinkhub.quiz.service;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -106,9 +108,8 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		}
 
 		if (authorId == null) {
-			Set<Long> authorIds = page.getContent().stream().map(post -> post.getAuthorId())
-					.collect(Collectors.toSet());
-			Set<AuthorResponse> authors = accountService.readAllAuthorsByAccountIds(authorIds);
+			List<Long> authorIds = page.getContent().stream().map(post -> post.getAuthorId()).toList();
+			Set<AuthorResponse> authors = new HashSet<>(accountService.readAllAuthorsByAccountIds(authorIds));
 			Map<Long, AuthorResponse> authorMap = authors.stream()
 					.collect(Collectors.toMap(AuthorResponse::getOriginalId, a -> {
 						a.setOriginalId(null);

@@ -17,10 +17,14 @@ import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
 import com.ta2khu75.thinkhub.account.response.AccountProfileResponse;
 import com.ta2khu75.thinkhub.account.response.AccountResponse;
 import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
+import com.ta2khu75.thinkhub.follow.FollowDirection;
+import com.ta2khu75.thinkhub.follow.dto.FollowStatusResponse;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
+import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
@@ -30,7 +34,7 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Account", description = "Manage user accounts, profiles and statuses")
 @ApiController("${app.api-prefix}/accounts")
-public class AccountController extends BaseController<AccountService> implements IdDecodable{
+public class AccountController extends BaseController<AccountService> implements IdDecodable {
 
 	protected AccountController(AccountService service) {
 		super(service);
@@ -73,6 +77,36 @@ public class AccountController extends BaseController<AccountService> implements
 	public ResponseEntity<AccountStatusResponse> updateStatus(@PathVariable String accountId,
 			@Valid @RequestBody AccountStatusRequest request) {
 		return ResponseEntity.ok(service.updateStatus(this.decodeAccountId(accountId), request));
+	}
+
+	@PostMapping("{accountId}/follow")
+	public ResponseEntity<Void> follow(@PathVariable String accountId) {
+		service.follow(this.decodeAccountId(accountId));
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@DeleteMapping("{accountId}/follow")
+	public ResponseEntity<Void> unfollow(@PathVariable String accountId) {
+		service.unFollow(this.decodeAccountId(accountId));
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("{accountId}/follow/status")
+	public ResponseEntity<FollowStatusResponse> isFollowing(@PathVariable String accountId) {
+		return ResponseEntity.ok(service.isFollowing(this.decodeAccountId(accountId)));
+	}
+
+	@GetMapping("{accountId}/followers")
+	public ResponseEntity<PageResponse<AuthorResponse>> readFollowers(@PathVariable String accountId,
+			@SnakeCaseModelAttribute Search search) {
+		return ResponseEntity.ok(service.readFollow(this.decodeAccountId(accountId), FollowDirection.FOLLOWER, search));
+	}
+
+	@GetMapping("{accountId}/following")
+	public ResponseEntity<PageResponse<AuthorResponse>> readFollowing(@PathVariable String accountId,
+			@SnakeCaseModelAttribute Search search) {
+		return ResponseEntity
+				.ok(service.readFollow(this.decodeAccountId(accountId), FollowDirection.FOLLOWING, search));
 	}
 
 	@Override

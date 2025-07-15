@@ -1,71 +1,77 @@
 package com.ta2khu75.thinkhub.follow.service;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Objects;
 
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ta2khu75.quiz.exception.ExistingException;
-import com.ta2khu75.quiz.exception.InvalidDataException;
-import com.ta2khu75.quiz.mapper.FollowMapper;
-import com.ta2khu75.quiz.model.entity.AccountProfile;
-import com.ta2khu75.quiz.model.entity.Follow;
-import com.ta2khu75.quiz.model.entity.id.FollowId;
-import com.ta2khu75.quiz.model.response.FollowResponse;
-import com.ta2khu75.quiz.model.response.PageResponse;
-import com.ta2khu75.quiz.repository.FollowRepository;
-import com.ta2khu75.quiz.repository.account.AccountProfileRepository;
-import com.ta2khu75.quiz.service.FollowService;
-import com.ta2khu75.quiz.service.base.BaseService;
-import com.ta2khu75.quiz.util.FunctionUtil;
-import com.ta2khu75.quiz.util.SecurityUtil;
+import com.ta2khu75.thinkhub.follow.FollowDirection;
+import com.ta2khu75.thinkhub.follow.FollowService;
+import com.ta2khu75.thinkhub.follow.dto.FollowResponse;
+import com.ta2khu75.thinkhub.follow.dto.FollowStatusResponse;
+import com.ta2khu75.thinkhub.follow.entity.Follow;
+import com.ta2khu75.thinkhub.follow.entity.FollowId;
+import com.ta2khu75.thinkhub.follow.repository.FollowRepository;
+import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
+import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
+import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
-public class FollowServiceImpl extends BaseService<FollowRepository, FollowMapper> implements FollowService {
-	private final AccountProfileRepository profileRepository;
-
-	public FollowServiceImpl(FollowRepository repository, AccountProfileRepository profileRepository, FollowMapper mapper) {
-		super(repository, mapper);
-		this.profileRepository=profileRepository;
-	}
+@RequiredArgsConstructor
+public class FollowServiceImpl implements FollowService {
+	private final FollowRepository repository;
+	private final ApplicationEventPublisher events;
 
 	@Override
 	@Transactional
-	public FollowResponse create(Long followingId) {
-		 AccountProfile follower = SecurityUtil.getCurrentProfile();
-		if(followingId.equals(follower.getId())) {
+	public void follow(Long followingId) {
+		Long followerId = SecurityUtil.getCurrentAccountIdDecode();
+		FollowId id = new FollowId(followingId, followerId);
+		if (followerId.equals(followingId)) {
 			throw new InvalidDataException("Cannot follow yourself");
 		}
-		Optional<Follow> existingFollow = repository.findById(new FollowId(1L, followingId));
-		if (existingFollow.isPresent()) {
-			throw new ExistingException("Already following this user");
+		if (!repository.existsById(id)) {
+			Follow follow = new Follow(id, null);
+			repository.save(follow);
 		}
-		AccountProfile following = FunctionUtil.findOrThrow(followingId, AccountProfile.class, profileRepository::findById);
-		Follow follow = new Follow();
-		follow.setId(new FollowId(follower.getId(), following.getId()));
-		follow.setFollower(SecurityUtil.getCurrentProfile());
-		follow.setFollowing(following);
-		return mapper.toResponse(repository.save(follow));
 	}
 
 	@Override
 	@Transactional
-	public void delete(Long followingId) {
-		Long followerId = SecurityUtil.getCurrentProfileId();
-		repository.deleteById(new FollowId(followerId, followingId));
+	public void unFollow(Long followingId) {
+		Long followerId = SecurityUtil.getCurrentAccountIdDecode();
+		repository.deleteById(new FollowId(followingId, followerId));
 	}
 
 	@Override
-	public FollowResponse read(Long followingId) {
-		Long followerId = SecurityUtil.getCurrentProfileId();
-		Follow follow = repository.findById(new FollowId(followerId, followingId)).orElse(null);
-		return follow == null ? null : mapper.toResponse(follow);
+	public PageResponse<FollowResponse> readPage(Long followingId, FollowDirection direction, Search search) {
+		Pageable pageable = search.toPageable();
+		if (direction == FollowDirection.FOLLOWING) {
+			Page<Follow> page = repository.findByFollowingId(followingId, pageable);
+			List<FollowResponse> followerResponse = page.getContent().stream()
+					.map(follow -> new FollowResponse(follow.getId().getFollowerId())).toList();
+			return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(),
+					followerResponse);
+		} else {
+			Page<Follow> page = repository.findByFollowerId(followingId, pageable);
+			List<FollowResponse> followingResponse = page.getContent().stream()
+					.map(follow -> new FollowResponse(follow.getId().getFollowingId())).toList();
+			return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(),
+					followingResponse);
+		}
 	}
 
 	@Override
-	public PageResponse<FollowResponse> readPage(Long followingId, Pageable pageable) {
-		return mapper.toPageResponse(repository.findByFollowingId(1L, pageable));
+	public FollowStatusResponse isFollowing(Long followingId) {
+		Long followerId = SecurityUtil.getCurrentAccountIdDecode();
+		return new FollowStatusResponse(repository.existsById(new FollowId(followingId, followerId)));
 	}
 
 }

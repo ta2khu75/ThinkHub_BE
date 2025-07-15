@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,6 +21,7 @@ import com.ta2khu75.thinkhub.account.entity.Account;
 import com.ta2khu75.thinkhub.account.entity.QAccount;
 import com.ta2khu75.thinkhub.account.projection.Author;
 import com.ta2khu75.thinkhub.account.request.AccountSearch;
+
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.getOrderSpecifiers;
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.applyIfNotNull;
 
@@ -63,24 +63,26 @@ public class AccountRepositoryImpl implements AccountRepositoryCustom {
 	}
 
 	@Override
-	public Set<Author> findAllAuthorsByAccountIds(Set<Long> accountIds) {
+	public List<Author> findAllAuthorsByAccountIds(List<Long> accountIds) {
 		QAccount account = QAccount.account;
 		List<Predicate> conditionList = Stream.of(applyIfNotNull(accountIds, () -> account.id.in(accountIds)))
 				.filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
 		Predicate[] conditions = conditionList.toArray(new Predicate[0]);
-		JPAQuery<Author> query = queryFactory.select(Projections.constructor(Author.class, account.id, account.profile.displayName)).from(account).where(conditions);
-		List<Author> content = query.fetch();
-		return content.stream().collect(Collectors.toSet());
+		JPAQuery<Author> query = queryFactory
+				.select(Projections.constructor(Author.class, account.id, account.profile.displayName)).from(account)
+				.where(conditions);
+		return query.fetch();
 	}
 
 	@Override
 	public Optional<Author> findAuthorByAccountId(Long accountId) {
 		QAccount account = QAccount.account;
-		Predicate[] conditions = new Predicate[] { account.id.eq(accountId) }; 
-		JPAQuery<Author> query = queryFactory.select(Projections.constructor(Author.class, account.id, account.profile.displayName)).from(account).where(conditions);
+		Predicate[] conditions = new Predicate[] { account.id.eq(accountId) };
+		JPAQuery<Author> query = queryFactory
+				.select(Projections.constructor(Author.class, account.id, account.profile.displayName)).from(account)
+				.where(conditions);
 		Author content = query.fetchOne();
 		return Optional.ofNullable(content);
 	}
-	
-	
+
 }

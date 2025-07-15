@@ -3,12 +3,11 @@ package com.ta2khu75.thinkhub.account.service;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ta2khu75.thinkhub.account.AccountDto;
 import com.ta2khu75.thinkhub.account.AccountService;
@@ -31,7 +30,12 @@ import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.RegisterRequest;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.follow.FollowDirection;
+import com.ta2khu75.thinkhub.follow.FollowService;
+import com.ta2khu75.thinkhub.follow.dto.FollowResponse;
+import com.ta2khu75.thinkhub.follow.dto.FollowStatusResponse;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
@@ -49,21 +53,25 @@ import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountServiceImpl extends BaseService<Account, Long, AccountRepository, AccountMapper>
 		implements AccountService {
+
 	AccountProfileRepository profileRepository;
 	AccountStatusReporitory statusRepository;
 	PasswordEncoder passwordEncoder;
 	RedisService redisService;
 	RoleService roleService;
+	FollowService followService;
 
 	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper,
 			AccountProfileRepository profileRepository, AccountStatusReporitory statusRepository,
-			PasswordEncoder passwordEncoder, RedisService redisService, RoleService roleService) {
+			PasswordEncoder passwordEncoder, RedisService redisService, RoleService roleService,
+			FollowService followService) {
 		super(repository, mapper);
 		this.profileRepository = profileRepository;
 		this.statusRepository = statusRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.redisService = redisService;
 		this.roleService = roleService;
+		this.followService = followService;
 	}
 
 	@Override
@@ -227,8 +235,38 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 	}
 
 	@Override
-	public Set<AuthorResponse> readAllAuthorsByAccountIds(Set<Long> accountIds) {
-		return repository.findAllAuthorsByAccountIds(accountIds).stream().map(mapper::toAuthorResponse)
-				.collect(Collectors.toSet());
+	public List<AuthorResponse> readAllAuthorsByAccountIds(List<Long> accountIds) {
+		return repository.findAllAuthorsByAccountIds(accountIds).stream().map(mapper::toAuthorResponse).toList();
 	}
+
+	@Override
+	@Transactional
+	public void follow(Long followingId) {
+		if (repository.existsById(followingId)) {
+			followService.follow(followingId);
+		}
+		throw new NotFoundException("Could not find account with id: " + followingId);
+	}
+
+	@Override
+	@Transactional
+	public void unFollow(Long followingId) {
+		followService.unFollow(followingId);
+	}
+
+	@Override
+	@Transactional
+	public FollowStatusResponse isFollowing(Long followingId) {
+		return followService.isFollowing(followingId);
+	}
+
+	@Override
+	public PageResponse<AuthorResponse> readFollow(Long following, FollowDirection direction, Search search) {
+		PageResponse<FollowResponse> pageResponse = followService.readPage(following, direction, search);
+		List<Long> accountIds = pageResponse.getContent().stream().map(followResponse -> followResponse.id()).toList();
+		List<AuthorResponse> authors = readAllAuthorsByAccountIds(accountIds);
+		return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalElements(), pageResponse.getPage(),
+				authors);
+	}
+
 }
