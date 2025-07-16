@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.category.dto.CategoryDto;
 import com.ta2khu75.thinkhub.quiz.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.enums.ResultVisibility;
 import com.ta2khu75.thinkhub.shared.dto.BaseClassResponse;

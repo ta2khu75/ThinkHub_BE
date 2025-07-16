@@ -10,18 +10,24 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ta2khu75.thinkhub.comment.dto.CommentRequest;
+import com.ta2khu75.thinkhub.comment.dto.CommentResponse;
 import com.ta2khu75.thinkhub.quiz.QuizService;
 import com.ta2khu75.thinkhub.quiz.dto.QuizRequest;
 import com.ta2khu75.thinkhub.quiz.dto.QuizResponse;
 import com.ta2khu75.thinkhub.quiz.dto.QuizSearch;
+import com.ta2khu75.thinkhub.report.dto.ReportRequest;
+import com.ta2khu75.thinkhub.report.dto.ReportResponse;
 import com.ta2khu75.thinkhub.result.QuizResultService;
 import com.ta2khu75.thinkhub.result.dto.QuizResultResponse;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -83,6 +89,21 @@ public class QuizController extends BaseController<QuizService> implements IdDec
 		return ResponseEntity.ok(response);
 	}
 
+	@PostMapping("{quizId}/comments")
+	public ResponseEntity<CommentResponse> comment(@PathVariable String quizId, @RequestBody CommentRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.comment(decodeId(quizId), request));
+	}
+
+	@PostMapping("{quizId}/reports")
+	public ResponseEntity<ReportResponse> report(@PathVariable String quizId, @RequestBody ReportRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.report(decodeId(quizId), request));
+	}
+
+	@GetMapping("{quizId}/comments")
+	public ResponseEntity<PageResponse<CommentResponse>> readComments(@PathVariable String quizId,
+			@SnakeCaseModelAttribute Search search) {
+		return ResponseEntity.ok(service.readPageComments(decodeId(quizId), search));
+	}
 //	@GetMapping("mine/{keyword}")
 //	public ResponseEntity<List<QuizResponse>> mySearch(@PathVariable String keyword) {
 //		Long authorId = SecurityUtil.getCurrentProfileId();

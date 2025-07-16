@@ -1,13 +1,10 @@
 package com.ta2khu75.thinkhub.quiz.repository;
 
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ta2khu75.thinkhub.quiz.entity.Quiz;
-import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 
-public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryCustom{
+public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryCustom {
 //	@Query("SELECT q FROM Quiz q WHERE "
 //			+ "(:keyword IS NULL OR q.title LIKE %:keyword% OR q.description LIKE %:keyword% OR q.author.displayName LIKE %:keyword% OR q.category.name LIKE %:keyword%) "
 //			+ "AND (:authorId IS NULL OR q.author.id = :authorId) "

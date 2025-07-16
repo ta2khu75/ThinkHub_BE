@@ -13,6 +13,7 @@ import com.ta2khu75.thinkhub.tag.dto.TagDto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PostResponse implements BaseClassResponse<String> {
@@ -21,7 +22,6 @@ public class PostResponse implements BaseClassResponse<String> {
 	String content;
 	Set<TagDto> tags;
 	AuthorResponse author;
-	Long authorId;
 	List<String> quizIds;
 	Long categoryId;
 	int viewCount;

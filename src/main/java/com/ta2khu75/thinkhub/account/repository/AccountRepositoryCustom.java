@@ -1,5 +1,6 @@
 package com.ta2khu75.thinkhub.account.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ import com.ta2khu75.thinkhub.account.request.AccountSearch;
 public interface AccountRepositoryCustom {
 	Page<Account> search(AccountSearch search);
 
-	List<Author> findAllAuthorsByAccountIds(List<Long> accountIds);
+	List<Author> findAllAuthorsByAccountIds(Collection<Long> accountIds);
 
 	Optional<Author> findAuthorByAccountId(Long accountId);
 }

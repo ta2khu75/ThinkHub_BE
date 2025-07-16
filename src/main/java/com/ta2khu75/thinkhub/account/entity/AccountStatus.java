@@ -32,6 +32,7 @@ public class AccountStatus {
 	Long id;
 	boolean enabled;
 	boolean nonLocked;
+	boolean deleted;
 	@LastModifiedDate
 	@Column(insertable = false)
 	Instant updatedAt;

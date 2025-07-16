@@ -2,12 +2,11 @@ package com.ta2khu75.thinkhub.report.entity;
 
 import java.io.Serializable;
 
-import com.ta2khu75.quiz.model.TargetType;
+import com.ta2khu75.thinkhub.report.ReportTargetType;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +20,5 @@ public class ReportId implements Serializable {
 	private Long authorId;
 	private Long targetId;
 	@Enumerated(EnumType.STRING)
-	@NotNull
-	private TargetType targetType;
- }
+	private ReportTargetType targetType;
+}

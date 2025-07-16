@@ -19,17 +19,18 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class QueryDslUtil {
 
-	public static BooleanExpression applyIfNotNull(Object data, Supplier<BooleanExpression> expressionSupplier) {
-		return data != null ? expressionSupplier.get() : null;
+	public static BooleanExpression applyIfNotNull(Object data, Supplier<BooleanExpression> supplier) {
+		return data != null ? supplier.get() : null;
 	}
 
-	public static BooleanExpression applyIfNotEmpty(String data, Supplier<BooleanExpression> expressionSupplier) {
-	    return (data != null && !data.trim().isEmpty()) ? expressionSupplier.get() : null;
+	public static BooleanExpression applyIfNotEmpty(String data, Supplier<BooleanExpression> supplier) {
+		return (data != null && !data.trim().isEmpty()) ? supplier.get() : null;
 	}
 
-	public static BooleanExpression applyIfNotEmpty(Collection<?> data, Supplier<BooleanExpression> expressionSupplier) {
-	    return (data != null && !data.isEmpty()) ? expressionSupplier.get() : null;
+	public static BooleanExpression applyIfNotEmpty(Collection<?> data, Supplier<BooleanExpression> supplier) {
+		return (data != null && !data.isEmpty()) ? supplier.get() : null;
 	}
+
 	public static <T extends EntityPathBase<?>> List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable,
 			T entity) {
 		List<OrderSpecifier<?>> orders = new ArrayList<>();

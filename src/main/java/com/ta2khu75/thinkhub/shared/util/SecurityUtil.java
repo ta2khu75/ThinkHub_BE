@@ -63,10 +63,10 @@ public final class SecurityUtil {
 		}
 	}
 
-	public static boolean isAuthorDecode(String id) {
+	public static boolean isAuthorDecode(Long id) {
 		try {
 			Long accountId = getCurrentAccountIdDecode();
-			return accountId.equals(IdConverterUtil.decode(id, IdConfig.ACCOUNT));
+			return accountId.equals(id);
 		} catch (Exception e) {
 			return false;
 		}

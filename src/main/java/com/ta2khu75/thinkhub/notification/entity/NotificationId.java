@@ -2,8 +2,6 @@ package com.ta2khu75.thinkhub.notification.entity;
 
 import java.io.Serializable;
 
-import com.ta2khu75.quiz.model.TargetType;
-
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,5 +18,5 @@ public class NotificationId implements Serializable {
 	private Long accountId;
 	private Long targetId;
 	@Enumerated(EnumType.STRING)
-	private TargetType targetType;
+	private NotificationTargetType targetType;
 }

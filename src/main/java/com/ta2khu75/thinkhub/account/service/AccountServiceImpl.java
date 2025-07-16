@@ -3,7 +3,13 @@ package com.ta2khu75.thinkhub.account.service;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,9 +33,6 @@ import com.ta2khu75.thinkhub.account.response.AccountProfileResponse;
 import com.ta2khu75.thinkhub.account.response.AccountResponse;
 import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
-import com.ta2khu75.thinkhub.auth.RegisterRequest;
-import com.ta2khu75.thinkhub.authority.RoleService;
-import com.ta2khu75.thinkhub.authority.response.RoleResponse;
 import com.ta2khu75.thinkhub.follow.FollowDirection;
 import com.ta2khu75.thinkhub.follow.FollowService;
 import com.ta2khu75.thinkhub.follow.dto.FollowResponse;
@@ -38,7 +41,7 @@ import com.ta2khu75.thinkhub.shared.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
-import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
+import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.AlreadyExistsException;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.exception.MismatchException;
@@ -56,22 +59,22 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 
 	AccountProfileRepository profileRepository;
 	AccountStatusReporitory statusRepository;
+	ApplicationEventPublisher events;
 	PasswordEncoder passwordEncoder;
-	RedisService redisService;
-	RoleService roleService;
 	FollowService followService;
+	RedisService redisService;
 
 	public AccountServiceImpl(AccountRepository repository, AccountMapper mapper,
 			AccountProfileRepository profileRepository, AccountStatusReporitory statusRepository,
-			PasswordEncoder passwordEncoder, RedisService redisService, RoleService roleService,
-			FollowService followService) {
+			PasswordEncoder passwordEncoder, RedisService redisService, FollowService followService,
+			ApplicationEventPublisher events) {
 		super(repository, mapper);
 		this.profileRepository = profileRepository;
 		this.statusRepository = statusRepository;
 		this.passwordEncoder = passwordEncoder;
-		this.redisService = redisService;
-		this.roleService = roleService;
 		this.followService = followService;
+		this.redisService = redisService;
+		this.events = events;
 	}
 
 	@Override
@@ -83,8 +86,7 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 		AccountProfile profile = mapper.toEntity(request.profile());
 		profile.setDisplayName(profile.getFirstName() + " " + profile.getLastName());
 		AccountStatus status = mapper.toEntity(request.status());
-		if (!roleService.exists(status.getRoleId()))
-			throw new NotFoundException("Could not find role with id: " + status.getRoleId());
+		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
 		Account account = new Account();
 		account.setUsername(request.username().toLowerCase());
 		account.setEmail(request.email().toLowerCase());
@@ -118,10 +120,8 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 				statusRepository::findByAccountId);
 		mapper.update(request, status);
 		if (!status.getRoleId().equals(request.roleId())) {
-			if (roleService.exists(request.roleId()))
-				status.setRoleId(request.roleId());
-			else
-				throw new NotFoundException("Could not find role with id: " + request.roleId());
+			events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, request.roleId()));
+			status.setRoleId(request.roleId());
 		}
 		status = statusRepository.save(status);
 		if (status.isNonLocked()) {
@@ -185,31 +185,6 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 	}
 
 	@Override
-	public void register(RegisterRequest request) {
-		if (!request.password().equals(request.confirmPassword()))
-			throw new MismatchException("password and confirm password not matches");
-		if (repository.existsByEmail(request.email()))
-			throw new AlreadyExistsException("Email already exists");
-		RoleResponse role = roleService.readByName(RoleDefault.USER.name());
-		AccountProfile profile = mapper.toEntity(request.profile());
-		profile.setDisplayName(profile.getFirstName() + " " + profile.getLastName());
-		AccountStatus status = new AccountStatus();
-		status.setRoleId(role.id());
-		Account account = new Account();
-		account.setEmail(request.email().toLowerCase());
-		account.setUsername(request.username().toLowerCase());
-		account.setPassword(passwordEncoder.encode(request.password()));
-		account.setProfile(profile);
-		account.setStatus(status);
-		try {
-			repository.save(account);
-		} catch (DataIntegrityViolationException e) {
-			e.printStackTrace();
-			throw new AlreadyExistsException(e.getMessage());
-		}
-	}
-
-	@Override
 	public AccountDto readDtoByUsername(String username) {
 		return repository.findByUsername(username).map(mapper::toDto)
 				.orElseThrow(() -> new NotFoundException("Could not find account with username: " + username));
@@ -235,8 +210,9 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 	}
 
 	@Override
-	public List<AuthorResponse> readAllAuthorsByAccountIds(List<Long> accountIds) {
-		return repository.findAllAuthorsByAccountIds(accountIds).stream().map(mapper::toAuthorResponse).toList();
+	public Map<Long, AuthorResponse> readMapAuthorsByAccountIds(Collection<Long> accountIds) {
+		return repository.findAllAuthorsByAccountIds(accountIds).stream()
+				.collect(Collectors.toMap(Author::id, a -> mapper.toAuthorResponse(a)));
 	}
 
 	@Override
@@ -264,7 +240,7 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 	public PageResponse<AuthorResponse> readFollow(Long following, FollowDirection direction, Search search) {
 		PageResponse<FollowResponse> pageResponse = followService.readPage(following, direction, search);
 		List<Long> accountIds = pageResponse.getContent().stream().map(followResponse -> followResponse.id()).toList();
-		List<AuthorResponse> authors = readAllAuthorsByAccountIds(accountIds);
+		List<AuthorResponse> authors = new ArrayList<>(readMapAuthorsByAccountIds(accountIds).values());
 		return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalElements(), pageResponse.getPage(),
 				authors);
 	}

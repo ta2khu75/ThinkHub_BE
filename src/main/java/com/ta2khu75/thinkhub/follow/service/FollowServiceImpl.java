@@ -1,7 +1,6 @@
 package com.ta2khu75.thinkhub.follow.service;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;

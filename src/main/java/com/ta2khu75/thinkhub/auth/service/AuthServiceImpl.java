@@ -3,7 +3,6 @@ package com.ta2khu75.thinkhub.auth.service;
 import java.time.Duration;
 import java.time.Instant;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ta2khu75.thinkhub.account.AccountDto;
 import com.ta2khu75.thinkhub.account.AccountService;
+import com.ta2khu75.thinkhub.account.request.AccountRequest;
+import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
 import com.ta2khu75.thinkhub.auth.AuthResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.LoginRequest;
@@ -22,8 +23,10 @@ import com.ta2khu75.thinkhub.auth.TokenResponse;
 import com.ta2khu75.thinkhub.auth.model.Auth;
 import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.response.RoleResponse;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
@@ -37,7 +40,6 @@ public class AuthServiceImpl implements AuthService, IdDecodable {
 	private final AccountService accountService;
 	private final RoleService roleService;
 	private final AuthenticationManager authenticationManager;
-	private final ApplicationEventPublisher events;
 	private final JwtService jwtService;
 	private final RedisService redisService;
 
@@ -51,15 +53,18 @@ public class AuthServiceImpl implements AuthService, IdDecodable {
 	}
 
 	@Override
-//	@Transactional
 	public void register(RegisterRequest request) {
-		events.publishEvent(request);
+		RoleResponse role = roleService.readByName(RoleDefault.USER.name());
+		AccountStatusRequest status = new AccountStatusRequest(false, true, role.id());
+		AccountRequest accountRequest = new AccountRequest(request.username(), request.password(),
+				request.confirmPassword(), request.email(), request.profile(), status);
+		accountService.create(accountRequest);
 	}
 
 	@Override
 	@Transactional
 	public void changePassword(ChangePasswordRequest request) {
-		events.publishEvent(request);
+		accountService.changePassword(request);
 	}
 
 	@Override
@@ -92,7 +97,7 @@ public class AuthServiceImpl implements AuthService, IdDecodable {
 		RoleDto role = auth.getRole();
 		TokenResponse refreshToken = jwtService.createRefreshToken(account);
 		String accessToken = jwtService.createAccessToken(account, role);
-		return new AuthResponse(account.id(),account.profile(), role.name(), accessToken, refreshToken);
+		return new AuthResponse(account.id(), account.profile(), role.name(), accessToken, refreshToken);
 	}
 
 	@Override

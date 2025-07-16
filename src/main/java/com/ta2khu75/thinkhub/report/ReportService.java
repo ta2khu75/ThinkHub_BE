@@ -1,18 +1,22 @@
 package com.ta2khu75.thinkhub.report;
 
-import com.ta2khu75.quiz.model.ReportStatus;
-import com.ta2khu75.quiz.model.entity.id.ReportId;
-import com.ta2khu75.quiz.model.request.ReportRequest;
-import com.ta2khu75.quiz.model.request.search.ReportSearch;
-import com.ta2khu75.quiz.model.request.update.ReportStatusRequest;
-import com.ta2khu75.quiz.model.response.ReportResponse;
-import com.ta2khu75.quiz.service.base.CrudService;
-import com.ta2khu75.quiz.service.base.SearchService;
+import com.ta2khu75.thinkhub.report.dto.ReportIdDto;
+import com.ta2khu75.thinkhub.report.dto.ReportRequest;
+import com.ta2khu75.thinkhub.report.dto.ReportResponse;
+import com.ta2khu75.thinkhub.report.dto.ReportSearch;
+import com.ta2khu75.thinkhub.report.dto.ReportStatusRequest;
+import com.ta2khu75.thinkhub.report.dto.ReportUpdateRequest;
+import com.ta2khu75.thinkhub.report.entity.ReportId;
+import com.ta2khu75.thinkhub.shared.service.SearchService;
 
-public interface ReportService extends  SearchService<ReportResponse, ReportSearch> {
+public interface ReportService extends SearchService<ReportSearch, ReportResponse> {
 	ReportResponse updateStatus(ReportStatusRequest request);
-	ReportResponse create(ReportRequest request);
-	ReportResponse update(ReportRequest request);
-//	ReportResponse read(String id);
-//	void delete(String id);
+
+	ReportResponse update(ReportUpdateRequest request);
+
+	ReportResponse read(String targetId, ReportTargetType targetType);
+
+	void delete(ReportId id);
+	
+	ReportResponse create(Long targetId, ReportTargetType targetType, ReportRequest request);
 }

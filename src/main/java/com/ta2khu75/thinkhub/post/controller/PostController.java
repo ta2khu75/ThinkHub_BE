@@ -3,18 +3,28 @@ package com.ta2khu75.thinkhub.post.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ta2khu75.thinkhub.comment.dto.CommentRequest;
+import com.ta2khu75.thinkhub.comment.dto.CommentResponse;
 import com.ta2khu75.thinkhub.post.PostService;
 import com.ta2khu75.thinkhub.post.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.dto.PostSearch;
+import com.ta2khu75.thinkhub.report.dto.ReportRequest;
+import com.ta2khu75.thinkhub.report.dto.ReportResponse;
+import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.controller.CrudController;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
 @RestController
@@ -49,6 +59,21 @@ public class PostController extends BaseController<PostService>
 	@Override
 	public ResponseEntity<PostResponse> read(String id) {
 		return ResponseEntity.ok(service.read(decodeId(id)));
+	}
+
+	@PostMapping("{postId}/comments")
+	public ResponseEntity<CommentResponse> comment(@PathVariable String postId, @RequestBody CommentRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.comment(decodeId(postId), request));
+	}
+
+	@PostMapping("{postId}/reports")
+	public ResponseEntity<ReportResponse> report(@PathVariable String postId, @RequestBody ReportRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.report(decodeId(postId), request));
+	}
+	@GetMapping("{postId}/comments")
+	public ResponseEntity<PageResponse<CommentResponse>> readComments(@PathVariable String postId,
+			@SnakeCaseModelAttribute Search search) {
+		return ResponseEntity.ok(service.readPageComments(decodeId(postId), search));
 	}
 
 	@Override

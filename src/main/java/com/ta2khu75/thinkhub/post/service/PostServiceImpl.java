@@ -1,8 +1,8 @@
 package com.ta2khu75.thinkhub.post.service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -12,6 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.account.AccountService;
+import com.ta2khu75.thinkhub.comment.CommentService;
+import com.ta2khu75.thinkhub.comment.CommentTargetType;
+import com.ta2khu75.thinkhub.comment.dto.CommentRequest;
+import com.ta2khu75.thinkhub.comment.dto.CommentResponse;
+import com.ta2khu75.thinkhub.comment.service.CommentServiceImpl;
 import com.ta2khu75.thinkhub.post.PostService;
 import com.ta2khu75.thinkhub.post.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.dto.PostResponse;
@@ -19,7 +24,12 @@ import com.ta2khu75.thinkhub.post.dto.PostSearch;
 import com.ta2khu75.thinkhub.post.entity.Post;
 import com.ta2khu75.thinkhub.post.mapper.PostMapper;
 import com.ta2khu75.thinkhub.post.repository.PostRepository;
+import com.ta2khu75.thinkhub.report.ReportService;
+import com.ta2khu75.thinkhub.report.ReportTargetType;
+import com.ta2khu75.thinkhub.report.dto.ReportRequest;
+import com.ta2khu75.thinkhub.report.dto.ReportResponse;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
@@ -36,16 +46,21 @@ import jakarta.validation.Valid;
 @Service
 public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper> implements PostService {
 
+	private final CommentService commentService;
 	private final ApplicationEventPublisher events;
 	private final AccountService accountService;
 	private final TagService tagService;
+	private final ReportService reportService;
 
 	public PostServiceImpl(PostRepository repository, PostMapper mapper, ApplicationEventPublisher events,
-			AccountService accountService, TagService tagService) {
+			AccountService accountService, TagService tagService, CommentServiceImpl commentService,
+			ReportService reportService) {
 		super(repository, mapper);
 		this.events = events;
 		this.accountService = accountService;
 		this.tagService = tagService;
+		this.commentService = commentService;
+		this.reportService = reportService;
 	}
 
 	@Override
@@ -118,42 +133,67 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 
 	@Override
 	public PageResponse<PostResponse> search(PostSearch search) {
-		String authorId = search.getAuthorId();
-		if (!SecurityUtil.isAuthor(authorId))
+		if (search.getAuthorId() != null) {
+			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.ACCOUNT));
+		}
+		Long authorId = search.getAuthorIdQuery();
+
+		// Nếu không phải là chính chủ, chỉ cho xem bài viết PUBLIC
+		if (!SecurityUtil.isAuthorDecode(authorId)) {
 			search.setAccessModifier(AccessModifier.PUBLIC);
+		}
+
 		Page<Post> page = repository.search(search);
-		PageResponse<PostResponse> response = mapper.toPageResponse(page);
+
+		// Lấy toàn bộ tagIds trong trang này
 		Set<Long> tagIds = page.stream().flatMap(post -> post.getTagIds().stream()).collect(Collectors.toSet());
-		Set<TagDto> tags = tagIds.isEmpty() ? Set.of() : tagService.readAllByIds(tagIds);
-		Map<Long, TagDto> tagMap = tags.stream().collect(Collectors.toMap(TagDto::id, Function.identity()));
+
+		Map<Long, TagDto> tagMap = tagIds.isEmpty() ? Map.of()
+				: tagService.readAllByIds(tagIds).stream().collect(Collectors.toMap(TagDto::id, Function.identity()));
+
+		// Lấy author map
+		Map<Long, AuthorResponse> authorMap;
 		if (authorId != null) {
-			Long accountId = decode(authorId, IdConfig.ACCOUNT);
-			search.setAuthorIdQuery(accountId);
-			AuthorResponse author = accountService.readAuthor(accountId);
-			response.getContent().stream().forEach(post -> {
-				post.setAuthor(author);
-				Set<TagDto> tagDtos = post.getTags().stream().map(tag -> tagMap.get(tag.id()))
-						.collect(Collectors.toSet());
-				post.setTags(tagDtos);
-			});
+			// Nếu đã biết authorId → chỉ cần 1 author
+			AuthorResponse author = accountService.readAuthor(authorId);
+			authorMap = Map.of(authorId, author);
+		} else {
+			// Lấy toàn bộ authorId trong trang
+			Set<Long> authorIds = page.getContent().stream().map(Post::getAuthorId).collect(Collectors.toSet());
+
+			authorMap = accountService.readMapAuthorsByAccountIds(authorIds);
 		}
-		if (authorId == null) {
-			List<Long> authorIds = page.getContent().stream().map(post -> post.getAuthorId()).toList();
-			Set<AuthorResponse> authors = new HashSet<>(accountService.readAllAuthorsByAccountIds(authorIds));
-			Map<Long, AuthorResponse> authorMap = authors.stream()
-					.collect(Collectors.toMap(AuthorResponse::getOriginalId, a -> {
-						a.setOriginalId(null);
-						return a;
-					}));
-			response.getContent().stream().forEach(post -> {
-				AuthorResponse author = authorMap.get(post.getAuthorId());
-				post.setAuthor(author);
-				post.setAuthorId(null);
-				Set<TagDto> tagDtos = post.getTags().stream().map(tag -> tagMap.get(tag.id()))
-						.collect(Collectors.toSet());
-				post.setTags(tagDtos);
-			});
-		}
+
+		// Ánh xạ post → PostResponse
+		List<PostResponse> responses = page.getContent().parallelStream()
+				.map(post -> toResponse(post, authorMap, tagMap)).toList();
+
+		return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(), responses);
+	}
+
+	private PostResponse toResponse(Post post, Map<Long, AuthorResponse> authorMap, Map<Long, TagDto> tagMap) {
+		PostResponse response = mapper.convert(post);
+		response.setAuthor(authorMap.get(post.getAuthorId()));
+
+		Set<TagDto> tags = post.getTagIds().stream().map(tagMap::get).filter(Objects::nonNull)
+				.collect(Collectors.toSet());
+
+		response.setTags(tags);
 		return response;
+	}
+
+	@Override
+	public CommentResponse comment(Long id, CommentRequest request) {
+		return commentService.create(id, CommentTargetType.POST, request);
+	}
+
+	@Override
+	public PageResponse<CommentResponse> readPageComments(Long targetId, Search search) {
+		return commentService.readPageBy(targetId, CommentTargetType.POST, search);
+	}
+
+	@Override
+	public ReportResponse report(Long id, ReportRequest request) {
+		return reportService.create(id, ReportTargetType.POST, request);
 	}
 }

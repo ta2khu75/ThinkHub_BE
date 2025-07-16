@@ -1,6 +1,7 @@
 package com.ta2khu75.thinkhub.account.repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,7 +64,7 @@ public class AccountRepositoryImpl implements AccountRepositoryCustom {
 	}
 
 	@Override
-	public List<Author> findAllAuthorsByAccountIds(List<Long> accountIds) {
+	public List<Author> findAllAuthorsByAccountIds(Collection<Long> accountIds) {
 		QAccount account = QAccount.account;
 		List<Predicate> conditionList = Stream.of(applyIfNotNull(accountIds, () -> account.id.in(accountIds)))
 				.filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
