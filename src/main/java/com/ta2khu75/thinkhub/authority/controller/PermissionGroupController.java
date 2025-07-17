@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.ta2khu75.thinkhub.authority.PermissionGroupService;
-import com.ta2khu75.thinkhub.authority.response.PermissionGroupResponse;
+import com.ta2khu75.thinkhub.authority.dto.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 

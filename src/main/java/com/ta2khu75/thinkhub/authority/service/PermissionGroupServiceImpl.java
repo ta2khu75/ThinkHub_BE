@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.authority.PermissionGroupService;
+import com.ta2khu75.thinkhub.authority.dto.request.PermissionGroupRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.authority.entity.Permission;
 import com.ta2khu75.thinkhub.authority.entity.PermissionGroup;
 import com.ta2khu75.thinkhub.authority.mapper.PermissionGroupMapper;
 import com.ta2khu75.thinkhub.authority.repository.PermissionGroupRepository;
-import com.ta2khu75.thinkhub.authority.request.PermissionGroupRequest;
-import com.ta2khu75.thinkhub.authority.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 import jakarta.validation.Valid;

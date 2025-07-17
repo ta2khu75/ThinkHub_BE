@@ -2,6 +2,8 @@ package com.ta2khu75.thinkhub.notification.entity;
 
 import java.io.Serializable;
 
+import com.ta2khu75.thinkhub.notification.NotificationTargetType;
+
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

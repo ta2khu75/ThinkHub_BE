@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.account.response;
+package com.ta2khu75.thinkhub.account.dto.response;
 
 import java.time.Instant;
 import java.time.LocalDate;

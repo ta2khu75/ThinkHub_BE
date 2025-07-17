@@ -8,10 +8,7 @@ import com.ta2khu75.thinkhub.follow.entity.Follow;
 import com.ta2khu75.thinkhub.follow.entity.FollowId;
 
 public interface FollowRepository extends JpaRepository<Follow, FollowId> {
-	Page<Follow> findByFollowingId(Long followingId, Pageable pageable);
+	Page<Follow> findByIdFollowingId(Long followingId, Pageable pageable);
 
-	Page<Follow> findByFollowerId(Long followerId, Pageable pageable);
-
-//
-//	Set<Follow> findByFollowingId(Long followingId);
+	Page<Follow> findByIdFollowerId(Long followerId, Pageable pageable);
 }

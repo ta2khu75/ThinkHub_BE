@@ -19,6 +19,9 @@ public interface ReportMapper extends Converter<Report, ReportResponse>, PageMap
 	ReportResponse convert(Report source);
 
 	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "status", ignore = true)
+	@Mapping(target = "createdAt", ignore = true)
+	@Mapping(target = "updatedAt", ignore = true)
 	Report toEntity(ReportRequest request);
 //
 //	@Mapping(target = "id", ignore = true)

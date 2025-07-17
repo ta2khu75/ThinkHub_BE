@@ -11,8 +11,10 @@ public interface IdDecodable {
 	default Long decodeAccountId(String accountId) {
 		return IdConverterUtil.decode(accountId, IdConfig.ACCOUNT);
 	}
+
 	default Long decodeId(String id) {
 		return decodeIdWithConfig(id, getIdConfig());
 	}
-	IdConfig getIdConfig(); 
+
+	IdConfig getIdConfig();
 }

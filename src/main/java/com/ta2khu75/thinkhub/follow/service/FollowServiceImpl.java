@@ -2,7 +2,6 @@ package com.ta2khu75.thinkhub.follow.service;
 
 import java.util.List;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {
 	private final FollowRepository repository;
-	private final ApplicationEventPublisher events;
 
 	@Override
 	@Transactional
@@ -53,13 +51,13 @@ public class FollowServiceImpl implements FollowService {
 	public PageResponse<FollowResponse> readPage(Long followingId, FollowDirection direction, Search search) {
 		Pageable pageable = search.toPageable();
 		if (direction == FollowDirection.FOLLOWING) {
-			Page<Follow> page = repository.findByFollowingId(followingId, pageable);
+			Page<Follow> page = repository.findByIdFollowingId(followingId, pageable);
 			List<FollowResponse> followerResponse = page.getContent().stream()
 					.map(follow -> new FollowResponse(follow.getId().getFollowerId())).toList();
 			return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(),
 					followerResponse);
 		} else {
-			Page<Follow> page = repository.findByFollowerId(followingId, pageable);
+			Page<Follow> page = repository.findByIdFollowerId(followingId, pageable);
 			List<FollowResponse> followingResponse = page.getContent().stream()
 					.map(follow -> new FollowResponse(follow.getId().getFollowingId())).toList();
 			return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(),
@@ -72,5 +70,4 @@ public class FollowServiceImpl implements FollowService {
 		Long followerId = SecurityUtil.getCurrentAccountIdDecode();
 		return new FollowStatusResponse(repository.existsById(new FollowId(followingId, followerId)));
 	}
-
 }

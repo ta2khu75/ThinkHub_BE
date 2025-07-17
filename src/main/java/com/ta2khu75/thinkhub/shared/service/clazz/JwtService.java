@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.auth.service;
+package com.ta2khu75.thinkhub.shared.service.clazz;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -12,13 +12,13 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.account.AccountDto;
+import com.ta2khu75.thinkhub.account.dto.AccountDto;
 import com.ta2khu75.thinkhub.auth.TokenResponse;
-import com.ta2khu75.thinkhub.authority.RoleDto;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
 import com.ta2khu75.thinkhub.config.JwtProperties;
+import com.ta2khu75.thinkhub.config.JwtProviderFactory;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenConfig;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
-import com.ta2khu75.thinkhub.config.JwtProviderFactory;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 
 import lombok.RequiredArgsConstructor;

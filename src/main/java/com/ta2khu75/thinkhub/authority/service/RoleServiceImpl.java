@@ -5,14 +5,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
+import com.ta2khu75.thinkhub.authority.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.authority.entity.Permission;
 import com.ta2khu75.thinkhub.authority.entity.Role;
 import com.ta2khu75.thinkhub.authority.mapper.RoleMapper;
 import com.ta2khu75.thinkhub.authority.repository.RoleRepository;
-import com.ta2khu75.thinkhub.authority.request.RoleRequest;
-import com.ta2khu75.thinkhub.authority.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;

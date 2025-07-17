@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.authority.request;
+package com.ta2khu75.thinkhub.authority.dto.request;
 
 import java.util.Set;
 

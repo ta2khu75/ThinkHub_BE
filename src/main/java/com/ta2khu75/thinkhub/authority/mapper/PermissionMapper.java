@@ -5,9 +5,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
+import com.ta2khu75.thinkhub.authority.dto.request.PermissionRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.PermissionResponse;
 import com.ta2khu75.thinkhub.authority.entity.Permission;
-import com.ta2khu75.thinkhub.authority.request.PermissionRequest;
-import com.ta2khu75.thinkhub.authority.response.PermissionResponse;
 import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 

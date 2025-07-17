@@ -66,6 +66,7 @@ public class AuthController extends BaseController<AuthService> {
 				.body(this.makeAuthResponse(response));
 	}
 
+	@PostMapping("/logout")
 	@Operation(summary = "Logout", description = "Invalidate the user session and delete authentication tokens.")
 	public ResponseEntity<Void> logout(@CookieValue(REFRESH_TOKEN) String token) {
 		service.logout(token);

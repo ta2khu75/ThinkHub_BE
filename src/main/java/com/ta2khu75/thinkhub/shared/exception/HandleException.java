@@ -1,7 +1,9 @@
 package com.ta2khu75.thinkhub.shared.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,7 +31,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import com.ta2khu75.thinkhub.shared.dto.ApiResponse;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class HandleException implements ResponseBodyAdvice<Object> {
+	private final HttpServletRequest request;
+
 	@ExceptionHandler(value = BaseException.class)
 	public ResponseEntity<ExceptionResponse> handleBaseException(BaseException ex) {
 		return ResponseEntity.status(ex.getStatusCode()).body(new ExceptionResponse(ex.getMessage()));
@@ -88,7 +93,9 @@ public class HandleException implements ResponseBodyAdvice<Object> {
 	@Override
 	public boolean supports(@NonNull MethodParameter returnType,
 			@NonNull Class<? extends HttpMessageConverter<?>> converterType) {
-		return true;
+		String uri = request.getRequestURI();
+
+		return !uri.startsWith("/swagger") && !uri.startsWith("/v3/api-docs") && !uri.startsWith("/swagger-ui");
 	}
 
 	@Override
@@ -98,7 +105,6 @@ public class HandleException implements ResponseBodyAdvice<Object> {
 			@NonNull ServerHttpResponse response) {
 		HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
 		int status = servletResponse.getStatus();
-
 		if (selectedContentType.includes(MediaType.APPLICATION_JSON)) {
 			if (status < HttpStatus.BAD_REQUEST.value()) {
 				return ApiResponse.builder().data(body).status(status).build();

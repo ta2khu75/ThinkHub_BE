@@ -4,11 +4,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.ta2khu75.thinkhub.authority.RoleDto;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
+import com.ta2khu75.thinkhub.authority.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.authority.entity.Permission;
 import com.ta2khu75.thinkhub.authority.entity.Role;
-import com.ta2khu75.thinkhub.authority.request.RoleRequest;
-import com.ta2khu75.thinkhub.authority.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 

@@ -3,13 +3,15 @@ package com.ta2khu75.thinkhub.account;
 import java.util.Collection;
 import java.util.Map;
 
-import com.ta2khu75.thinkhub.account.request.AccountProfileRequest;
-import com.ta2khu75.thinkhub.account.request.AccountRequest;
-import com.ta2khu75.thinkhub.account.request.AccountSearch;
-import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
-import com.ta2khu75.thinkhub.account.response.AccountProfileResponse;
-import com.ta2khu75.thinkhub.account.response.AccountResponse;
-import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
+import com.ta2khu75.thinkhub.account.dto.AccountDto;
+import com.ta2khu75.thinkhub.account.dto.UpdatePassword;
+import com.ta2khu75.thinkhub.account.dto.request.AccountProfileRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountSearch;
+import com.ta2khu75.thinkhub.account.dto.request.AccountStatusRequest;
+import com.ta2khu75.thinkhub.account.dto.response.AccountProfileResponse;
+import com.ta2khu75.thinkhub.account.dto.response.AccountResponse;
+import com.ta2khu75.thinkhub.account.dto.response.AccountStatusResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.follow.FollowDirection;
 import com.ta2khu75.thinkhub.follow.dto.FollowStatusResponse;
@@ -40,7 +42,7 @@ public interface AccountService extends SearchService<AccountSearch, AccountResp
 
 	AccountDto readDto(Long id);
 
-	void changePassword(ChangePasswordRequest request);
+	void updatePassword(UpdatePassword request);
 
 	AuthorResponse readAuthor(Long id);
 

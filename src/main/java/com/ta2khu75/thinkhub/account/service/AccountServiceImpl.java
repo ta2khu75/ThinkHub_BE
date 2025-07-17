@@ -11,12 +11,21 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ta2khu75.thinkhub.account.AccountDto;
 import com.ta2khu75.thinkhub.account.AccountService;
+import com.ta2khu75.thinkhub.account.dto.AccountDto;
+import com.ta2khu75.thinkhub.account.dto.UpdatePassword;
+import com.ta2khu75.thinkhub.account.dto.request.AccountProfileRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountSearch;
+import com.ta2khu75.thinkhub.account.dto.request.AccountStatusRequest;
+import com.ta2khu75.thinkhub.account.dto.response.AccountProfileResponse;
+import com.ta2khu75.thinkhub.account.dto.response.AccountResponse;
+import com.ta2khu75.thinkhub.account.dto.response.AccountStatusResponse;
 import com.ta2khu75.thinkhub.account.entity.Account;
 import com.ta2khu75.thinkhub.account.entity.AccountProfile;
 import com.ta2khu75.thinkhub.account.entity.AccountStatus;
@@ -25,13 +34,6 @@ import com.ta2khu75.thinkhub.account.projection.Author;
 import com.ta2khu75.thinkhub.account.repository.AccountProfileRepository;
 import com.ta2khu75.thinkhub.account.repository.AccountRepository;
 import com.ta2khu75.thinkhub.account.repository.AccountStatusReporitory;
-import com.ta2khu75.thinkhub.account.request.AccountProfileRequest;
-import com.ta2khu75.thinkhub.account.request.AccountRequest;
-import com.ta2khu75.thinkhub.account.request.AccountSearch;
-import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
-import com.ta2khu75.thinkhub.account.response.AccountProfileResponse;
-import com.ta2khu75.thinkhub.account.response.AccountResponse;
-import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.follow.FollowDirection;
 import com.ta2khu75.thinkhub.follow.FollowService;
@@ -111,7 +113,9 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 
 	@Override
 	public void delete(Long id) {
-		repository.deleteById(id);
+		AccountStatus status = FunctionUtil.findOrThrow(id, AccountStatus.class, statusRepository::findByAccountId);
+		status.setDeleted(true);
+		statusRepository.save(status);
 	}
 
 	@Override
@@ -144,9 +148,8 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 
 	@Override
 	public PageResponse<AccountResponse> search(AccountSearch search) {
-//		Page<Account> page = repository.search(search);
-//		return mapper.toPageResponse(page);
-		return null;
+		Page<Account> page = repository.search(search);
+		return mapper.toPageResponse(page);
 	}
 
 	@Override
@@ -174,9 +177,7 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 	}
 
 	@Override
-	public void changePassword(ChangePasswordRequest request) {
-		if (!request.newPassword().equals(request.confirmPassword()))
-			throw new MismatchException("New password and confirm password not matches");
+	public void updatePassword(UpdatePassword request) {
 		Account account = this.readEntity(SecurityUtil.getCurrentAccountIdDecode());
 		if (!passwordEncoder.matches(request.password(), account.getPassword()))
 			throw new MismatchException("Password not matches");
@@ -212,7 +213,7 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 	@Override
 	public Map<Long, AuthorResponse> readMapAuthorsByAccountIds(Collection<Long> accountIds) {
 		return repository.findAllAuthorsByAccountIds(accountIds).stream()
-				.collect(Collectors.toMap(Author::id, a -> mapper.toAuthorResponse(a)));
+				.collect(Collectors.toMap(Author::id, mapper::toAuthorResponse));
 	}
 
 	@Override
@@ -239,7 +240,7 @@ public class AccountServiceImpl extends BaseService<Account, Long, AccountReposi
 	@Override
 	public PageResponse<AuthorResponse> readFollow(Long following, FollowDirection direction, Search search) {
 		PageResponse<FollowResponse> pageResponse = followService.readPage(following, direction, search);
-		List<Long> accountIds = pageResponse.getContent().stream().map(followResponse -> followResponse.id()).toList();
+		List<Long> accountIds = pageResponse.getContent().stream().map(FollowResponse::id).toList();
 		List<AuthorResponse> authors = new ArrayList<>(readMapAuthorsByAccountIds(accountIds).values());
 		return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalElements(), pageResponse.getPage(),
 				authors);

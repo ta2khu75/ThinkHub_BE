@@ -1,5 +1,6 @@
 package com.ta2khu75.thinkhub.comment.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -15,5 +16,7 @@ public interface CommentMapper extends Converter<Comment, CommentResponse> {
 	@Mapping(target = "author", ignore = true)
 	CommentResponse convert(Comment comment);
 
+	@BeanMapping(ignoreByDefault = true)
+	@Mapping(target = "content", source = "content")
 	Comment toEntity(CommentRequest request);
 }

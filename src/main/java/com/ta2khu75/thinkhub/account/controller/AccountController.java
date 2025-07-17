@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ta2khu75.thinkhub.account.AccountService;
-import com.ta2khu75.thinkhub.account.request.AccountProfileRequest;
-import com.ta2khu75.thinkhub.account.request.AccountRequest;
-import com.ta2khu75.thinkhub.account.request.AccountSearch;
-import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
-import com.ta2khu75.thinkhub.account.response.AccountProfileResponse;
-import com.ta2khu75.thinkhub.account.response.AccountResponse;
-import com.ta2khu75.thinkhub.account.response.AccountStatusResponse;
+import com.ta2khu75.thinkhub.account.dto.request.AccountProfileRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountSearch;
+import com.ta2khu75.thinkhub.account.dto.request.AccountStatusRequest;
+import com.ta2khu75.thinkhub.account.dto.response.AccountProfileResponse;
+import com.ta2khu75.thinkhub.account.dto.response.AccountResponse;
+import com.ta2khu75.thinkhub.account.dto.response.AccountStatusResponse;
 import com.ta2khu75.thinkhub.follow.FollowDirection;
 import com.ta2khu75.thinkhub.follow.dto.FollowStatusResponse;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
@@ -32,7 +32,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "Account", description = "Manage user accounts, profiles and statuses")
+@Tag(name = "Account", description = "Provides account management features including profile editing, status control, and following/unfollowing other users.")
 @ApiController("${app.api-prefix}/accounts")
 public class AccountController extends BaseController<AccountService> implements IdDecodable {
 
@@ -80,29 +80,35 @@ public class AccountController extends BaseController<AccountService> implements
 	}
 
 	@PostMapping("{accountId}/follow")
+	@Operation(summary = "Follow a user", description = "Start following a specific user account.")
 	public ResponseEntity<Void> follow(@PathVariable String accountId) {
 		service.follow(this.decodeAccountId(accountId));
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	@DeleteMapping("{accountId}/follow")
+	@Operation(summary = "Unfollow a user", description = "Stop following a previously followed user account.")
 	public ResponseEntity<Void> unfollow(@PathVariable String accountId) {
 		service.unFollow(this.decodeAccountId(accountId));
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("{accountId}/follow/status")
+	@Operation(summary = "Check follow status", description = "Check whether you are currently following the specified user.")
 	public ResponseEntity<FollowStatusResponse> isFollowing(@PathVariable String accountId) {
 		return ResponseEntity.ok(service.isFollowing(this.decodeAccountId(accountId)));
 	}
 
 	@GetMapping("{accountId}/followers")
+	@Operation(summary = "Get followers", description = "View the list of users who are currently following the specified account.")
+
 	public ResponseEntity<PageResponse<AuthorResponse>> readFollowers(@PathVariable String accountId,
 			@SnakeCaseModelAttribute Search search) {
 		return ResponseEntity.ok(service.readFollow(this.decodeAccountId(accountId), FollowDirection.FOLLOWER, search));
 	}
 
 	@GetMapping("{accountId}/following")
+	@Operation(summary = "Get following", description = "View the list of accounts the user is currently following.")
 	public ResponseEntity<PageResponse<AuthorResponse>> readFollowing(@PathVariable String accountId,
 			@SnakeCaseModelAttribute Search search) {
 		return ResponseEntity

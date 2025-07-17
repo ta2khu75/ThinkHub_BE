@@ -19,11 +19,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
-import com.ta2khu75.thinkhub.account.AccountDto;
 import com.ta2khu75.thinkhub.account.AccountService;
+import com.ta2khu75.thinkhub.account.dto.AccountDto;
 import com.ta2khu75.thinkhub.auth.model.Auth;
-import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 
 import jakarta.servlet.http.HttpServletRequest;

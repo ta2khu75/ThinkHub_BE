@@ -20,7 +20,7 @@ import com.ta2khu75.thinkhub.result.QuizResultService;
 import com.ta2khu75.thinkhub.result.dto.QuizResultRequest;
 import com.ta2khu75.thinkhub.result.dto.QuizResultResponse;
 import com.ta2khu75.thinkhub.result.dto.QuizResultSearch;
-import com.ta2khu75.thinkhub.result.dto.UserAnswerDto;
+import com.ta2khu75.thinkhub.result.dto.UserAnswerRequest;
 import com.ta2khu75.thinkhub.result.entity.QuizResult;
 import com.ta2khu75.thinkhub.result.entity.UserAnswer;
 import com.ta2khu75.thinkhub.result.mapper.QuizResultMapper;
@@ -84,19 +84,19 @@ public class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizRes
 		return response;
 	}
 
-	private void gradeQuizResult(QuizResult quizResult, Set<UserAnswerDto> userAnswerRequests) {
+	private void gradeQuizResult(QuizResult quizResult, Set<UserAnswerRequest> userAnswerRequests) {
 		float totalScore = 0;
 		QuizResponse quiz = redisService.getValue(RedisKeyBuilder.quiz(quizResult.getQuizId()), QuizResponse.class);
 		List<QuestionDto> questions = quiz.getQuestions();
 		Set<UserAnswer> userAnswers = new HashSet<>();
 		Map<Long, QuestionDto> questionMap = questions.stream()
 				.collect(Collectors.toMap(QuestionDto::id, Function.identity()));
-		Map<Long, UserAnswerDto> userAnswerMap = userAnswerRequests.stream()
-				.collect(Collectors.toMap(UserAnswerDto::questionId, Function.identity()));
-		for (Map.Entry<Long, UserAnswerDto> entry : userAnswerMap.entrySet()) {
+		Map<Long, UserAnswerRequest> userAnswerMap = userAnswerRequests.stream()
+				.collect(Collectors.toMap(UserAnswerRequest::questionId, Function.identity()));
+		for (Map.Entry<Long, UserAnswerRequest> entry : userAnswerMap.entrySet()) {
 			Long questionId = entry.getKey();
-			UserAnswerDto userAnswerDto = entry.getValue();
-			Set<Long> userAnswerIds = userAnswerDto.answerIds();
+			UserAnswerRequest userAnswerRequest = entry.getValue();
+			Set<Long> userAnswerIds = userAnswerRequest.answerIds();
 			QuestionDto question = questionMap.get(questionId);
 			if (question == null)
 				continue;
@@ -111,7 +111,7 @@ public class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizRes
 			default:
 				isCorrect = false;
 			}
-			UserAnswer userAnswer = mapper.toEntity(userAnswerDto);
+			UserAnswer userAnswer = mapper.toEntity(userAnswerRequest);
 			userAnswer.setCorrect(isCorrect);
 			userAnswers.add(userAnswer);
 			totalScore += isCorrect ? 1 : 0;

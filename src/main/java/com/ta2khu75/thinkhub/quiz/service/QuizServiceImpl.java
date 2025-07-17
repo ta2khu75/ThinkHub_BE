@@ -40,6 +40,7 @@ import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseFileService;
 import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService;
 import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService.Folder;
+import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.tag.TagService;
 import com.ta2khu75.thinkhub.tag.dto.TagDto;

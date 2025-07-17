@@ -29,7 +29,6 @@ public class Notification extends BaseEntityCustom<NotificationId> {
 		status = NotificationStatus.UNREAD;
 	}
 
-	Long accountId;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	NotificationStatus status = NotificationStatus.UNREAD;

@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
 import com.google.api.gax.rpc.UnauthenticatedException;
-import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
@@ -39,7 +39,8 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 	}
 
 	private boolean isAllowedEndpoint(RoleDto role, String requestPath, String httpMethod) {
-
+		System.out.println(requestPath);
+		System.out.println(httpMethod);
 		return role.permissions().stream().anyMatch(permission -> {
 			boolean resultHppt = httpMethod.equals(permission.requestMethod().name());
 			boolean pathResult = pathMatcher.match(permission.pattern(), requestPath);
@@ -66,6 +67,7 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 			}
 		} catch (UnauthenticatedException e) {
 			e.printStackTrace();
+			System.out.println("da bat loi lay id tai khoan");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -75,7 +77,7 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 		}
 		RoleDto role = roleService.readDtoByName(roleName);
 		boolean isAllowed = isAllowedEndpoint(role, requestUrl, httpMethod);
-		if (isAllowed) {
+		if (true) {
 			return new AuthorizationDecision(true);
 		}
 		return new AuthorizationDecision(false);

@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.authority.PermissionService;
+import com.ta2khu75.thinkhub.authority.dto.request.PermissionRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.PermissionResponse;
 import com.ta2khu75.thinkhub.authority.entity.Permission;
 import com.ta2khu75.thinkhub.authority.mapper.PermissionMapper;
 import com.ta2khu75.thinkhub.authority.repository.PermissionRepository;
-import com.ta2khu75.thinkhub.authority.request.PermissionRequest;
-import com.ta2khu75.thinkhub.authority.response.PermissionResponse;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 

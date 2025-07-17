@@ -8,6 +8,7 @@ import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 import com.ta2khu75.thinkhub.shared.service.clazz.ExistsServiceRegistry;
 
+import ch.qos.logback.core.spi.ConfigurationEvent.EventType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +21,7 @@ public class SharedLisnter {
 
 	@EventListener
 	public void handleCheckExistsEvent(CheckExistsEvent<?> event) {
-		ExistsService<Object> existsService = registry.getService(EntityType.CATEGORY);
+		ExistsService<Object> existsService = registry.getService(event.entityType());
 		existsService.checkExists(event.id());
 	}
 }

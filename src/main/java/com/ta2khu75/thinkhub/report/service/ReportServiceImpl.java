@@ -22,6 +22,7 @@ import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.encode;
+import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
 import lombok.AccessLevel;
@@ -81,7 +82,8 @@ public class ReportServiceImpl extends BaseService<Report, ReportId, ReportRepos
 	}
 
 	@Override
-	public void delete(ReportId id) {
+	public void delete(ReportIdDto dto) {
+		ReportId id = toReportId(dto);
 		repository.deleteById(id);
 	}
 

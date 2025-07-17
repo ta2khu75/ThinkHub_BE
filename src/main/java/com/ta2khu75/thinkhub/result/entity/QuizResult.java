@@ -33,7 +33,7 @@ public class QuizResult extends BaseEntityLong {
 	Long accountId;
 	@Column(nullable = false, updatable = false)
 	Long quizId;
-	@OneToMany(mappedBy = "quizResult", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "quiz_result_id")
 	Set<UserAnswer> userAnswers;
 }

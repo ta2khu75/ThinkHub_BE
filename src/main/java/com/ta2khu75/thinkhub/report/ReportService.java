@@ -6,17 +6,17 @@ import com.ta2khu75.thinkhub.report.dto.ReportResponse;
 import com.ta2khu75.thinkhub.report.dto.ReportSearch;
 import com.ta2khu75.thinkhub.report.dto.ReportStatusRequest;
 import com.ta2khu75.thinkhub.report.dto.ReportUpdateRequest;
-import com.ta2khu75.thinkhub.report.entity.ReportId;
 import com.ta2khu75.thinkhub.shared.service.SearchService;
 
 public interface ReportService extends SearchService<ReportSearch, ReportResponse> {
+	ReportResponse create(Long targetId, ReportTargetType targetType, ReportRequest request);
+
+	ReportResponse read(String targetId, ReportTargetType targetType);
+
 	ReportResponse updateStatus(ReportStatusRequest request);
 
 	ReportResponse update(ReportUpdateRequest request);
 
-	ReportResponse read(String targetId, ReportTargetType targetType);
+	void delete(ReportIdDto id);
 
-	void delete(ReportId id);
-	
-	ReportResponse create(Long targetId, ReportTargetType targetType, ReportRequest request);
 }

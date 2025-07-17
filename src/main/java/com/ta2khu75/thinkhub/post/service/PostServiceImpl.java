@@ -37,6 +37,7 @@ import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
+import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.tag.TagService;
 import com.ta2khu75.thinkhub.tag.dto.TagDto;
@@ -45,7 +46,6 @@ import jakarta.validation.Valid;
 
 @Service
 public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper> implements PostService {
-
 	private final CommentService commentService;
 	private final ApplicationEventPublisher events;
 	private final AccountService accountService;

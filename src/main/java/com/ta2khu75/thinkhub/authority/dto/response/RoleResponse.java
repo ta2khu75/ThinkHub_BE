@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.authority.response;
+package com.ta2khu75.thinkhub.authority.dto.response;
 
 import java.util.Set;
 

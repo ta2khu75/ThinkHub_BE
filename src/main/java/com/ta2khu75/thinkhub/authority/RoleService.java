@@ -2,8 +2,9 @@ package com.ta2khu75.thinkhub.authority;
 
 import java.util.List;
 
-import com.ta2khu75.thinkhub.authority.request.RoleRequest;
-import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
+import com.ta2khu75.thinkhub.authority.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.service.CrudService;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 

@@ -13,4 +13,5 @@ public interface FollowService {
 	FollowStatusResponse isFollowing(Long followingId);
 
 	PageResponse<FollowResponse> readPage(Long followingId, FollowDirection direction, Search search);
+
 }

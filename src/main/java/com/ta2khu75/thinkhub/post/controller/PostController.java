@@ -16,6 +16,7 @@ import com.ta2khu75.thinkhub.post.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.dto.PostSearch;
 import com.ta2khu75.thinkhub.report.dto.ReportRequest;
 import com.ta2khu75.thinkhub.report.dto.ReportResponse;
+import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.controller.CrudController;
@@ -24,11 +25,13 @@ import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@RestController
-@RequestMapping("${app.api-prefix}/posts")
+@Tag(name = "Post", description = "Create, manage, and interact with posts including commenting and reporting.")
+@ApiController("${app.api-prefix}/posts")
 public class PostController extends BaseController<PostService>
 		implements CrudController<PostRequest, PostResponse, String>, IdDecodable {
 	protected PostController(PostService service) {
@@ -36,42 +39,51 @@ public class PostController extends BaseController<PostService>
 	}
 
 	@GetMapping
+	@Operation(summary = "Search posts", description = "Look up posts using filters, sorting, and pagination to explore content.")
 	public ResponseEntity<PageResponse<PostResponse>> search(PostSearch search) {
 		return ResponseEntity.ok(service.search(search));
 	}
 
 	@Override
+	@Operation(summary = "Create a new post", description = "Publish a new post to share content with others.")
 	public ResponseEntity<PostResponse> create(@Valid PostRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
 	}
 
 	@Override
+	@Operation(summary = "Update a post", description = "Edit the content or metadata of an existing post.")
 	public ResponseEntity<PostResponse> update(String id, @Valid PostRequest request) {
 		return ResponseEntity.ok(service.update(decodeId(id), request));
 	}
 
 	@Override
+	@Operation(summary = "Delete a post", description = "Permanently remove a post from the system.")
 	public ResponseEntity<Void> delete(String id) {
 		service.delete(decodeId(id));
 		return ResponseEntity.noContent().build();
 	}
 
 	@Override
+	@Operation(summary = "Get a post", description = "Retrieve detailed information about a specific post.")
 	public ResponseEntity<PostResponse> read(String id) {
 		return ResponseEntity.ok(service.read(decodeId(id)));
 	}
 
 	@PostMapping("{postId}/comments")
+	@Operation(summary = "Add a comment to a post", description = "Post a comment on a specific post to start or join a discussion.")
 	public ResponseEntity<CommentResponse> comment(@PathVariable String postId, @RequestBody CommentRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.comment(decodeId(postId), request));
 	}
 
 	@PostMapping("{postId}/reports")
+	@Operation(summary = "Report a post", description = "Flag a post for review if it violates rules or contains inappropriate content.")
 	public ResponseEntity<ReportResponse> report(@PathVariable String postId, @RequestBody ReportRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.report(decodeId(postId), request));
 	}
+
 	@GetMapping("{postId}/comments")
-	public ResponseEntity<PageResponse<CommentResponse>> readComments(@PathVariable String postId,
+	@Operation(summary = "Get comments on a post", description = "View all comments under a specific post, with pagination support.")
+	public ResponseEntity<PageResponse<CommentResponse>> readPageComments(@PathVariable String postId,
 			@SnakeCaseModelAttribute Search search) {
 		return ResponseEntity.ok(service.readPageComments(decodeId(postId), search));
 	}
@@ -80,7 +92,7 @@ public class PostController extends BaseController<PostService>
 	public IdConfig getIdConfig() {
 		return IdConfig.POST;
 	}
-
+}
 //	private final ObjectMapper objectMapper;
 //	private final CommentService commentService;
 //
@@ -167,4 +179,3 @@ public class PostController extends BaseController<PostService>
 //		return ResponseEntity
 //				.ok(new CountResponse(service.countByAuthorIdAndAccessModifier(id, AccessModifier.PUBLIC)));
 //	}
-}

@@ -9,7 +9,7 @@ class ThinkhubApplicationTests {
 
 	@Test
 	void contextLoads() {
-//		ApplicationModules modules = ApplicationModules.of(ThinkhubApplication.class).verify();;
+		ApplicationModules modules = ApplicationModules.of(ThinkhubApplication.class).verify();
 	}
 
 }

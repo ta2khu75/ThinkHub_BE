@@ -2,8 +2,6 @@ package com.ta2khu75.thinkhub.result.entity;
 
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.quiz.entity.Answer;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

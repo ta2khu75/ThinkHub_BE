@@ -18,10 +18,10 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ta2khu75.thinkhub.account.dto.request.AccountSearch;
 import com.ta2khu75.thinkhub.account.entity.Account;
 import com.ta2khu75.thinkhub.account.entity.QAccount;
 import com.ta2khu75.thinkhub.account.projection.Author;
-import com.ta2khu75.thinkhub.account.request.AccountSearch;
 
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.getOrderSpecifiers;
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.applyIfNotNull;

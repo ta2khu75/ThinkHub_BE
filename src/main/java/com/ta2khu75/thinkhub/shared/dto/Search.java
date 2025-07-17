@@ -8,7 +8,7 @@ public class Search {
 	private String keyword;
 	private int page = 0;
 	private int size = 10;
-	private String sortBy = "createdAt"; // mặc định
+	private String sortBy; // mặc định
 	private String direction = "desc"; // asc hoặc desc
 
 	public String getSortBy() {
@@ -24,7 +24,8 @@ public class Search {
 	}
 
 	public void setDirection(String direction) {
-		if (!direction.equals("asc") && !direction.equals("desc")) return;
+		if (!direction.equals("asc") && !direction.equals("desc"))
+			return;
 		this.direction = direction;
 	}
 
@@ -57,6 +58,9 @@ public class Search {
 	}
 
 	public Pageable toPageable() {
+		if (sortBy == null) {
+			return PageRequest.of(page, size);
+		}
 		Sort.Direction dir = Sort.Direction.fromOptionalString(direction).orElse(Sort.Direction.DESC);
 		Sort sort = Sort.by(dir, sortBy);
 		return PageRequest.of(page, size, sort);

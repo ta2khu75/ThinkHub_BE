@@ -1,5 +1,7 @@
 package com.ta2khu75.thinkhub.category.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import com.ta2khu75.thinkhub.category.CategoryService;
 import com.ta2khu75.thinkhub.category.dto.CategoryDto;
@@ -52,5 +54,10 @@ public class CategoryServiceImpl extends BaseService<Category, Long, CategoryRep
 	@Override
 	public EntityType getEntityType() {
 		return EntityType.CATEGORY;
+	}
+
+	@Override
+	public List<CategoryDto> readAll() {
+		return repository.findAll().stream().map(mapper::convert).toList();
 	}
 }

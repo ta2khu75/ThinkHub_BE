@@ -14,6 +14,8 @@ public interface CommentService {
 
 	CommentResponse update(Long id, CommentRequest request);
 
+	CommentResponse read(Long id);
+
 	ReportResponse report(Long id, ReportRequest request);
 
 	void delete(Long id);

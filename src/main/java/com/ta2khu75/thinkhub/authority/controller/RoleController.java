@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.ta2khu75.thinkhub.authority.RoleService;
-import com.ta2khu75.thinkhub.authority.request.RoleRequest;
-import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.authority.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.controller.CrudController;

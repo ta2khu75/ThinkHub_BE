@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.auth;
 
-import com.ta2khu75.thinkhub.account.request.AccountProfileRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountProfileRequest;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

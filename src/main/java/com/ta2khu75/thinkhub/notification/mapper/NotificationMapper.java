@@ -1,15 +1,25 @@
 package com.ta2khu75.thinkhub.notification.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.core.convert.converter.Converter;
 
-import com.ta2khu75.quiz.model.entity.Notification;
-import com.ta2khu75.quiz.model.response.NotificationResponse;
+import com.ta2khu75.thinkhub.notification.dto.NotificationRequest;
+import com.ta2khu75.thinkhub.notification.dto.NotificationResponse;
+import com.ta2khu75.thinkhub.notification.entity.Notification;
+import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 
-@Mapper(componentModel = "spring", uses = { AccountMapper.class })
+@Mapper(config = MapperSpringConfig.class)
 public interface NotificationMapper
-		extends PageMapper<Notification, NotificationResponse> {
+		extends Converter<Notification, NotificationResponse>, PageMapper<Notification, NotificationResponse> {
+	@Override
 	@Mapping(target = "target", ignore = true)
-//	@Mapping(target = "info", source = "entity")
-	NotificationResponse toResponse(Notification entity);
+	@Mapping(target = "id", ignore = true)
+	NotificationResponse convert(Notification entity);
+
+	@BeanMapping(ignoreByDefault = true)
+	@Mapping(target = "id", source = "request")
+	Notification toEntity(NotificationRequest request);
 }

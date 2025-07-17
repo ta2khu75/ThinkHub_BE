@@ -8,8 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.ta2khu75.thinkhub.account.AccountDto;
-import com.ta2khu75.thinkhub.authority.RoleDto;
+import com.ta2khu75.thinkhub.account.dto.AccountDto;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

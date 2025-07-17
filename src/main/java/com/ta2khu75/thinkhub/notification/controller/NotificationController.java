@@ -1,33 +1,50 @@
 package com.ta2khu75.thinkhub.notification.controller;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import com.ta2khu75.quiz.anotation.EndpointMapping;
-import com.ta2khu75.quiz.model.response.NotificationResponse;
-import com.ta2khu75.quiz.model.response.PageResponse;
-import com.ta2khu75.quiz.service.NotificationService;
+import com.ta2khu75.thinkhub.notification.NotificationService;
+import com.ta2khu75.thinkhub.notification.dto.NotificationIdDto;
+import com.ta2khu75.thinkhub.notification.dto.NotificationResponse;
+import com.ta2khu75.thinkhub.notification.dto.NotificationStatusRequest;
+import com.ta2khu75.thinkhub.shared.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
+import com.ta2khu75.thinkhub.shared.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 
-@RestController
-@RequestMapping("${app.api-prefix}/notifications")
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
+@Tag(name = "Notification", description = "View, update, and manage user notifications in the system.")
+@ApiController("${app.api-prefix}/notifications")
 public class NotificationController extends BaseController<NotificationService> {
 
 	public NotificationController(NotificationService service) {
 		super(service);
 	}
 
-	@GetMapping("/account/{accountId}")
-	@EndpointMapping(name="Read page notification")
-	public ResponseEntity<PageResponse<NotificationResponse>> readPage(
-			@PathVariable String accountId,
-			@RequestParam(name = "size", required = false, defaultValue = "5") int size,
-			@RequestParam(name = "page", required = false, defaultValue = "1") int page) {
-		Pageable pageable = Pageable.ofSize(size).withPage(page - 1);
-		return ResponseEntity.ok(service.readPageByAccountId(accountId, pageable));
+	@GetMapping
+	@Operation(summary = "Get notifications", description = "Retrieve a paginated list of notifications for the current user.")
+	public ResponseEntity<PageResponse<NotificationResponse>> readPage(@SnakeCaseModelAttribute Search search) {
+		return ResponseEntity.ok(service.readPage(search));
+	}
+
+	@PutMapping
+
+	@Operation(summary = "Update notification status", description = "Mark notifications as read, unread, or perform other status changes.")
+	public ResponseEntity<NotificationResponse> update(@RequestBody @Valid NotificationStatusRequest request) {
+		return ResponseEntity.ok(service.update(request));
+	}
+
+	@DeleteMapping
+	@Operation(summary = "Delete a notification", description = "Remove a specific notification from your inbox.")
+	public ResponseEntity<Void> delete(@RequestBody NotificationIdDto id) {
+		service.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 }

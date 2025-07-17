@@ -88,6 +88,15 @@ public class CommentServiceImpl extends BaseService<Comment, Long, CommentReposi
 		return reportService.create(id, ReportTargetType.COMMENT, request);
 	}
 
+	@Override
+	public CommentResponse read(Long id) {
+		Comment comment = this.readEntity(id);
+		AuthorResponse author = accountService.readAuthor(comment.getAuthorId());
+		CommentResponse response = mapper.convert(comment);
+		response.setAuthor(author);
+		return response;
+	}
+
 //	@Override
 //	@Transactional
 //	public CommentResponse create(Long id, CommentTargetType   , CommentRequest request) {

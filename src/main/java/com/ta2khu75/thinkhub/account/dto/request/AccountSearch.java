@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.account.request;
+package com.ta2khu75.thinkhub.account.dto.request;
 
 import java.time.Instant;
 

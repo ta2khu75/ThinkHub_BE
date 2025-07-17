@@ -13,11 +13,19 @@ spring:
     show-sql: true
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
   datasource:
     url: jdbc:mysql://localhost:3366/think_hub
     username: root
     password: Bom474002
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5         # 🔹 Giữ số lượng connection tối đa thấp
+      minimum-idle: 1              # 🔹 Chỉ giữ 1 connection rỗi để giảm RAM
+      idle-timeout: 300000         # 5 phút - ngắt kết nối rảnh
+      max-lifetime: 900000         # 15 phút - tái sử dụng connection
+      connection-timeout: 10000    # 10s - đủ để client retry
+      pool-name: HikariPool
   servlet:
     multipart:
       enabled: true

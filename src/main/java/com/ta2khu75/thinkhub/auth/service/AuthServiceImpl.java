@@ -11,27 +11,29 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ta2khu75.thinkhub.account.AccountDto;
 import com.ta2khu75.thinkhub.account.AccountService;
-import com.ta2khu75.thinkhub.account.request.AccountRequest;
-import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
+import com.ta2khu75.thinkhub.account.dto.AccountDto;
+import com.ta2khu75.thinkhub.account.dto.UpdatePassword;
+import com.ta2khu75.thinkhub.account.dto.request.AccountRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountStatusRequest;
 import com.ta2khu75.thinkhub.auth.AuthResponse;
 import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.LoginRequest;
 import com.ta2khu75.thinkhub.auth.RegisterRequest;
 import com.ta2khu75.thinkhub.auth.TokenResponse;
 import com.ta2khu75.thinkhub.auth.model.Auth;
-import com.ta2khu75.thinkhub.authority.RoleDto;
 import com.ta2khu75.thinkhub.authority.RoleService;
-import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.authority.dto.RoleDto;
+import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
+import com.ta2khu75.thinkhub.shared.exception.MismatchException;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
+import com.ta2khu75.thinkhub.shared.service.clazz.JwtService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -64,7 +66,9 @@ public class AuthServiceImpl implements AuthService, IdDecodable {
 	@Override
 	@Transactional
 	public void changePassword(ChangePasswordRequest request) {
-		accountService.changePassword(request);
+		if (!request.newPassword().equals(request.confirmPassword()))
+			throw new MismatchException("New password and confirm password not matches");
+		accountService.updatePassword(new UpdatePassword(request.password(), request.newPassword()));
 	}
 
 	@Override

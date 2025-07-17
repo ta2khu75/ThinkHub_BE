@@ -23,18 +23,18 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.ta2khu75.thinkhub.account.AccountService;
-import com.ta2khu75.thinkhub.account.request.AccountProfileRequest;
-import com.ta2khu75.thinkhub.account.request.AccountRequest;
-import com.ta2khu75.thinkhub.account.request.AccountStatusRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountProfileRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountRequest;
+import com.ta2khu75.thinkhub.account.dto.request.AccountStatusRequest;
 import com.ta2khu75.thinkhub.authority.PermissionGroupService;
 import com.ta2khu75.thinkhub.authority.PermissionService;
 import com.ta2khu75.thinkhub.authority.RoleService;
-import com.ta2khu75.thinkhub.authority.request.PermissionGroupRequest;
-import com.ta2khu75.thinkhub.authority.request.PermissionRequest;
-import com.ta2khu75.thinkhub.authority.request.RoleRequest;
-import com.ta2khu75.thinkhub.authority.response.PermissionGroupResponse;
-import com.ta2khu75.thinkhub.authority.response.PermissionResponse;
-import com.ta2khu75.thinkhub.authority.response.RoleResponse;
+import com.ta2khu75.thinkhub.authority.dto.request.PermissionGroupRequest;
+import com.ta2khu75.thinkhub.authority.dto.request.PermissionRequest;
+import com.ta2khu75.thinkhub.authority.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.dto.response.PermissionGroupResponse;
+import com.ta2khu75.thinkhub.authority.dto.response.PermissionResponse;
+import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 

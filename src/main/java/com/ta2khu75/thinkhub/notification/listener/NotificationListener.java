@@ -3,25 +3,35 @@ package com.ta2khu75.thinkhub.notification.listener;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
-import com.ta2khu75.thinkhub.follow.FollowService;
-import com.ta2khu75.thinkhub.follow.entity.FollowId;
-import com.ta2khu75.thinkhub.follow.event.FollowEvent;
-import com.ta2khu75.thinkhub.follow.event.UnFollowEvent;
+import com.ta2khu75.thinkhub.comment.CommentCreatedEvent;
+import com.ta2khu75.thinkhub.notification.NotificationTargetType;
+import com.ta2khu75.thinkhub.notification.dto.NotificationRequest;
+import com.ta2khu75.thinkhub.notification.service.TargetNotificationService;
+import com.ta2khu75.thinkhub.post.PostCreatedEvent;
+import com.ta2khu75.thinkhub.quiz.QuizCreatedEvent;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class NotificationListener {
-	private final FollowService service;
+	private final TargetNotificationService service;
 
 	@ApplicationModuleListener
-	public void onFollow(FollowEvent event) {
-		service.follow(new FollowId(event.followingId(), event.followerId()));
+	public void onPostCreated(PostCreatedEvent event) {
+		service.notifyFollowersAboutNewTarget(
+				new NotificationRequest(event.accountId(), event.targetId(), NotificationTargetType.POST));
 	}
 
 	@ApplicationModuleListener
-	public void handleUnFollow(UnFollowEvent event) {
-		service.unFollow(new FollowId(event.followingId(), event.followerId()));
+	public void onQuizCreated(QuizCreatedEvent event) {
+		service.notifyFollowersAboutNewTarget(
+				new NotificationRequest(event.accountId(), event.targetId(), NotificationTargetType.QUIZ));
+	}
+
+	@ApplicationModuleListener
+	public void onCommentCreated(CommentCreatedEvent event) {
+		service.notifyFollowersAboutNewTarget(
+				new NotificationRequest(event.accountId(), event.targetId(), NotificationTargetType.COMMENT));
 	}
 }
