@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ta2khu75.thinkhub.authority.PermissionGroupService;
 import com.ta2khu75.thinkhub.authority.dto.request.PermissionGroupRequest;
@@ -62,6 +63,7 @@ public class PermissionGroupServiceImpl
 	}
 
 	@Override
+	@Transactional
 	public List<PermissionGroupResponse> readAll() {
 		return repository.findAll().stream().map(mapper::convert).toList();
 	}

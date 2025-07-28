@@ -13,5 +13,5 @@ public record PostRequest(@NotNull(message = "Title must not be null") String ti
 		@NotNull(message = "Content must not be null") String content, Set<String> quizIds,
 		@NotNull(message = "Category id must not be null") Long categoryId,
 		@NotNull(message = "Access modifier must not be null") AccessModifier accessModifier,
-		@NotEmpty(message = "Blog tags must not be empty") @Valid Set<TagDto> tags) {
+		@NotEmpty(message = "Blog tags must not be empty") Set<String> tags) {
 }

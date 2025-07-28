@@ -30,6 +30,7 @@ public interface PostMapper
 	@Mapping(target = "viewCount", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
+	@Mapping(target = "quizIds", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
 	Post toEntity(PostRequest request);
 

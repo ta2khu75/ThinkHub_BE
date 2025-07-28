@@ -1,5 +1,8 @@
 package com.ta2khu75.thinkhub.shared.util;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,5 +45,8 @@ public final class QueryDslUtil {
 					new OrderSpecifier<>(direction, pathBuilder.getComparable(order.getProperty(), Comparable.class)));
 		}
 		return orders;
+	}
+	public static Instant toInstant(LocalDate date) {
+	    return date.atStartOfDay(ZoneId.systemDefault()).toInstant();
 	}
 }

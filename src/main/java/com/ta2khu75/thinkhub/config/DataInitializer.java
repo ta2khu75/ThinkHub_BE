@@ -57,7 +57,7 @@ public class DataInitializer implements ApplicationRunner {
 
 	private Long initRole() {
 		List<RoleResponse> roles = Arrays.stream(RoleDefault.values())
-				.map(role -> roleService.create(new RoleRequest(role.name(), Set.of()))).toList();
+				.map(role -> roleService.create(new RoleRequest(role.name(), null, Set.of()))).toList();
 		return roles.stream().filter(role -> role.name().equals(RoleDefault.ADMIN.name())).findFirst()
 				.orElseThrow(() -> new NotFoundException("Not found role name ADMIN")).id();
 	}
@@ -92,7 +92,6 @@ public class DataInitializer implements ApplicationRunner {
 				String pattern = mappingInfo.getPathPatternsCondition().getPatternValues().iterator().next();
 				PermissionRequest permissionRequest = new PermissionRequest(operation.summary(),
 						operation.description(), pattern, requestMethod);
-//				createOrUpdatePermission(permissionRequest);
 				PermissionResponse permission = createOrUpdatePermission(permissionRequest);
 				permissionGroupMap.computeIfAbsent(permissionGroupRequest, k -> new HashSet<>()).add(permission.id());
 				if (publicEndpoints.getOrDefault(requestMethod, Set.of()).contains(pattern)) {
@@ -132,16 +131,16 @@ public class DataInitializer implements ApplicationRunner {
 	public void run(ApplicationArguments args) throws Exception {
 		if (accountService.count() == 0) {
 			AccountStatusRequest status = new AccountStatusRequest(true, true, initRole());
-			AccountProfileRequest profile = new AccountProfileRequest("admin", "admin", LocalDate.now(), "ta2khu75");
+			AccountProfileRequest profile = new AccountProfileRequest("admin", "admin", LocalDate.now(), "ta2khu75",null);
 			AccountRequest account = new AccountRequest("admin", "123456", "123456", "admin@g.com", profile, status);
 			accountService.create(account);
 		}
 		Set<Long> permissionSet = initPermission();
 		RoleResponse role = roleService.readByName(RoleDefault.ANONYMOUS.name());
 		if (role.permissionIds() == null) {
-			roleService.update(role.id(), new RoleRequest(role.name(), permissionSet));
+			roleService.update(role.id(), new RoleRequest(role.name(), role.description(), permissionSet));
 		} else {
-			roleService.update(role.id(), new RoleRequest(role.name(),
+			roleService.update(role.id(), new RoleRequest(role.name(),role.description(),
 					Stream.concat(role.permissionIds().stream(), permissionSet.stream()).collect(Collectors.toSet())));
 		}
 

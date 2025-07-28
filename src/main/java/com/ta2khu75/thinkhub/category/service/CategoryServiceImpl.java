@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import com.ta2khu75.thinkhub.category.CategoryService;
-import com.ta2khu75.thinkhub.category.dto.CategoryDto;
+import com.ta2khu75.thinkhub.category.dto.CategoryRequest;
+import com.ta2khu75.thinkhub.category.dto.CategoryResponse;
 import com.ta2khu75.thinkhub.category.entity.Category;
 import com.ta2khu75.thinkhub.category.mapper.CategoryMapper;
 import com.ta2khu75.thinkhub.category.repository.CategoryRepository;
@@ -23,19 +24,20 @@ public class CategoryServiceImpl extends BaseService<Category, Long, CategoryRep
 	}
 
 	@Override
-	public CategoryDto create(@Valid CategoryDto request) {
+	public CategoryResponse create(@Valid CategoryRequest request) {
 		Category category = mapper.toEntity(request);
 		return mapper.convert(repository.save(category));
 	}
 
 	@Override
-	public CategoryDto update(Long id, @Valid CategoryDto request) {
-		Category category = mapper.toEntity(request);
+	public CategoryResponse update(Long id, @Valid CategoryRequest request) {
+		Category category = readEntity(id);
+		mapper.update(request, category);
 		return mapper.convert(repository.save(category));
 	}
 
 	@Override
-	public CategoryDto read(Long id) {
+	public CategoryResponse read(Long id) {
 		return mapper.convert(readEntity(id));
 	}
 
@@ -57,7 +59,7 @@ public class CategoryServiceImpl extends BaseService<Category, Long, CategoryRep
 	}
 
 	@Override
-	public List<CategoryDto> readAll() {
+	public List<CategoryResponse> readAll() {
 		return repository.findAll().stream().map(mapper::convert).toList();
 	}
 }

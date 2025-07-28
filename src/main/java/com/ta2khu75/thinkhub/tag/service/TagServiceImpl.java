@@ -4,7 +4,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ta2khu75.thinkhub.shared.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
@@ -51,4 +54,18 @@ public class TagServiceImpl extends BaseService<Tag, Long, TagRepository, TagMap
 		return repository.findAllById(ids).stream().map(mapper::convert).collect(Collectors.toSet());
 	}
 
+	@Override
+	public PageResponse<TagDto> search(Search search) {
+		return mapper.toPageResponse(repository.findByNameContainingIgnoreCase(search.getKeyword(), search.toPageable()));
+	}
+
+	@Override
+	public Set<TagDto> readAllByNameIn(Set<String> names) {
+		return  repository.findAllByNameIn(names).stream().map(mapper::convert).collect(Collectors.toSet());
+	}
+
+	@Override
+	public TagDto readByName(String name) {
+		return repository.findByName(name).map(mapper::convert).orElse(null);
+	}
 }

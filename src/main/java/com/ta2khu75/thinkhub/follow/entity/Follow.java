@@ -25,5 +25,5 @@ public class Follow {
 	private FollowId id;
 	@CreatedDate
 	@Column(updatable = false, nullable = false)
-	private Instant createdAt;
+	private Instant followedAt;
 }

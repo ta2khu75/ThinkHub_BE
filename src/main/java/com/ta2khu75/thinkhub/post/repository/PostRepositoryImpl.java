@@ -35,8 +35,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				applyIfNotNull(search.getKeyword(), () -> post.title.containsIgnoreCase(search.getKeyword())),
 				applyIfNotEmpty(search.getTagIds(), () -> post.tagIds.any().in(search.getTagIds())),
 				applyIfNotEmpty(search.getCategoryIds(), () -> post.categoryId.in(search.getTagIds())),
-				applyIfNotNull(search.getMinView(), () -> post.viewCount.goe(search.getMinView())),
-				applyIfNotNull(search.getMaxView(), () -> post.viewCount.loe(search.getMaxView())),
+				applyIfNotNull(search.getMinViews(), () -> post.viewCount.goe(search.getMinViews())),
+				applyIfNotNull(search.getMaxViews(), () -> post.viewCount.loe(search.getMaxViews())),
 				applyIfNotNull(search.getAccessModifier(), () -> post.accessModifier.eq(search.getAccessModifier())),
 				applyIfNotNull(search.getAuthorIdQuery(), () -> post.authorId.eq(search.getAuthorIdQuery())) };
 		JPAQuery<Post> query = queryFactory.selectFrom(post).where(conditions)

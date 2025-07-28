@@ -1,7 +1,7 @@
 package com.ta2khu75.thinkhub.quiz.enums;
 
 public enum ResultVisibility {
-	FULL, // Hiển thị cả đáp án và kết quả
-	RESULT_ONLY, // Chỉ hiển thị đúng/sai
-	HIDDEN // Không hiển thị
+	FULL, // Hiện đầy đủ: câu đúng/sai + đáp án đúng
+	MARK_ONLY, // Chỉ hiện đúng/sai từng câu, không hiện đáp án đúng
+	SCORE_ONLY // Chỉ hiện tổng điểm + số câu đúng
 }

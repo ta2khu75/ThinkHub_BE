@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.config;
+package com.ta2khu75.thinkhub.auth.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -24,12 +24,5 @@ public class JwtProperties {
 
 	public long getExpirationByType(TokenType type) {
 		return getConfigByType(type).expiration();
-	}
-
-	public enum TokenType {
-		ACCESS, REFRESH;
-	}
-
-	public record TokenConfig(String secret, long expiration) {
 	}
 }

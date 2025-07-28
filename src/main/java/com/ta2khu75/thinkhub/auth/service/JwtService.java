@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.shared.service.clazz;
+package com.ta2khu75.thinkhub.auth.service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -13,12 +13,14 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.account.dto.AccountDto;
+import com.ta2khu75.thinkhub.auth.AuthResponse;
 import com.ta2khu75.thinkhub.auth.TokenResponse;
+import com.ta2khu75.thinkhub.auth.config.JwtProperties;
+import com.ta2khu75.thinkhub.auth.config.JwtProviderFactory;
+import com.ta2khu75.thinkhub.auth.config.TokenConfig;
+import com.ta2khu75.thinkhub.auth.config.TokenType;
+import com.ta2khu75.thinkhub.auth.model.Auth;
 import com.ta2khu75.thinkhub.authority.dto.RoleDto;
-import com.ta2khu75.thinkhub.config.JwtProperties;
-import com.ta2khu75.thinkhub.config.JwtProviderFactory;
-import com.ta2khu75.thinkhub.config.JwtProperties.TokenConfig;
-import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 
 import lombok.RequiredArgsConstructor;
@@ -29,26 +31,30 @@ public class JwtService {
 	private final JwtProviderFactory jwtProviderFactory;
 	private final JwtProperties jwtProperties;
 
-	public String createAccessToken(AccountDto account, RoleDto role) {
+	public TokenResponse createJwt(Auth auth, TokenType tokenType) {
+		AccountDto account = auth.getAccount();
+		RoleDto role = auth.getRole();
 		Instant now = Instant.now();
-		TokenConfig tokenConfig = jwtProperties.getConfigByType(TokenType.ACCESS);
-		JwtEncoder jwtEncoder = jwtProviderFactory.getEncoder(TokenType.ACCESS);
+		TokenConfig tokenConfig = jwtProperties.getConfigByType(tokenType);
+		JwtEncoder jwtEncoder = jwtProviderFactory.getEncoder(tokenType);
 		Instant validity = now.plus(tokenConfig.expiration(), ChronoUnit.SECONDS);
-		JwtClaimsSet claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity)
-				.subject(account.id()).claim("username", account.username()).claim("scope", "ROLE_" + role.name())
-				.build();
 		JwsHeader jwsHeader = JwsHeader.with(JwtProviderFactory.JWT_ALGORITHM).build();
-		return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-	}
-
-	public TokenResponse createRefreshToken(AccountDto account) {
-		Instant now = Instant.now();
-		TokenConfig tokenConfig = jwtProperties.getConfigByType(TokenType.REFRESH);
-		JwtEncoder jwtEncoder = jwtProviderFactory.getEncoder(TokenType.REFRESH);
-		Instant validity = now.plus(tokenConfig.expiration(), ChronoUnit.SECONDS);
-		JwtClaimsSet claims = JwtClaimsSet.builder().id(UUID.randomUUID().toString()).issuer("com.ta2khu75")
-				.issuedAt(now).expiresAt(validity).subject(account.id()).build();
-		JwsHeader jwsHeader = JwsHeader.with(JwtProviderFactory.JWT_ALGORITHM).build();
+		JwtClaimsSet claims;
+		switch (tokenType) {
+		case ACCESS: {
+			claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity)
+					.subject(account.id()).claim("username", account.username()).claim("scope", "ROLE_" + role.name())
+					.build();
+			break;
+		}
+		case REFRESH: {
+			claims = JwtClaimsSet.builder().id(UUID.randomUUID().toString()).issuer("com.ta2khu75").issuedAt(now)
+					.expiresAt(validity).subject(account.id()).build();
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + tokenType);
+		}
 		String token = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
 		return new TokenResponse(token, validity.toEpochMilli());
 	}

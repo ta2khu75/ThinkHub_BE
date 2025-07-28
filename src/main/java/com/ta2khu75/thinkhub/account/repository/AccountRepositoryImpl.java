@@ -25,6 +25,7 @@ import com.ta2khu75.thinkhub.account.projection.Author;
 
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.getOrderSpecifiers;
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.applyIfNotNull;
+import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.toInstant;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,8 +43,14 @@ public class AccountRepositoryImpl implements AccountRepositoryCustom {
 				.of(applyIfNotNull(search.getRoleId(), () -> account.status.roleId.eq(search.getRoleId())),
 						applyIfNotNull(search.getEnabled(), () -> account.status.enabled.eq(search.getEnabled())),
 						applyIfNotNull(search.getNonLocked(), () -> account.status.nonLocked.eq(search.getNonLocked())),
-						applyIfNotNull(search.getCreatedFrom(), () -> account.createdAt.goe(search.getCreatedFrom())),
-						applyIfNotNull(search.getCreatedTo(), () -> account.createdAt.loe(search.getCreatedTo())))
+						applyIfNotNull(search.getCreated().from(),
+								() -> account.createdAt.goe(toInstant(search.getCreated().from()))),
+						applyIfNotNull(search.getCreated().to(),
+								() -> account.createdAt.lt(toInstant(search.getCreated().to()))),
+						applyIfNotNull(search.getUpdated().from(),
+								() -> account.updatedAt.goe(toInstant(search.getUpdated().from()))),
+						applyIfNotNull(search.getUpdated().to(),
+								() -> account.updatedAt.lt(toInstant(search.getUpdated().to()))))
 				.filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
 		if (search.getKeyword() != null && search.getKeyword().startsWith("@")) {
 			conditionList.add(account.email.contains(search.getKeyword().substring(1)));

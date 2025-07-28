@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ta2khu75.thinkhub.account.AccountService;
@@ -82,6 +83,7 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		Quiz quiz = readEntity(id);
 		mapper.update(request, quiz);
 		quiz.setTagIds(this.getTagIds(request));
+		quiz.setPostIds(request.postIds().stream().map(post -> decode(post, IdConfig.POST)).collect(Collectors.toSet()));
 		this.saveFile(quiz, file, Folder.QUIZ_FOLDER, Quiz::setImageUrl);
 		return save(quiz);
 	}
@@ -101,6 +103,7 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 	}
 
 	@Override
+	@Transactional
 	public PageResponse<QuizResponse> search(QuizSearch search) {
 		if (search.getAuthorId() != null) {
 			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.ACCOUNT));
@@ -134,7 +137,7 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		}
 
 		// Ánh xạ quiz → QuizResponse
-		List<QuizResponse> responses = page.getContent().parallelStream()
+		List<QuizResponse> responses = page.getContent().stream()
 				.map(quiz -> toResponse(quiz, authorMap, tagMap)).toList();
 
 		return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(), responses);
@@ -151,9 +154,10 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 	}
 
 	@Override
+	@Transactional
 	public QuizResponse readDetail(Long id) {
 		return mapper.convert(readEntity(id));
-	}
+}
 
 	@Override
 	public void checkExists(Long id) {
@@ -171,19 +175,13 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		events.publishEvent(new CheckExistsEvent<>(EntityType.CATEGORY, request.categoryId()));
 		request.postIds().forEach(
 				postId -> events.publishEvent(new CheckExistsEvent<>(EntityType.POST, decode(postId, IdConfig.POST))));
-		request.tags().forEach(tag -> {
-			if (tag.id() != null)
-				events.publishEvent(new CheckExistsEvent<>(EntityType.TAG, tag.id()));
-
-		});
-	}
+			}
 
 	private Set<Long> getTagIds(QuizRequest request) {
 		return request.tags().stream().map(tag -> {
-			if (tag.id() != null) {
-				return tag.id();
-			}
-			return tagService.create(tag).id();
+			TagDto tagDto = tagService.readByName(tag.toLowerCase());
+			if(tagDto != null) return tagDto.id();
+			return tagService.create(new TagDto(null, tag)).id();
 		}).collect(Collectors.toSet());
 	}
 

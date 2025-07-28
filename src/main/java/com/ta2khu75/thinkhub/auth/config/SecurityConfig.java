@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.config;
+package com.ta2khu75.thinkhub.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,6 @@ import com.ta2khu75.thinkhub.account.dto.AccountDto;
 import com.ta2khu75.thinkhub.auth.model.Auth;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.authority.dto.RoleDto;
-import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -66,9 +65,9 @@ public class SecurityConfig {
 				.addFilterBefore(new AuthorizationFilter(authorizationManager), AuthorizationFilter.class)
 				.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
 				.authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
-				.oauth2ResourceServer(
-						oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtProviderFactory.getDecoder(TokenType.ACCESS)))
-								.authenticationEntryPoint(authenticationEntryPoint))
+				.oauth2ResourceServer(oauth2 -> oauth2.bearerTokenResolver(new CookieTokenResolver("access_token"))
+						.jwt(jwt -> jwt.decoder(jwtProviderFactory.getDecoder(TokenType.ACCESS)))
+						.authenticationEntryPoint(authenticationEntryPoint))
 				.formLogin(login -> login.disable());
 		return http.build();
 	}
@@ -90,5 +89,4 @@ public class SecurityConfig {
 		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 		return jwtAuthenticationConverter;
 	}
-
 }

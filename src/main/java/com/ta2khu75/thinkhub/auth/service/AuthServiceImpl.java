@@ -21,17 +21,16 @@ import com.ta2khu75.thinkhub.auth.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.auth.LoginRequest;
 import com.ta2khu75.thinkhub.auth.RegisterRequest;
 import com.ta2khu75.thinkhub.auth.TokenResponse;
+import com.ta2khu75.thinkhub.auth.config.TokenType;
 import com.ta2khu75.thinkhub.auth.model.Auth;
 import com.ta2khu75.thinkhub.authority.RoleService;
 import com.ta2khu75.thinkhub.authority.dto.RoleDto;
 import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
-import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.MismatchException;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
-import com.ta2khu75.thinkhub.shared.service.clazz.JwtService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import lombok.RequiredArgsConstructor;
@@ -99,8 +98,8 @@ public class AuthServiceImpl implements AuthService, IdDecodable {
 	private AuthResponse makeAuthResponse(Auth auth) {
 		AccountDto account = auth.getAccount();
 		RoleDto role = auth.getRole();
-		TokenResponse refreshToken = jwtService.createRefreshToken(account);
-		String accessToken = jwtService.createAccessToken(account, role);
+		TokenResponse refreshToken = jwtService.createJwt(auth, TokenType.REFRESH);
+		TokenResponse accessToken = jwtService.createJwt(auth, TokenType.ACCESS);
 		return new AuthResponse(account.id(), account.profile(), role.name(), accessToken, refreshToken);
 	}
 

@@ -28,6 +28,7 @@ import jakarta.validation.Valid;
 @ApiController("${app.api-prefix}/auth")
 public class AuthController extends BaseController<AuthService> {
 	private static final String REFRESH_TOKEN = "refresh_token";
+	private static final String ACCESS_TOKEN = "access_token";
 
 	protected AuthController(AuthService service) {
 		super(service);
@@ -53,7 +54,8 @@ public class AuthController extends BaseController<AuthService> {
 	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
 		AuthResponse response = service.login(request);
 		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
-		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString())
+		ResponseCookie cookieAccess = createCookie(ACCESS_TOKEN, response.accessToken());
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
 				.body(this.makeAuthResponse(response));
 	}
 
@@ -62,7 +64,8 @@ public class AuthController extends BaseController<AuthService> {
 	public ResponseEntity<AuthResponse> refreshToken(@CookieValue(REFRESH_TOKEN) String refreshToken) {
 		AuthResponse response = service.refreshToken(refreshToken);
 		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
-		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString())
+		ResponseCookie cookieAccess = createCookie(ACCESS_TOKEN, response.accessToken());
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
 				.body(this.makeAuthResponse(response));
 	}
 
@@ -74,7 +77,7 @@ public class AuthController extends BaseController<AuthService> {
 	}
 
 	private AuthResponse makeAuthResponse(AuthResponse auth) {
-		return new AuthResponse(auth.id(), auth.profile(), auth.role(), auth.accessToken(), null);
+		return new AuthResponse(auth.id(), auth.profile(), auth.role(), null, null);
 	}
 
 	private ResponseCookie createCookie(String name, TokenResponse toke) {

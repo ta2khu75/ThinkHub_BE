@@ -24,6 +24,7 @@ public interface QuizMapper
 
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
+	@Mapping(target = "postIds", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "authorId", ignore = true)

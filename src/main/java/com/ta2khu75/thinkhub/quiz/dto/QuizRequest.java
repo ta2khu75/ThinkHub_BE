@@ -18,7 +18,7 @@ public record QuizRequest(@NotBlank(message = "Title must not be blank") String 
 		@NotBlank(message = "Description must not be blank") String description,
 		@NotNull(message = "Exam level must not be null") QuizLevel level, boolean shuffleQuestion, boolean completed,
 		List<String> postIds, @NotNull(message = "Quiz category must not be null") Long categoryId,
-		@NotEmpty(message = "Tag must not be empty") @Valid Set<TagDto> tags,
+		@NotEmpty(message = "Tag must not be empty") @Valid Set<String> tags,
 		@NotEmpty(message = "Question must not be empty") @Valid List<QuestionDto> questions,
 		AccessModifier accessModifier, ResultVisibility resultVisibility) {
 }

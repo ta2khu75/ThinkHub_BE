@@ -68,6 +68,7 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 		validateExistence(request);
 		Post post = mapper.toEntity(request);
 		post.setTagIds(this.getTagIds(request));
+		post.setQuizIds(request.quizIds().stream().map(quizId-> decode(quizId, IdConfig.QUIZ)).collect(Collectors.toSet()));
 		post.setAuthorId(SecurityUtil.getCurrentAccountIdDecode());
 		return this.save(post);
 	}
@@ -110,19 +111,14 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 		events.publishEvent(new CheckExistsEvent<>(EntityType.CATEGORY, request.categoryId()));
 		request.quizIds().forEach(
 				quizId -> events.publishEvent(new CheckExistsEvent<>(EntityType.QUIZ, decode(quizId, IdConfig.QUIZ))));
-		request.tags().forEach(tag -> {
-			if (tag.id() != null)
-				events.publishEvent(new CheckExistsEvent<>(EntityType.TAG, tag.id()));
-
-		});
 	}
 
 	private Set<Long> getTagIds(PostRequest request) {
 		return request.tags().stream().map(tag -> {
-			if (tag.id() != null) {
-				return tag.id();
-			}
-			return tagService.create(tag).id();
+			TagDto tagDto = tagService.readByName(tag.toLowerCase());
+			if (tagDto != null)
+				return tagDto.id();
+			return tagService.create(new TagDto(null, tag)).id();
 		}).collect(Collectors.toSet());
 	}
 
@@ -165,7 +161,7 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 		}
 
 		// Ánh xạ post → PostResponse
-		List<PostResponse> responses = page.getContent().parallelStream()
+		List<PostResponse> responses = page.getContent().stream()
 				.map(post -> toResponse(post, authorMap, tagMap)).toList();
 
 		return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(), responses);

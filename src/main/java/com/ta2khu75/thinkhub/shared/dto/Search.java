@@ -8,8 +8,8 @@ public class Search {
 	private String keyword;
 	private int page = 0;
 	private int size = 10;
-	private String sortBy; // mặc định
-	private String direction = "desc"; // asc hoặc desc
+	private String sortBy;
+	private String direction = "desc";
 
 	public String getSortBy() {
 		return sortBy;

@@ -30,6 +30,7 @@ public class Role {
 	Long id;
 	@Column(unique = true, nullable = false)
 	String name;
+	String description;
 	@ManyToMany(fetch = FetchType.EAGER)
 	Set<Permission> permissions;
 }

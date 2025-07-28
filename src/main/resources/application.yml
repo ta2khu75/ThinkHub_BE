@@ -73,7 +73,7 @@ firebase:
 jwt:
   access:
     secret: QKuAdmm4EATXnd7RqmGFg7ccqhh_bslrrKC_sYuDNcS7TS-heA4jic5CBQ4k-uqQ-TD48704FTm1VzDgbujNqA
-    expiration: 7749
+    expiration: 7749999
   refresh:
     secret: J5uUvKodanwEbMy5nPAue-RmwlwX5bgfWVC-M74Lq-V-AT2dG8BDimAFWHanyiZYick3rho8Wg2eyXvmIiTAlw
     expiration: 2592000

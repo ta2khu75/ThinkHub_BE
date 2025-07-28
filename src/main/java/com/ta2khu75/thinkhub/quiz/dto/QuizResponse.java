@@ -29,11 +29,11 @@ public class QuizResponse implements BaseClassResponse<String> {
 	AuthorResponse author;
 	Long authorId;
 	List<String> postIds;
+	List<QuestionDto> questions;
 	AccessModifier accessModifier;
 	ResultVisibility resultVisibility;
 	boolean shuffleQuestion;
 	boolean completed;
 	Instant createdAt;
 	Instant updatedAt;
-	List<QuestionDto> questions;
 }

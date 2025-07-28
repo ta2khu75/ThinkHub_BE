@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.config;
+package com.ta2khu75.thinkhub.auth.config;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -12,8 +12,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
-import com.ta2khu75.thinkhub.config.JwtProperties.TokenType;
-
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -32,7 +30,6 @@ public class JwtProviderFactory {
 		String secret = jwtProperties.getSecretByType(type);
 		return NimbusJwtDecoder.withSecretKey(decodeSecret(secret)).macAlgorithm(JWT_ALGORITHM).build();
 	}
-	
 
 	private SecretKey decodeSecret(String base64Secret) {
 		byte[] keyBytes = Base64.from(base64Secret).decode();

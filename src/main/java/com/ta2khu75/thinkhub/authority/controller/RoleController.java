@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.ta2khu75.thinkhub.authority.RoleService;
@@ -26,6 +27,7 @@ public class RoleController extends BaseController<RoleService>
 		super(service);
 	}
 
+	@GetMapping
 	@Operation(summary = "View all roles", description = "Use this endpoint to see a list of all roles that exist in the system. Roles define what permissions or access levels a user can have.")
 	public ResponseEntity<List<RoleResponse>> readAll() {
 		return ResponseEntity.ok(service.readAll());

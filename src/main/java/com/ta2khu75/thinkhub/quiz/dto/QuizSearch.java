@@ -1,5 +1,6 @@
 package com.ta2khu75.thinkhub.quiz.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.ta2khu75.thinkhub.quiz.enums.QuizLevel;
@@ -21,4 +22,6 @@ public class QuizSearch extends Search {
 	private Long authorIdQuery;
 	private Boolean completed;
 	private AccessModifier accessModifier;
+	private LocalDate createdFrom;
+	private LocalDate createdTo;
 }

@@ -55,9 +55,11 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 
 	@Column(nullable = false, updatable = false)
 	Long authorId;
+	@ElementCollection
 	Set<Long> postIds;
 	@Column(nullable = false)
 	Long categoryId;
+	@ElementCollection
 	Set<Long> tagIds;
 	@JoinColumn(name = "quiz_id")
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -67,5 +69,4 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	public IdConfig getIdConfig() {
 		return IdConfig.QUIZ;
 	}
-
 }

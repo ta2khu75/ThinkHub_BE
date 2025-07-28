@@ -29,6 +29,11 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	@Override
 	public RoleResponse create(@Valid RoleRequest request) {
 		Role role = mapper.toEntity(request);
+		role.setPermissions(request.permissionIds().stream().map(permissionId -> {
+			Permission permission = new Permission();
+			permission.setId(permissionId);
+			return permission;
+		}).collect(Collectors.toSet()));
 		role = repository.save(role);
 		return mapper.convert(role);
 	}

@@ -38,6 +38,7 @@ public class AccountProfile {
 	String lastName;
 	@Column(nullable = false)
 	LocalDate birthday;
+	String summary;
 	@LastModifiedDate
 	@Column(insertable = false)
 	Instant updatedAt;

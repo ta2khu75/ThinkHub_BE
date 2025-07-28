@@ -4,5 +4,5 @@ import java.util.Set;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record RoleRequest(@NotBlank String name, Set<Long> permissionIds) {
+public record RoleRequest(@NotBlank String name, String description, Set<Long> permissionIds) {
 }
