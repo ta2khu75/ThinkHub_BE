@@ -15,10 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ta2khu75.thinkhub.account.AccountService;
-import com.ta2khu75.thinkhub.comment.CommentService;
-import com.ta2khu75.thinkhub.comment.CommentTargetType;
-import com.ta2khu75.thinkhub.comment.dto.CommentRequest;
-import com.ta2khu75.thinkhub.comment.dto.CommentResponse;
 import com.ta2khu75.thinkhub.quiz.QuizService;
 import com.ta2khu75.thinkhub.quiz.dto.QuizRequest;
 import com.ta2khu75.thinkhub.quiz.dto.QuizResponse;
@@ -26,12 +22,7 @@ import com.ta2khu75.thinkhub.quiz.dto.QuizSearch;
 import com.ta2khu75.thinkhub.quiz.entity.Quiz;
 import com.ta2khu75.thinkhub.quiz.mapper.QuizMapper;
 import com.ta2khu75.thinkhub.quiz.repository.QuizRepository;
-import com.ta2khu75.thinkhub.report.ReportService;
-import com.ta2khu75.thinkhub.report.ReportTargetType;
-import com.ta2khu75.thinkhub.report.dto.ReportRequest;
-import com.ta2khu75.thinkhub.report.dto.ReportResponse;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
@@ -41,6 +32,9 @@ import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseFileService;
 import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService;
 import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService.Folder;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
+import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
+
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.tag.TagService;
@@ -52,19 +46,16 @@ import jakarta.validation.Valid;
 public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMapper> implements QuizService {
 	private final ApplicationEventPublisher events;
 	private final TagService tagService;
+	private final RedisService redisService;
 	private final AccountService accountService;
-	private final CommentService commentService;
-	private final ReportService reportService;
 
 	public QuizServiceImpl(QuizRepository repository, QuizMapper mapper, FirebaseService fireBaseService,
-			ApplicationEventPublisher events, TagService tagService, AccountService accountService,
-			CommentService commentService, ReportService reportService) {
+			ApplicationEventPublisher events, TagService tagService, RedisService redisService, AccountService accountService) {
 		super(repository, mapper, fireBaseService);
 		this.events = events;
 		this.tagService = tagService;
+		this.redisService = redisService;
 		this.accountService = accountService;
-		this.commentService = commentService;
-		this.reportService = reportService;
 	}
 
 	@Override
@@ -83,16 +74,21 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		Quiz quiz = readEntity(id);
 		mapper.update(request, quiz);
 		quiz.setTagIds(this.getTagIds(request));
-		quiz.setPostIds(request.postIds().stream().map(post -> decode(post, IdConfig.POST)).collect(Collectors.toSet()));
+		quiz.setPostIds(
+				request.postIds().stream().map(post -> decode(post, IdConfig.POST)).collect(Collectors.toSet()));
 		this.saveFile(quiz, file, Folder.QUIZ_FOLDER, Quiz::setImageUrl);
 		return save(quiz);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public QuizResponse read(Long id) {
 		Quiz quiz = readEntity(id);
 		quiz.setQuestions(null);
-		return mapper.convert(quiz);
+		QuizResponse response = mapper.convert(quiz);
+		response.setAuthor(accountService.readAuthor(quiz.getAuthorId()));
+		response.setTags(tagService.readAllByIds(quiz.getTagIds()));
+		return response;
 	}
 
 	@Override
@@ -137,8 +133,8 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		}
 
 		// Ánh xạ quiz → QuizResponse
-		List<QuizResponse> responses = page.getContent().stream()
-				.map(quiz -> toResponse(quiz, authorMap, tagMap)).toList();
+		List<QuizResponse> responses = page.getContent().stream().map(quiz -> toResponse(quiz, authorMap, tagMap))
+				.toList();
 
 		return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(), responses);
 	}
@@ -148,7 +144,6 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		response.setAuthor(authorMap.get(quiz.getAuthorId()));
 		Set<TagDto> tags = quiz.getTagIds().stream().map(tagMap::get).filter(Objects::nonNull)
 				.collect(Collectors.toSet());
-
 		response.setTags(tags);
 		return response;
 	}
@@ -156,8 +151,17 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 	@Override
 	@Transactional
 	public QuizResponse readDetail(Long id) {
-		return mapper.convert(readEntity(id));
-}
+		try {
+		QuizResponse response =redisService.getValue(RedisKeyBuilder.quiz(id), QuizResponse.class);
+		if(response!=null) return response;
+		response = mapper.convert(this.readEntity(id));
+		return response;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
 
 	@Override
 	public void checkExists(Long id) {
@@ -175,12 +179,13 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		events.publishEvent(new CheckExistsEvent<>(EntityType.CATEGORY, request.categoryId()));
 		request.postIds().forEach(
 				postId -> events.publishEvent(new CheckExistsEvent<>(EntityType.POST, decode(postId, IdConfig.POST))));
-			}
+	}
 
 	private Set<Long> getTagIds(QuizRequest request) {
 		return request.tags().stream().map(tag -> {
 			TagDto tagDto = tagService.readByName(tag.toLowerCase());
-			if(tagDto != null) return tagDto.id();
+			if (tagDto != null)
+				return tagDto.id();
 			return tagService.create(new TagDto(null, tag)).id();
 		}).collect(Collectors.toSet());
 	}
@@ -190,18 +195,4 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		return mapper.convert(quiz);
 	}
 
-	@Override
-	public CommentResponse comment(Long id, CommentRequest request) {
-		return commentService.create(id, CommentTargetType.QUIZ, request);
-	}
-
-	@Override
-	public PageResponse<CommentResponse> readPageComments(Long targetId, Search search) {
-		return commentService.readPageBy(targetId, CommentTargetType.QUIZ, search);
-	}
-
-	@Override
-	public ReportResponse report(Long id, ReportRequest request) {
-		return reportService.create(id, ReportTargetType.QUIZ, request);
-	}
 }

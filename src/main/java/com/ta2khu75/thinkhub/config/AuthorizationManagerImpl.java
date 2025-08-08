@@ -60,6 +60,8 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 		String requestUrl = object.getRequestURI();
 		String httpMethod = object.getMethod();
 		try {
+		String username = SecurityUtil.getCurrentUsername();
+		System.out.println("username: " + username);
 			Long accountId = SecurityUtil.getCurrentAccountIdDecode();
 			boolean exists = redisService.exists(RedisKeyBuilder.accountLock(accountId));
 			if (exists) {

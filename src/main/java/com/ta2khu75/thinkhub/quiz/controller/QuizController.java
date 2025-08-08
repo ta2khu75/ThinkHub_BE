@@ -39,11 +39,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 @Tag(name = "Quiz", description = "Create, manage, take, and interact with quizzes including commenting and reporting.")
 @ApiController("${app.api-prefix}/quizzes")
 public class QuizController extends BaseController<QuizService> implements IdDecodable {
-	private final QuizResultService resultService;
+//	private final QuizResultService resultService;
 
 	public QuizController(QuizService service, QuizResultService resultService) {
 		super(service);
-		this.resultService = resultService;
 	}
 
 	@GetMapping
@@ -88,32 +87,6 @@ public class QuizController extends BaseController<QuizService> implements IdDec
 	@Override
 	public IdConfig getIdConfig() {
 		return IdConfig.QUIZ;
-	}
-
-	@PostMapping("{id}/start")
-	@Operation(summary = "Start a quiz", description = "Initiate the quiz attempt process for a specific quiz.")
-	public ResponseEntity<QuizResultResponse> take(@PathVariable String id) {
-		QuizResultResponse response = resultService.take(decodeId(id));
-		return ResponseEntity.ok(response);
-	}
-
-	@PostMapping("{quizId}/comments")
-	@Operation(summary = "Add a comment to a quiz", description = "Leave a comment or feedback on a specific quiz.")
-	public ResponseEntity<CommentResponse> comment(@PathVariable String quizId, @RequestBody CommentRequest request) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.comment(decodeId(quizId), request));
-	}
-
-	@GetMapping("{quizId}/comments")
-	@Operation(summary = "View comments on a quiz", description = "Retrieve all user comments on a specific quiz, with support for pagination.")
-	public ResponseEntity<PageResponse<CommentResponse>> readPageComments(@PathVariable String quizId,
-			@SnakeCaseModelAttribute Search search) {
-		return ResponseEntity.ok(service.readPageComments(decodeId(quizId), search));
-	}
-
-	@PostMapping("{quizId}/reports")
-	@Operation(summary = "Report a quiz", description = "Flag a quiz for review due to inappropriate content or other concerns.")
-	public ResponseEntity<ReportResponse> report(@PathVariable String quizId, @RequestBody ReportRequest request) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.report(decodeId(quizId), request));
 	}
 }
 //	@GetMapping("mine/{keyword}")

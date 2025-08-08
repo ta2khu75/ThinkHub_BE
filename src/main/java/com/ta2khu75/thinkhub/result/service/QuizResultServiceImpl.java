@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import com.ta2khu75.thinkhub.quiz.QuizService;
 import com.ta2khu75.thinkhub.quiz.dto.AnswerDto;
 import com.ta2khu75.thinkhub.quiz.dto.QuestionDto;
 import com.ta2khu75.thinkhub.quiz.dto.QuizResponse;
+import com.ta2khu75.thinkhub.quiz.service.QuizCacheService;
 import com.ta2khu75.thinkhub.result.QuizResultService;
 import com.ta2khu75.thinkhub.result.dto.QuizResultRequest;
 import com.ta2khu75.thinkhub.result.dto.QuizResultResponse;
@@ -34,13 +36,13 @@ import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 @Service
 public class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepository, QuizResultMapper>
 		implements QuizResultService {
-	private final QuizService quizService;
+	private final QuizCacheService quizCacheService;
 	private final RedisService redisService;
 
-	public QuizResultServiceImpl(QuizResultRepository repository, QuizResultMapper mapper, QuizService quizService,
+	public QuizResultServiceImpl(QuizResultRepository repository, QuizResultMapper mapper, QuizCacheService quizCacheService,
 			RedisService redisService) {
 		super(repository, mapper);
-		this.quizService = quizService;
+		this.quizCacheService=quizCacheService;
 		this.redisService = redisService;
 	}
 
@@ -51,20 +53,13 @@ public class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizRes
 
 	@Override
 	public QuizResultResponse take(Long quizId) {
-		QuizResultResponse response = redisService.getValue(
-				RedisKeyBuilder.quizResult(SecurityUtil.getCurrentAccountIdDecode(), quizId), QuizResultResponse.class);
-		if (response == null) {
-			QuizResponse quiz = redisService.getValue(RedisKeyBuilder.quiz(quizId), QuizResponse.class);
-			if (quiz == null)
-				quiz = quizService.readDetail(quizId);
-			redisService.setValue(RedisKeyBuilder.quiz(quizId), quiz,
-					Instant.now().plusSeconds((quiz.getDuration() + 1) * 60L));
+			QuizResponse quiz=quizCacheService.readQuizDetail(quizId);
 			quiz.getQuestions().forEach(question -> question.answers().forEach(answer -> answer.setCorrect(false)));
 			QuizResult quizResult = new QuizResult();
 			quizResult.setQuizId(quizId);
 			quizResult.setEndTime(Instant.now().plusSeconds(quiz.getDuration() * 60L).plusSeconds(30));
 			quizResult.setAccountId(SecurityUtil.getCurrentAccountIdDecode());
-			response = mapper.convert(repository.save(quizResult));
+			QuizResultResponse response = mapper.convert(repository.save(quizResult));
 			response.setQuiz(quiz);
 			if (quiz.isShuffleQuestion()) {
 				QuizResponse quizResponse = response.getQuiz();
@@ -80,7 +75,6 @@ public class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizRes
 			}
 			redisService.setValue(RedisKeyBuilder.quizResult(SecurityUtil.getCurrentAccountIdDecode(), quizId),
 					response, response.getEndTime());
-		}
 		return response;
 	}
 
@@ -145,7 +139,7 @@ public class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizRes
 		QuizResultResponse response = mapper.convert(quizResult);
 		QuizResponse quiz = redisService.getValue(RedisKeyBuilder.quiz(quizId), QuizResponse.class);
 		if (quiz == null)
-			quiz = quizService.readDetail(quizId);
+			quiz = quizCacheService.readQuizDetail(quizId);
 		response.setQuiz(quiz);
 		return response;
 	}
@@ -165,4 +159,16 @@ public class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizRes
 		return correctSelected == correctAnswers.size() && incorrectSelected == 0;
 	}
 
+	@Override
+	public QuizResultResponse readByQuizId(Long quizId) {
+		Long accountId = SecurityUtil.getCurrentAccountIdDecode();
+		try {
+		QuizResultResponse response = redisService.getValue(RedisKeyBuilder.quizResult(accountId, quizId), QuizResultResponse.class);
+		return response;
+		} catch (Exception e) {
+			e.printStackTrace();
+			Optional<QuizResult> quizResult = repository.findByAccountIdAndQuizIdAndEndTimeAfterAndUpdatedAtIsNull(accountId, quizId, Instant.now());
+			return quizResult.map(mapper::convert).orElse(null);
+		}
+	}
 }

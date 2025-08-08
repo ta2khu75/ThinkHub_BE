@@ -1,11 +1,14 @@
 package com.ta2khu75.thinkhub.result.repository;
 
+import java.time.Instant;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ta2khu75.thinkhub.result.entity.QuizResult;
 
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
-
+	Optional<QuizResult> findByAccountIdAndQuizIdAndEndTimeAfterAndUpdatedAtIsNull(Long accountId, Long quizId, Instant now);
 //	Optional<QuizResult> findByAccountIdAndQuizIdAndEndTimeAfterAndUpdatedAtIsNull(Long id, Long quizId,
 //			Instant now);
 //

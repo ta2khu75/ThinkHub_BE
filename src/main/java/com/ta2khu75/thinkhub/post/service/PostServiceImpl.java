@@ -12,11 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.account.AccountService;
-import com.ta2khu75.thinkhub.comment.CommentService;
-import com.ta2khu75.thinkhub.comment.CommentTargetType;
-import com.ta2khu75.thinkhub.comment.dto.CommentRequest;
-import com.ta2khu75.thinkhub.comment.dto.CommentResponse;
-import com.ta2khu75.thinkhub.comment.service.CommentServiceImpl;
 import com.ta2khu75.thinkhub.post.PostService;
 import com.ta2khu75.thinkhub.post.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.dto.PostResponse;
@@ -24,12 +19,7 @@ import com.ta2khu75.thinkhub.post.dto.PostSearch;
 import com.ta2khu75.thinkhub.post.entity.Post;
 import com.ta2khu75.thinkhub.post.mapper.PostMapper;
 import com.ta2khu75.thinkhub.post.repository.PostRepository;
-import com.ta2khu75.thinkhub.report.ReportService;
-import com.ta2khu75.thinkhub.report.ReportTargetType;
-import com.ta2khu75.thinkhub.report.dto.ReportRequest;
-import com.ta2khu75.thinkhub.report.dto.ReportResponse;
 import com.ta2khu75.thinkhub.shared.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
@@ -46,21 +36,16 @@ import jakarta.validation.Valid;
 
 @Service
 public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper> implements PostService {
-	private final CommentService commentService;
 	private final ApplicationEventPublisher events;
 	private final AccountService accountService;
 	private final TagService tagService;
-	private final ReportService reportService;
 
 	public PostServiceImpl(PostRepository repository, PostMapper mapper, ApplicationEventPublisher events,
-			AccountService accountService, TagService tagService, CommentServiceImpl commentService,
-			ReportService reportService) {
+			AccountService accountService, TagService tagService) {
 		super(repository, mapper);
 		this.events = events;
 		this.accountService = accountService;
 		this.tagService = tagService;
-		this.commentService = commentService;
-		this.reportService = reportService;
 	}
 
 	@Override
@@ -179,17 +164,13 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 	}
 
 	@Override
-	public CommentResponse comment(Long id, CommentRequest request) {
-		return commentService.create(id, CommentTargetType.POST, request);
-	}
-
-	@Override
-	public PageResponse<CommentResponse> readPageComments(Long targetId, Search search) {
-		return commentService.readPageBy(targetId, CommentTargetType.POST, search);
-	}
-
-	@Override
-	public ReportResponse report(Long id, ReportRequest request) {
-		return reportService.create(id, ReportTargetType.POST, request);
-	}
+	public PostResponse readDetail(Long id) {
+		Post post = readEntity(id);
+		PostResponse response = mapper.convert(readEntity(id));
+		AuthorResponse author = accountService.readAuthor(post.getAuthorId());
+		Set<TagDto> tags = tagService.readAllByIds(post.getTagIds());
+		response.setAuthor(author);
+		response.setTags(tags);
+		return response;
+}
 }

@@ -52,5 +52,4 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	public IdConfig getIdConfig() {
 		return IdConfig.POST;
 	}
-
 }
