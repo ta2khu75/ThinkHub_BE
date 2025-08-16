@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
 import com.google.api.gax.rpc.UnauthenticatedException;
-import com.ta2khu75.thinkhub.authority.RoleService;
-import com.ta2khu75.thinkhub.authority.dto.RoleDto;
+import com.ta2khu75.thinkhub.authority.api.RoleApi;
+import com.ta2khu75.thinkhub.authority.api.dto.RoleDto;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
@@ -31,7 +31,7 @@ import lombok.experimental.NonFinal;
 public class AuthorizationManagerImpl implements AuthorizationManager<HttpServletRequest> {
 	@NonFinal
 	AntPathMatcher pathMatcher = new AntPathMatcher();
-	RoleService roleService;
+	RoleApi roleService;
 	RedisService redisService;
 
 	private boolean isAdmin(String roleName) {

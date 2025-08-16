@@ -45,6 +45,8 @@ spring:
             enable: true
   data:
     redis:
+      repositories:
+        enabled: false
       host: singapore-keyvalue.render.com
       port: 6379
       username: ${redis.username}
@@ -67,6 +69,8 @@ spring:
     property-naming-strategy: SNAKE_CASE
     serialization:
       indent-output: true
+  modulith:
+    detection-strategy: com.ta2khu75.thinkhub.config.CustomApplicationModuleDetectionStrategy 
 firebase:
   storage-bucket: blog-exam-master.appspot.com
   adminsdk: firebase-adminsdk.json

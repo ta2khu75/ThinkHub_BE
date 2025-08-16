@@ -22,19 +22,19 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.ta2khu75.thinkhub.account.AccountService;
-import com.ta2khu75.thinkhub.account.dto.request.AccountProfileRequest;
-import com.ta2khu75.thinkhub.account.dto.request.AccountRequest;
-import com.ta2khu75.thinkhub.account.dto.request.AccountStatusRequest;
-import com.ta2khu75.thinkhub.authority.PermissionGroupService;
-import com.ta2khu75.thinkhub.authority.PermissionService;
-import com.ta2khu75.thinkhub.authority.RoleService;
-import com.ta2khu75.thinkhub.authority.dto.request.PermissionGroupRequest;
-import com.ta2khu75.thinkhub.authority.dto.request.PermissionRequest;
-import com.ta2khu75.thinkhub.authority.dto.request.RoleRequest;
-import com.ta2khu75.thinkhub.authority.dto.response.PermissionGroupResponse;
-import com.ta2khu75.thinkhub.authority.dto.response.PermissionResponse;
-import com.ta2khu75.thinkhub.authority.dto.response.RoleResponse;
+import com.ta2khu75.thinkhub.account.api.AccountApi;
+import com.ta2khu75.thinkhub.account.api.dto.request.AccountProfileRequest;
+import com.ta2khu75.thinkhub.account.api.dto.request.AccountRequest;
+import com.ta2khu75.thinkhub.account.api.dto.request.AccountStatusRequest;
+import com.ta2khu75.thinkhub.authority.api.RoleApi;
+import com.ta2khu75.thinkhub.authority.api.dto.request.PermissionGroupRequest;
+import com.ta2khu75.thinkhub.authority.api.dto.request.PermissionRequest;
+import com.ta2khu75.thinkhub.authority.api.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.authority.api.dto.response.PermissionGroupResponse;
+import com.ta2khu75.thinkhub.authority.api.dto.response.PermissionResponse;
+import com.ta2khu75.thinkhub.authority.api.dto.response.RoleResponse;
+import com.ta2khu75.thinkhub.authority.internal.PermissionGroupService;
+import com.ta2khu75.thinkhub.authority.internal.PermissionService;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 
@@ -48,8 +48,8 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataInitializer implements ApplicationRunner {
-	AccountService accountService;
-	RoleService roleService;
+	AccountApi accountService;
+	RoleApi roleService;
 	PermissionService permissionService;
 	PermissionGroupService permissionGroupService;
 	ApplicationContext applicationContext;
