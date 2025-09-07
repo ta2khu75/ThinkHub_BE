@@ -12,12 +12,13 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizSearch;
-import com.ta2khu75.thinkhub.quiz.entity.QQuiz;
+import com.ta2khu75.thinkhub.quiz.internal.entity.QQuiz;
 import com.ta2khu75.thinkhub.quiz.internal.entity.Quiz;
 
 import lombok.RequiredArgsConstructor;
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.getOrderSpecifiers;
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.applyIfNotNull;
+
 @Repository
 @RequiredArgsConstructor
 public class QuizRepositoryImpl implements QuizRepositoryCustom {
@@ -38,13 +39,13 @@ public class QuizRepositoryImpl implements QuizRepositoryCustom {
 				applyIfNotNull(search.getMaxDuration(), () -> quiz.duration.loe(search.getMaxDuration())),
 				applyIfNotNull(search.getAccessModifier(), () -> quiz.accessModifier.eq(search.getAccessModifier())),
 				applyIfNotNull(search.getAuthorIdQuery(), () -> quiz.authorId.eq(search.getAuthorIdQuery())) };
-		JPAQuery<Quiz> query = queryFactory.selectFrom(quiz).leftJoin(quiz.tagIds).fetchJoin().where(conditions).orderBy(orderSpecifiers.toArray(new OrderSpecifier[0])).offset(pageable.getOffset())
+		JPAQuery<Quiz> query = queryFactory.selectFrom(quiz).leftJoin(quiz.tagIds).fetchJoin().where(conditions)
+				.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0])).offset(pageable.getOffset())
 				.limit(pageable.getPageSize());
 		List<Quiz> content = query.fetch();
 
 		long total = queryFactory.select(quiz.count()).from(quiz).where(conditions).fetchOne();
 		return new PageImpl<>(content, pageable, total);
 	}
-	
 
 }

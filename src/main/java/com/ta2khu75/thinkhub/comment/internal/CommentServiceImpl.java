@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.account.api.AccountApi;
 import com.ta2khu75.thinkhub.comment.api.CommentApi;
 import com.ta2khu75.thinkhub.comment.api.dto.CommentRequest;
 import com.ta2khu75.thinkhub.comment.api.dto.CommentResponse;
@@ -16,23 +15,20 @@ import com.ta2khu75.thinkhub.comment.internal.entity.Comment;
 import com.ta2khu75.thinkhub.comment.internal.entity.CommentTargetType;
 import com.ta2khu75.thinkhub.comment.internal.mapper.CommentMapper;
 import com.ta2khu75.thinkhub.comment.internal.repository.CommentRepository;
-import com.ta2khu75.thinkhub.report.api.ReportApi;
-import com.ta2khu75.thinkhub.report.api.dto.ReportRequest;
-import com.ta2khu75.thinkhub.report.api.dto.ReportResponse;
-import com.ta2khu75.thinkhub.report.internal.enums.ReportTargetType;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
+import com.ta2khu75.thinkhub.user.api.UserApi;
 
 @Service
 public class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository, CommentMapper>
 		implements CommentApi {
-	private final AccountApi accountService;
+	private final UserApi accountService;
 
-	public CommentServiceImpl(CommentRepository repository, CommentMapper mapper, AccountApi accountService) {
+	public CommentServiceImpl(CommentRepository repository, CommentMapper mapper, UserApi accountService) {
 		super(repository, mapper);
 		this.accountService = accountService;
 	}
@@ -41,7 +37,7 @@ public class CommentServiceImpl extends BaseService<Comment, Long, CommentReposi
 	public PageResponse<CommentResponse> readPageBy(Long targetId, CommentTargetType targetType, Search search) {
 		Page<Comment> page = repository.findByTargetIdAndTargetType(targetId, targetType, search.toPageable());
 		Set<Long> authorIds = page.getContent().stream().map(Comment::getAuthorId).collect(Collectors.toSet());
-		Map<Long, AuthorResponse> authorMap = accountService.readMapAuthorsByAccountIds(authorIds);
+		Map<Long, AuthorResponse> authorMap = accountService.readMapAuthorsByUserIds(authorIds);
 		List<CommentResponse> comments = page.getContent().stream().map(comment -> {
 			CommentResponse response = mapper.convert(comment);
 			response.setAuthor(authorMap.get(comment.getAuthorId()));
@@ -52,9 +48,9 @@ public class CommentServiceImpl extends BaseService<Comment, Long, CommentReposi
 
 	@Override
 	public CommentResponse create(Long targetId, CommentTargetType targetType, CommentRequest request) {
-		AuthorResponse author = accountService.readAuthor(SecurityUtil.getCurrentAccountIdDecode());
+		AuthorResponse author = accountService.readAuthor(SecurityUtil.getCurrentUserIdDecode());
 		Comment comment = mapper.toEntity(request);
-		comment.setAuthorId(SecurityUtil.getCurrentAccountIdDecode());
+		comment.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
 		comment.setTargetId(targetId);
 		comment.setTargetType(targetType);
 		CommentResponse response = mapper.convert(repository.save(comment));
@@ -65,7 +61,7 @@ public class CommentServiceImpl extends BaseService<Comment, Long, CommentReposi
 	@Override
 	public CommentResponse update(Long id, CommentRequest request) {
 		Comment comment = this.readEntity(id);
-		if (comment.getAuthorId().equals(SecurityUtil.getCurrentAccountIdDecode())) {
+		if (comment.getAuthorId().equals(SecurityUtil.getCurrentUserIdDecode())) {
 			comment.setContent(request.getContent());
 			AuthorResponse author = accountService.readAuthor(comment.getAuthorId());
 			CommentResponse response = mapper.convert(repository.save(comment));

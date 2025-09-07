@@ -30,7 +30,7 @@ public class QuizResult extends BaseEntityLong {
 	Integer correctCount;
 	Instant endTime;
 	@Column(nullable = false, updatable = false)
-	Long accountId;
+	Long userId;
 	@Column(nullable = false, updatable = false)
 	Long quizId;
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

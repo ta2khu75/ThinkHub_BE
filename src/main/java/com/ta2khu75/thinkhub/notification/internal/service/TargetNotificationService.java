@@ -17,25 +17,25 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class TargetNotificationService {
-	private final FollowApi followService;
-	private final NotificationApi notificationService;
-
-	public void notifyFollowersAboutNewTarget(NotificationRequest request) {
-		Search search = new Search();
-		search.setPage(0);
-		search.setSize(1000);
-		PageResponse<AuthorResponse> followerPage = followService.readPage(request.getAccountId(),
-				FollowDirection.FOLLOWER, search);
-		int totalPage = followerPage.getTotalPages();
-		NotificationRequest notificationRequest = new NotificationRequest();
-		BeanUtils.copyProperties(request, notificationRequest);
-		do {
-			for (AuthorResponse follower : followerPage.getContent()) {
-//				notificationRequest.setAccountId(follower.id());
-				notificationService.create(notificationRequest);
-			}
-			search.setPage(followerPage.getPage() + 1);
-			followerPage = followService.readPage(request.getAccountId(), FollowDirection.FOLLOWER, search);
-		} while (followerPage.getPage() < totalPage);
-	}
+//	private final FollowApi followService;
+//	private final NotificationApi notificationService;
+//
+//	public void notifyFollowersAboutNewTarget(NotificationRequest request) {
+//		Search search = new Search();
+//		search.setPage(0);
+//		search.setSize(1000);
+//		PageResponse<AuthorResponse> followerPage = followService.readPage(request.getAccountId(),
+//				FollowDirection.FOLLOWER, search);
+//		int totalPage = followerPage.getTotalPages();
+//		NotificationRequest notificationRequest = new NotificationRequest();
+//		BeanUtils.copyProperties(request, notificationRequest);
+//		do {
+//			for (AuthorResponse follower : followerPage.getContent()) {
+////				notificationRequest.setAccountId(follower.id());
+//				notificationService.create(notificationRequest);
+//			}
+//			search.setPage(followerPage.getPage() + 1);
+//			followerPage = followService.readAuthPage(request.getUserId(), FollowDirection.FOLLOWER, search);
+//		} while (followerPage.getPage() < totalPage);
+//	}
 }

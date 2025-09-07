@@ -1,7 +1,5 @@
 package com.ta2khu75.thinkhub.quiz.internal.mapper;
 
-import org.mapstruct.InheritConfiguration;
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
@@ -20,16 +18,18 @@ import org.mapstruct.Mapping;
 @Mapper(config = MapperSpringConfig.class)
 public interface QuizMapper
 		extends Converter<Quiz, QuizResponse>, BaseMapper<QuizRequest, Quiz>, PageMapper<Quiz, QuizResponse> {
-	@Mapping(target = "id", source = "source")
-	@Mapping(target = "author", ignore = true)
-	@Mapping(target = "tags", source = "tagIds")
-	QuizResponse baseConvert(Quiz source);
 
 	@Override
+	@Mapping(target = "id", source = "source")
+	@Mapping(target = "tags", source = "tagIds")
+	@Mapping(target = "author", ignore = true)
 	QuizResponse convert(Quiz source);
 
+	@Mapping(target = "id", source = "source")
+	@Mapping(target = "tags", source = "tagIds")
+	@Mapping(target = "author", ignore = true)
 	@Mapping(target = "posts", ignore = true)
-	QuizDetailResponse toDetailResponse(Quiz quiz);
+	QuizDetailResponse toDetailResponse(Quiz source);
 
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)

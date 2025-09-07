@@ -1,7 +1,6 @@
 package com.ta2khu75.thinkhub.quiz.api.dto;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 
 import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;

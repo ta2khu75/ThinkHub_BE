@@ -42,12 +42,12 @@ public final class SecurityUtil {
 		return getClaim("username", String.class);
 	}
 
-	public static String getCurrentAccountId() {
+	public static String getCurrentUserId() {
 		return getJwtToken().getSubject();
 	}
 
-	public static Long getCurrentAccountIdDecode() {
-		return IdConverterUtil.decode(getCurrentAccountId(), IdConfig.ACCOUNT);
+	public static Long getCurrentUserIdDecode() {
+		return IdConverterUtil.decode(getCurrentUserId(), IdConfig.USER);
 	}
 
 	public static String getCurrentRole() {
@@ -56,7 +56,7 @@ public final class SecurityUtil {
 
 	public static boolean isAuthor(String id) {
 		try {
-			String accountId = getCurrentAccountId();
+			String accountId = getCurrentUserId();
 			return accountId.equals(id);
 		} catch (Exception e) {
 			return false;
@@ -65,7 +65,7 @@ public final class SecurityUtil {
 
 	public static boolean isAuthorDecode(Long id) {
 		try {
-			Long accountId = getCurrentAccountIdDecode();
+			Long accountId = getCurrentUserIdDecode();
 			return accountId.equals(id);
 		} catch (Exception e) {
 			return false;

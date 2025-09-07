@@ -2,6 +2,7 @@ package com.ta2khu75.thinkhub.notification.internal.service;
 
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +32,12 @@ public class NotificationServiceImpl
 	private final PostApi postService;
 	private final QuizApi quizService;
 	private final CommentApi commentService;
+	private final ApplicationEventPublisher events;
 
-	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper,
-			PostApi postService, QuizApi quizService, CommentApi commentService) {
+	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper, PostApi postService,
+			QuizApi quizService, CommentApi commentService, ApplicationEventPublisher events) {
 		super(repository, mapper);
+		this.events = events;
 		this.postService = postService;
 		this.quizService = quizService;
 		this.commentService = commentService;
@@ -46,6 +49,7 @@ public class NotificationServiceImpl
 		notification = repository.save(notification);
 		NotificationResponse response = mapper.convert(notification);
 		response.setId(toNotificationIdDto(notification.getId()));
+		
 		return response;
 
 	}
@@ -69,8 +73,8 @@ public class NotificationServiceImpl
 
 	@Override
 	public PageResponse<NotificationResponse> readPage(Search search) {
-		Long accountId = SecurityUtil.getCurrentAccountIdDecode();
-		Page<Notification> page = repository.findByIdAccountId(accountId, search.toPageable());
+		Long userId = SecurityUtil.getCurrentUserIdDecode();
+		Page<Notification> page = repository.findByIdUserId(userId, search.toPageable());
 		List<NotificationResponse> notifications = page.getContent().stream().map(notification -> {
 			NotificationResponse response = mapper.convert(notification);
 			response.setTarget(this.resolveTarget(notification));
@@ -95,32 +99,32 @@ public class NotificationServiceImpl
 	}
 
 	private NotificationIdDto toNotificationIdDto(NotificationId id) {
-		String accountId = IdConverterUtil.encode(id.getAccountId(), IdConfig.ACCOUNT);
+		String userId = IdConverterUtil.encode(id.getUserId(), IdConfig.USER);
 		switch (id.getTargetType()) {
 		case POST:
 			String postId = IdConverterUtil.encode(id.getTargetId(), IdConfig.POST);
-			return new NotificationIdDto(accountId, postId, id.getTargetType());
+			return new NotificationIdDto(userId, postId, id.getTargetType());
 		case QUIZ:
 			String quizId = IdConverterUtil.encode(id.getTargetId(), IdConfig.QUIZ);
-			return new NotificationIdDto(accountId, quizId, id.getTargetType());
+			return new NotificationIdDto(userId, quizId, id.getTargetType());
 		case COMMENT:
-			return new NotificationIdDto(accountId, id.getTargetId().toString(), id.getTargetType());
+			return new NotificationIdDto(userId, id.getTargetId().toString(), id.getTargetType());
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + id.getTargetType());
 		}
 	}
 
 	private NotificationId toNotificationId(NotificationIdDto id) {
-		Long accountId = IdConverterUtil.decode(id.accountId(), IdConfig.ACCOUNT);
+		Long userId = IdConverterUtil.decode(id.accountId(), IdConfig.USER);
 		switch (id.targetType()) {
 		case POST:
 			Long postId = IdConverterUtil.decode(id.targetId(), IdConfig.POST);
-			return new NotificationId(accountId, postId, id.targetType());
+			return new NotificationId(userId, postId, id.targetType());
 		case QUIZ:
 			Long quizId = IdConverterUtil.decode(id.targetId(), IdConfig.QUIZ);
-			return new NotificationId(accountId, quizId, id.targetType());
+			return new NotificationId(userId, quizId, id.targetType());
 		case COMMENT:
-			return new NotificationId(accountId, Long.valueOf(id.targetId()), id.targetType());
+			return new NotificationId(userId, Long.valueOf(id.targetId()), id.targetType());
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + id.targetType());
 		}

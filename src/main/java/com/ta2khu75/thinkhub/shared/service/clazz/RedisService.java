@@ -143,16 +143,16 @@ public class RedisService {
 			return "authority:role:" + id;
 		}
 
-		public static String accountLock(Long id) {
-			return "account:lock:" + id;
+		public static String userLock(Long id) {
+			return "user:lock:" + id;
 		}
 
 		public static String quiz(Long id) {
 			return "quiz:" + id;
 		}
 
-		public static String quizResult(Long accountId, Long quizId) {
-			return "quiz:" + quizId + ":account:" + accountId + ":result";
+		public static String quizResult(Long userId, Long quizId) {
+			return "quiz:" + quizId + ":user:" + userId + ":result";
 		}
 	}
 }

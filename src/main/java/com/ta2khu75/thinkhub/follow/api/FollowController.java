@@ -18,37 +18,39 @@ import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import io.swagger.v3.oas.annotations.Operation;
-@ApiController("${app.api-prefix}/accounts")
-public class FollowController extends BaseController<FollowApi> implements IdDecodable{
+
+@ApiController("${app.api-prefix}/follows")
+public class FollowController extends BaseController<FollowApi> implements IdDecodable {
 	protected FollowController(FollowApi service) {
 		super(service);
 	}
 
-	@PostMapping("{accountId}/follow")
+	@PostMapping("{accountId}")
 	@Operation(summary = "Follow a user", description = "Start following a specific user account.")
 	public ResponseEntity<Void> follow(@PathVariable String accountId) {
-		service.follow(this.decodeAccountId(accountId));
+		service.follow(this.decodeUserId(accountId));
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@DeleteMapping("{accountId}/follow")
+	@DeleteMapping("{accountId}")
 	@Operation(summary = "Unfollow a user", description = "Stop following a previously followed user account.")
 	public ResponseEntity<Void> unfollow(@PathVariable String accountId) {
-		service.unFollow(this.decodeAccountId(accountId));
+		service.unFollow(this.decodeUserId(accountId));
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("{accountId}/follow/status")
+	@GetMapping("{accountId}/status")
 	@Operation(summary = "Check follow status", description = "Check whether you are currently following the specified user.")
 	public ResponseEntity<FollowStatusResponse> isFollowing(@PathVariable String accountId) {
-		return ResponseEntity.ok(service.isFollowing(this.decodeAccountId(accountId)));
+		return ResponseEntity.ok(service.isFollowing(this.decodeUserId(accountId)));
 	}
 
 	@GetMapping("{accountId}/followers")
 	@Operation(summary = "Get followers", description = "View the list of users who are currently following the specified account.")
 	public ResponseEntity<PageResponse<AuthorResponse>> readFollowers(@PathVariable String accountId,
 			@SnakeCaseModelAttribute Search search) {
-		return ResponseEntity.ok(service.readPage(this.decodeAccountId(accountId), FollowDirection.FOLLOWER, search));
+		return ResponseEntity
+				.ok(service.readAuthorPage(this.decodeUserId(accountId), FollowDirection.FOLLOWER, search));
 	}
 
 	@GetMapping("{accountId}/following")
@@ -56,12 +58,12 @@ public class FollowController extends BaseController<FollowApi> implements IdDec
 	public ResponseEntity<PageResponse<AuthorResponse>> readFollowing(@PathVariable String accountId,
 			@SnakeCaseModelAttribute Search search) {
 		return ResponseEntity
-				.ok(service.readPage(this.decodeAccountId(accountId), FollowDirection.FOLLOWING, search));
+				.ok(service.readAuthorPage(this.decodeUserId(accountId), FollowDirection.FOLLOWING, search));
 	}
 
 	@Override
 	public IdConfig getIdConfig() {
 		return null;
 	}
-	
+
 }

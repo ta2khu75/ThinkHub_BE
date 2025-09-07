@@ -1,5 +1,6 @@
 package com.ta2khu75.thinkhub.follow.api;
 
+import com.ta2khu75.thinkhub.follow.api.dto.FollowResponse;
 import com.ta2khu75.thinkhub.follow.api.dto.FollowStatusResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
@@ -12,6 +13,6 @@ public interface FollowApi {
 
 	FollowStatusResponse isFollowing(Long followingId);
 
-	PageResponse<AuthorResponse> readPage(Long followingId, FollowDirection direction, Search search);
-
+	PageResponse<AuthorResponse> readAuthorPage(Long followingId, FollowDirection direction, Search search);
+	PageResponse<FollowResponse> readPage(Long followingId, FollowDirection direction, Search search);	
 }

@@ -19,7 +19,7 @@ import com.ta2khu75.thinkhub.tag.internal.repository.TagRepository;
 import jakarta.validation.Valid;
 
 @Service
-public class TagServiceImpl extends BaseService<Tag, Long, TagRepository, TagMapper> implements TagApi {
+class TagServiceImpl extends BaseService<Tag, Long, TagRepository, TagMapper> implements TagApi {
 
 	protected TagServiceImpl(TagRepository repository, TagMapper mapper) {
 		super(repository, mapper);
@@ -55,12 +55,13 @@ public class TagServiceImpl extends BaseService<Tag, Long, TagRepository, TagMap
 
 	@Override
 	public PageResponse<TagDto> search(Search search) {
-		return mapper.toPageResponse(repository.findByNameContainingIgnoreCase(search.getKeyword(), search.toPageable()));
+		return mapper
+				.toPageResponse(repository.findByNameContainingIgnoreCase(search.getKeyword(), search.toPageable()));
 	}
 
 	@Override
 	public Set<TagDto> readAllByNameIn(Set<String> names) {
-		return  repository.findAllByNameIn(names).stream().map(mapper::convert).collect(Collectors.toSet());
+		return repository.findAllByNameIn(names).stream().map(mapper::convert).collect(Collectors.toSet());
 	}
 
 	@Override

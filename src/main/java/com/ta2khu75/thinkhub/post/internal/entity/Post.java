@@ -10,6 +10,7 @@ import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -41,7 +42,10 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	AccessModifier accessModifier;
+	@ElementCollection
 	Set<Long> quizIds;
+	@ElementCollection
+	@Column(nullable = false)
 	Set<Long> tagIds;
 	@Column(nullable = false)
 	Long categoryId;

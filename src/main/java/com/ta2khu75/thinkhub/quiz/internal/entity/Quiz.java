@@ -57,10 +57,11 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	Long authorId;
 	@ElementCollection
 	Set<Long> postIds;
+	@ElementCollection
+	@Column(nullable = false)
+	Set<Long> tagIds;
 	@Column(nullable = false)
 	Long categoryId;
-	@ElementCollection
-	Set<Long> tagIds;
 	@JoinColumn(name = "quiz_id")
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Question> questions;

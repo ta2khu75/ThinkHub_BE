@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
 import com.google.api.gax.rpc.UnauthenticatedException;
-import com.ta2khu75.thinkhub.authority.api.RoleApi;
-import com.ta2khu75.thinkhub.authority.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authorization.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authorization.internal.role.RoleService;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
@@ -31,7 +31,7 @@ import lombok.experimental.NonFinal;
 public class AuthorizationManagerImpl implements AuthorizationManager<HttpServletRequest> {
 	@NonFinal
 	AntPathMatcher pathMatcher = new AntPathMatcher();
-	RoleApi roleService;
+	RoleService roleService;
 	RedisService redisService;
 
 	private boolean isAdmin(String roleName) {
@@ -60,10 +60,10 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 		String requestUrl = object.getRequestURI();
 		String httpMethod = object.getMethod();
 		try {
-		String username = SecurityUtil.getCurrentUsername();
-		System.out.println("username: " + username);
-			Long accountId = SecurityUtil.getCurrentAccountIdDecode();
-			boolean exists = redisService.exists(RedisKeyBuilder.accountLock(accountId));
+			String username = SecurityUtil.getCurrentUsername();
+			System.out.println("username: " + username);
+			Long userId = SecurityUtil.getCurrentUserIdDecode();
+			boolean exists = redisService.exists(RedisKeyBuilder.userLock(userId));
 			if (exists) {
 				throw new AccessDeniedException("Account locked");
 			}
@@ -79,7 +79,7 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 		}
 		RoleDto role = roleService.readDtoByName(roleName);
 		boolean isAllowed = isAllowedEndpoint(role, requestUrl, httpMethod);
-		if (true) {
+		if (isAllowed) {
 			return new AuthorizationDecision(true);
 		}
 		return new AuthorizationDecision(false);

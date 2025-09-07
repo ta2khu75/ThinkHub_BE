@@ -20,12 +20,12 @@ import com.ta2khu75.thinkhub.quiz.api.dto.QuizDetailResponse;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizRequest;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizResponse;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizSearch;
+import com.ta2khu75.thinkhub.quiz.api.event.QuizCreatedEvent;
 import com.ta2khu75.thinkhub.quiz.internal.entity.Quiz;
 import com.ta2khu75.thinkhub.quiz.internal.mapper.QuizMapper;
-import com.ta2khu75.thinkhub.quiz.internal.repository.QuizCache;
 import com.ta2khu75.thinkhub.quiz.internal.repository.QuizRepository;
-import com.ta2khu75.thinkhub.quiz.required.client.AccountClient;
-import com.ta2khu75.thinkhub.quiz.required.client.TagClient;
+import com.ta2khu75.thinkhub.quiz.required.port.QuizTagPort;
+import com.ta2khu75.thinkhub.quiz.required.port.QuizUserPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
@@ -44,19 +44,17 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMapper> implements QuizApi {
+class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMapper> implements QuizApi {
 	private final ApplicationEventPublisher events;
-	private final QuizCache cache;
-	private final TagClient tagClient;
-	private final AccountClient accountClient;
+	private final QuizTagPort tagPort;
+	private final QuizUserPort userPort;
 
 	public QuizServiceImpl(QuizRepository repository, QuizMapper mapper, FirebaseService fireBaseService,
-			ApplicationEventPublisher events, TagClient tagClient, AccountClient accountClient, QuizCache cache) {
+			ApplicationEventPublisher events, QuizTagPort tagPort, QuizUserPort accountPort) {
 		super(repository, mapper, fireBaseService);
 		this.events = events;
-		this.tagClient = tagClient;
-		this.accountClient = accountClient;
-		this.cache = cache;
+		this.tagPort = tagPort;
+		this.userPort = accountPort;
 	}
 
 	@Override
@@ -64,9 +62,11 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		validateExistence(request);
 		Quiz quiz = mapper.toEntity(request);
 		quiz.setTagIds(getTagIds(request));
-		quiz.setAuthorId(SecurityUtil.getCurrentAccountIdDecode());
+		quiz.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
 		this.saveFile(quiz, file, Folder.QUIZ_FOLDER, Quiz::setImageUrl);
-		return this.save(quiz);
+		QuizResponse response = this.save(quiz);
+		events.publishEvent(new QuizCreatedEvent(quiz.getAuthorId(), quiz.getId()));
+		return response;
 	}
 
 	@Override
@@ -87,8 +87,8 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		Quiz quiz = readEntity(id);
 		quiz.setQuestions(null);
 		QuizResponse response = mapper.convert(quiz);
-		response.setAuthor(accountClient.readAuthor(quiz.getAuthorId()));
-		response.setTags(tagClient.readAllByIds(quiz.getTagIds()));
+		response.setAuthor(userPort.readAuthor(quiz.getAuthorId()));
+		response.setTags(tagPort.readAllByIds(quiz.getTagIds()));
 		return response;
 	}
 
@@ -103,7 +103,7 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 	@Transactional
 	public PageResponse<QuizResponse> search(QuizSearch search) {
 		if (search.getAuthorId() != null) {
-			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.ACCOUNT));
+			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.USER));
 		}
 		Long authorId = search.getAuthorIdQuery();
 
@@ -118,19 +118,19 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 		Set<Long> tagIds = page.stream().flatMap(quiz -> quiz.getTagIds().stream()).collect(Collectors.toSet());
 
 		Map<Long, TagDto> tagMap = tagIds.isEmpty() ? Map.of()
-				: tagClient.readAllByIds(tagIds).stream().collect(Collectors.toMap(TagDto::id, Function.identity()));
+				: tagPort.readAllByIds(tagIds).stream().collect(Collectors.toMap(TagDto::id, Function.identity()));
 
 		// Lấy author map
 		Map<Long, AuthorResponse> authorMap;
 		if (authorId != null) {
 			// Nếu đã biết authorId → chỉ cần 1 author
-			AuthorResponse author = accountClient.readAuthor(authorId);
+			AuthorResponse author = userPort.readAuthor(authorId);
 			authorMap = Map.of(authorId, author);
 		} else {
 			// Lấy toàn bộ authorId trong trang
 			Set<Long> authorIds = page.getContent().stream().map(Quiz::getAuthorId).collect(Collectors.toSet());
 
-			authorMap = accountClient.readMapAuthorsByAccountIds(authorIds);
+			authorMap = userPort.readMapAuthorsByUserIds(authorIds);
 		}
 
 		// Ánh xạ quiz → QuizResponse
@@ -176,10 +176,10 @@ public class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository,
 
 	private Set<Long> getTagIds(QuizRequest request) {
 		return request.tags().stream().map(tag -> {
-			TagDto tagDto = tagClient.readByName(tag.toLowerCase());
+			TagDto tagDto = tagPort.readByName(tag.toLowerCase());
 			if (tagDto != null)
 				return tagDto.id();
-			return tagClient.create(tag).id();
+			return tagPort.create(tag).id();
 		}).collect(Collectors.toSet());
 	}
 

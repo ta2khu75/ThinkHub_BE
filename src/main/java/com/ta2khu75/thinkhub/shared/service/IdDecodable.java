@@ -8,8 +8,8 @@ public interface IdDecodable {
 		return IdConverterUtil.decode(id, idConfig);
 	}
 
-	default Long decodeAccountId(String accountId) {
-		return IdConverterUtil.decode(accountId, IdConfig.ACCOUNT);
+	default Long decodeUserId(String userId) {
+		return IdConverterUtil.decode(userId, IdConfig.USER);
 	}
 
 	default Long decodeId(String id) {

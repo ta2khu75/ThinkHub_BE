@@ -1,9 +1,8 @@
 package com.ta2khu75.thinkhub.result.api.dto;
 
 import java.time.Instant;
-import java.util.List;
 
-import com.ta2khu75.thinkhub.quiz.api.dto.QuizResponse;
+import com.ta2khu75.thinkhub.quiz.api.dto.QuizDetailResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.BaseClassResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 
@@ -17,10 +16,9 @@ public class QuizResultResponse implements BaseClassResponse<String> {
 	String id;
 	Float score;
 	Instant endTime;
-	QuizResponse quiz;
+	QuizDetailResponse quiz;
 	AuthorResponse account;
 	Integer correctCount;
-	List<UserAnswerResponse> userAnswers;
 	Instant createdAt;
 	Instant updatedAt;
 }

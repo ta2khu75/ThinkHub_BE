@@ -13,7 +13,7 @@ spring:
     show-sql: true
     open-in-view: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
   datasource:
     url: jdbc:mysql://localhost:3366/think_hub
     username: root
@@ -70,7 +70,7 @@ spring:
     serialization:
       indent-output: true
   modulith:
-    detection-strategy: com.ta2khu75.thinkhub.config.CustomApplicationModuleDetectionStrategy 
+    detection-strategy: com.ta2khu75.thinkhub.config.CustomApplicationModuleDetectionStrategy
 firebase:
   storage-bucket: blog-exam-master.appspot.com
   adminsdk: firebase-adminsdk.json

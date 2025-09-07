@@ -15,11 +15,12 @@ import com.ta2khu75.thinkhub.post.api.PostApi;
 import com.ta2khu75.thinkhub.post.api.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.api.dto.PostSearch;
+import com.ta2khu75.thinkhub.post.api.event.PostCreatedEvent;
 import com.ta2khu75.thinkhub.post.internal.entity.Post;
 import com.ta2khu75.thinkhub.post.internal.mapper.PostMapper;
 import com.ta2khu75.thinkhub.post.internal.repository.PostRepository;
-import com.ta2khu75.thinkhub.post.required.client.AccountClient;
-import com.ta2khu75.thinkhub.post.required.client.TagClient;
+import com.ta2khu75.thinkhub.post.required.client.PostTagPort;
+import com.ta2khu75.thinkhub.post.required.client.PostUserPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
@@ -37,15 +38,15 @@ import jakarta.validation.Valid;
 @Service
 public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper> implements PostApi {
 	private final ApplicationEventPublisher events;
-	private final AccountClient accountClient;
-	private final TagClient tagClient;
+	private final PostUserPort userPort;
+	private final PostTagPort tagPort;
 
 	public PostServiceImpl(PostRepository repository, PostMapper mapper, ApplicationEventPublisher events,
-			AccountClient accountClient, TagClient tagClient) {
+			PostUserPort userPort, PostTagPort tagPort) {
 		super(repository, mapper);
 		this.events = events;
-		this.accountClient = accountClient;
-		this.tagClient = tagClient;
+		this.userPort = userPort;
+		this.tagPort = tagPort;
 	}
 
 	@Override
@@ -55,8 +56,10 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 		post.setTagIds(this.getTagIds(request));
 		post.setQuizIds(
 				request.quizIds().stream().map(quizId -> decode(quizId, IdConfig.QUIZ)).collect(Collectors.toSet()));
-		post.setAuthorId(SecurityUtil.getCurrentAccountIdDecode());
-		return this.save(post);
+		post.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
+		PostResponse response = this.save(post);
+		events.publishEvent(new PostCreatedEvent(post.getAuthorId(), post.getId()));
+		return response;
 	}
 
 	@Override
@@ -101,10 +104,10 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 
 	private Set<Long> getTagIds(PostRequest request) {
 		return request.tags().stream().map(tag -> {
-			TagDto tagDto = tagClient.readByName(tag.toLowerCase());
+			TagDto tagDto = tagPort.readByName(tag.toLowerCase());
 			if (tagDto != null)
 				return tagDto.id();
-			return tagClient.create(tag).id();
+			return tagPort.create(tag).id();
 		}).collect(Collectors.toSet());
 	}
 
@@ -116,7 +119,7 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 	@Override
 	public PageResponse<PostResponse> search(PostSearch search) {
 		if (search.getAuthorId() != null) {
-			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.ACCOUNT));
+			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.USER));
 		}
 		Long authorId = search.getAuthorIdQuery();
 
@@ -131,19 +134,19 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 		Set<Long> tagIds = page.stream().flatMap(post -> post.getTagIds().stream()).collect(Collectors.toSet());
 
 		Map<Long, TagDto> tagMap = tagIds.isEmpty() ? Map.of()
-				: tagClient.readAllByIds(tagIds).stream().collect(Collectors.toMap(TagDto::id, Function.identity()));
+				: tagPort.readAllByIds(tagIds).stream().collect(Collectors.toMap(TagDto::id, Function.identity()));
 
 		// Lấy author map
 		Map<Long, AuthorResponse> authorMap;
 		if (authorId != null) {
 			// Nếu đã biết authorId → chỉ cần 1 author
-			AuthorResponse author = accountClient.readAuthor(authorId);
+			AuthorResponse author = userPort.readAuthor(authorId);
 			authorMap = Map.of(authorId, author);
 		} else {
 			// Lấy toàn bộ authorId trong trang
 			Set<Long> authorIds = page.getContent().stream().map(Post::getAuthorId).collect(Collectors.toSet());
 
-			authorMap = accountClient.readMapAuthorsByAccountIds(authorIds);
+			authorMap = userPort.readMapAuthorsByUserIds(authorIds);
 		}
 
 		// Ánh xạ post → PostResponse
@@ -168,8 +171,8 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 	public PostResponse readDetail(Long id) {
 		Post post = readEntity(id);
 		PostResponse response = mapper.convert(readEntity(id));
-		AuthorResponse author = accountClient.readAuthor(post.getAuthorId());
-		Set<TagDto> tags = tagClient.readAllByIds(post.getTagIds());
+		AuthorResponse author = userPort.readAuthor(post.getAuthorId());
+		Set<TagDto> tags = tagPort.readAllByIds(post.getTagIds());
 		response.setAuthor(author);
 		response.setTags(tags);
 		return response;

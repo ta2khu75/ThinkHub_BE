@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ta2khu75.thinkhub.result.internal.entity.QuizResult;
 
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
-	Optional<QuizResult> findByAccountIdAndQuizIdAndEndTimeAfterAndUpdatedAtIsNull(Long accountId, Long quizId, Instant now);
+	Optional<QuizResult> findByUserIdAndQuizIdAndEndTimeAfterAndUpdatedAtIsNull(Long accountId, Long quizId,
+			Instant now);
 //	Optional<QuizResult> findByAccountIdAndQuizIdAndEndTimeAfterAndUpdatedAtIsNull(Long id, Long quizId,
 //			Instant now);
 //
