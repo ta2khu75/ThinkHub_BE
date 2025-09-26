@@ -1,6 +1,5 @@
 package com.ta2khu75.thinkhub.post.api.dto;
 
-import java.time.Instant;
 
 import java.util.Set;
 
@@ -11,12 +10,13 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PostResponse implements BaseClassResponse<String> {
-	String id;
+public class PostResponse extends BaseClassResponse<String> {
 	String title;
 	String content;
 	Set<TagDto> tags;
@@ -24,6 +24,4 @@ public class PostResponse implements BaseClassResponse<String> {
 	Long categoryId;
 	int viewCount;
 	AccessModifier accessModifier;
-	Instant createdAt;
-	Instant updatedAt;
 }

@@ -19,13 +19,16 @@ public class Category extends BaseEntityLong {
 	@Column(nullable = false, unique = true)
 	String name;
 	String description;
+	@Column(nullable = false)
+	String imageUrl;
+	@Column(nullable = false)
+	String targetImageUrl;
 	@CreatedBy
 	@Column(updatable = false, nullable = false)
 	String createdBy;
 	@Column(insertable = false)
 	@LastModifiedBy
 	String updatedBy;
-
 	@PreUpdate
 	@PrePersist
 	public void normalizeName() {

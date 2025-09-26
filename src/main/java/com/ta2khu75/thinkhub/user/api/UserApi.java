@@ -41,6 +41,6 @@ public interface UserApi extends SearchService<UserSearch, UserResponse>, Exists
 
 	AuthorResponse readAuthor(Long id);
 	
-	List<Long> readUserIdsByRoleDefault(RoleDefault roleDefault);
+	List<Long> readUserIdsByRoleName(String roleName);
 
 }

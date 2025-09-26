@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizRequest;
@@ -14,6 +12,7 @@ import com.ta2khu75.thinkhub.quiz.api.dto.QuizSearch;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.api.controller.CrudFileController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
@@ -29,7 +28,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @Tag(name = "Quiz", description = "Create, manage, take, and interact with quizzes including commenting and reporting.")
 @ApiController("${app.api-prefix}/quizzes")
-public class QuizController extends BaseController<QuizApi> implements IdDecodable {
+public class QuizController extends BaseController<QuizApi>
+		implements CrudFileController<QuizRequest, QuizResponse, String>, IdDecodable {
 	public QuizController(QuizApi service) {
 		super(service);
 	}
@@ -40,35 +40,33 @@ public class QuizController extends BaseController<QuizApi> implements IdDecodab
 		return ResponseEntity.ok(service.search(search));
 	}
 
-	@PostMapping
+	@Override
 	@Operation(summary = "Create a new quiz", description = "Upload a new quiz with optional image to test user knowledge.")
-	public ResponseEntity<QuizResponse> create(@Valid @RequestPart QuizRequest quiz,
-			@RequestPart(required = true) MultipartFile image) throws IOException {
+	public ResponseEntity<QuizResponse> create(@Valid QuizRequest quiz, MultipartFile image) throws IOException {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(quiz, image));
 	}
 
-	@GetMapping("{id}")
+	@Override
 	@Operation(summary = "Get quiz by ID", description = "Retrieve a quiz’s basic information by its identifier.")
-	public ResponseEntity<QuizResponse> read(@PathVariable String id) {
+	public ResponseEntity<QuizResponse> read(String id) {
 		return ResponseEntity.ok(service.read(decodeId(id)));
 	}
 
 	@GetMapping("{id}/detail")
 	@Operation(summary = "Get detailed quiz information", description = "Retrieve a quiz along with all questions, answers, and related data.")
-	public ResponseEntity<QuizResponse> readDetail(@PathVariable String id) {
+	public ResponseEntity<QuizResponse> readDetail(String id) {
 		return ResponseEntity.ok(service.readDetail(decodeId(id)));
 	}
 
-	@PutMapping("{id}")
+	@Override
 	@Operation(summary = "Update an existing quiz", description = "Modify quiz content or replace its associated image.")
-	public ResponseEntity<QuizResponse> update(@PathVariable String id, @RequestPart("quiz") QuizRequest quiz,
-			@RequestPart(name = "image", required = false) MultipartFile image) throws IOException {
+	public ResponseEntity<QuizResponse> update(String id, QuizRequest quiz, MultipartFile image) throws IOException {
 		return ResponseEntity.ok(service.update(decodeId(id), quiz, image));
 	}
 
-	@DeleteMapping("{id}")
+	@Override
 	@Operation(summary = "Delete a quiz", description = "Permanently remove a quiz from the system.")
-	public ResponseEntity<Void> delete(@PathVariable String id) {
+	public ResponseEntity<Void> delete(String id) {
 		service.delete(decodeId(id));
 		return ResponseEntity.noContent().build();
 	}

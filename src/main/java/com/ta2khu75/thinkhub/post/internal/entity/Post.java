@@ -37,6 +37,7 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	String title;
 	@Column(nullable = false, columnDefinition = "TEXT")
 	String content;
+	String imageUrl;
 	int viewCount;
 	boolean deleted;
 	@Column(nullable = false)

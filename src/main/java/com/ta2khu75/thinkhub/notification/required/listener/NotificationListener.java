@@ -34,7 +34,7 @@ public class NotificationListener {
 
 	@ApplicationModuleListener
 	public void onReportCreated(ReportCreatedEvent event) {
-		List<Long> userIds = userApi.readUserIdsByRoleDefault(RoleDefault.ADMIN);
+		List<Long> userIds = userApi.readUserIdsByRoleName(RoleDefault.ADMIN.name());
 		userIds.forEach(
 				userId -> api.create(new NotificationRequest(userId, event.targetId(), NotificationTargetType.REPORT)));
 	}

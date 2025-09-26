@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
 import com.google.api.gax.rpc.UnauthenticatedException;
-import com.ta2khu75.thinkhub.authorization.api.dto.RoleDto;
-import com.ta2khu75.thinkhub.authorization.internal.role.RoleService;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authz.internal.role.RoleService;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
@@ -42,7 +42,7 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 		System.out.println(requestPath);
 		System.out.println(httpMethod);
 		return role.permissions().stream().anyMatch(permission -> {
-			boolean resultHppt = httpMethod.equals(permission.requestMethod().name());
+			boolean resultHppt = httpMethod.equals(permission.method().name());
 			boolean pathResult = pathMatcher.match(permission.pattern(), requestPath);
 			return resultHppt && pathResult;
 		});

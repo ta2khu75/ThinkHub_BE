@@ -59,9 +59,10 @@ class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMa
 
 	@Override
 	public QuizResponse create(@Valid QuizRequest request, MultipartFile file) throws IOException {
-		validateExistence(request);
+		this.validateExistence(request);
 		Quiz quiz = mapper.toEntity(request);
 		quiz.setTagIds(getTagIds(request));
+		quiz.setPostIds(this.getPostIds(request));
 		quiz.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
 		this.saveFile(quiz, file, Folder.QUIZ_FOLDER, Quiz::setImageUrl);
 		QuizResponse response = this.save(quiz);
@@ -75,8 +76,7 @@ class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMa
 		Quiz quiz = readEntity(id);
 		mapper.update(request, quiz);
 		quiz.setTagIds(this.getTagIds(request));
-		quiz.setPostIds(
-				request.postIds().stream().map(post -> decode(post, IdConfig.POST)).collect(Collectors.toSet()));
+		quiz.setPostIds(this.getPostIds(request));
 		this.saveFile(quiz, file, Folder.QUIZ_FOLDER, Quiz::setImageUrl);
 		return save(quiz);
 	}
@@ -170,8 +170,7 @@ class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMa
 
 	private void validateExistence(QuizRequest request) {
 		events.publishEvent(new CheckExistsEvent<>(EntityType.CATEGORY, request.categoryId()));
-		request.postIds().forEach(
-				postId -> events.publishEvent(new CheckExistsEvent<>(EntityType.POST, decode(postId, IdConfig.POST))));
+		getPostIds(request).forEach(postId -> events.publishEvent(new CheckExistsEvent<>(EntityType.POST, postId)));
 	}
 
 	private Set<Long> getTagIds(QuizRequest request) {
@@ -181,6 +180,9 @@ class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMa
 				return tagDto.id();
 			return tagPort.create(tag).id();
 		}).collect(Collectors.toSet());
+	}
+	private Set<Long> getPostIds(QuizRequest request) {
+		return request.postIds().stream().map(postId -> decode(postId, IdConfig.POST)).collect(Collectors.toSet());
 	}
 
 	private QuizResponse save(Quiz quiz) {

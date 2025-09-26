@@ -13,7 +13,13 @@ spring:
     show-sql: true
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          batch-size: 50
+        order-inserts: true
+        order-updates: true
   datasource:
     url: jdbc:mysql://localhost:3366/think_hub
     username: root
@@ -44,6 +50,9 @@ spring:
           starttls:
             enable: true
   data:
+    jpa:
+      repositories:
+        bootstrap-mode: lazy
     redis:
       repositories:
         enabled: false
@@ -81,16 +90,16 @@ jwt:
   refresh:
     secret: J5uUvKodanwEbMy5nPAue-RmwlwX5bgfWVC-M74Lq-V-AT2dG8BDimAFWHanyiZYick3rho8Wg2eyXvmIiTAlw
     expiration: 2592000
-id:
-  quiz:
-    salted: 11
-    offset: 23
-    alphabet: OIdwbWQ3NYkfD5ZLn7qGtMzKjA8isHUcSaTCBx2h0VPRX9oJ4eu1rgyElpv6Fm
-  account:
-    salted: 97
-    offset: 79
-    alphabet: DHMKlP6QeukgvjwCFAqmipnT0WGJEIBR572NbYaUV8rS3hOyZst4xdzX1cL9fo
-  post:
-    salted: 59
-    offset: 41
-    alphabet: lN3JRfS2jh0IeGyFYribK1LO5BqM4DCQEa9vPUkVW8zXZgt7mHwxnusdpcTA6o
+#id:
+#  quiz:
+#    salted: 11
+#    offset: 23
+#    alphabet: OIdwbWQ3NYkfD5ZLn7qGtMzKjA8isHUcSaTCBx2h0VPRX9oJ4eu1rgyElpv6Fm
+#  account:
+#    salted: 97
+#    offset: 79
+#    alphabet: DHMKlP6QeukgvjwCFAqmipnT0WGJEIBR572NbYaUV8rS3hOyZst4xdzX1cL9fo
+#  post:
+#    salted: 59
+#    offset: 41
+#    alphabet: lN3JRfS2jh0IeGyFYribK1LO5BqM4DCQEa9vPUkVW8zXZgt7mHwxnusdpcTA6o

@@ -13,13 +13,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.authorization.api.AuthorizationApi;
-import com.ta2khu75.thinkhub.authorization.api.dto.response.RoleResponse;
-import com.ta2khu75.thinkhub.authorization.internal.role.RoleService;
+import com.ta2khu75.thinkhub.authz.api.AuthzApi;
+import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
-import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.AlreadyExistsException;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
@@ -48,15 +46,15 @@ import com.ta2khu75.thinkhub.user.projection.internal.projection.Author;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper> implements UserApi {
 	public UserServiceImpl(UserRepository repository, UserMapper mapper, UserStatusRepository statusRepository,
-			AuthorizationApi authorizationApi, ApplicationEventPublisher events, RedisService redisService) {
+			AuthzApi authzApi, ApplicationEventPublisher events, RedisService redisService) {
 		super(repository, mapper);
 		this.statusRepository = statusRepository;
 		this.redisService = redisService;
-		this.authorizationApi = authorizationApi;
+		this.authzApi= authzApi;
 		this.events = events;
 	}
 
-	AuthorizationApi authorizationApi;
+	AuthzApi authzApi;
 	RedisService redisService;
 	UserStatusRepository statusRepository;
 	ApplicationEventPublisher events;
@@ -180,8 +178,8 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 	}
 
 	@Override
-	public List<Long> readUserIdsByRoleDefault(RoleDefault roleDefault) {
-		RoleResponse role = authorizationApi.readRoleByName(roleDefault.name());
+	public List<Long> readUserIdsByRoleName(String roleName) {
+		RoleResponse role = authzApi.readRoleByName(roleName);
 		return repository.findUserIdsByRoleId(role.id());
 	}
 

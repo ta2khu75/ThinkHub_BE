@@ -38,7 +38,6 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	Integer duration;
 	@Column(nullable = false, length = 255)
 	String description;
-	@Column(nullable = false)
 	String imageUrl;
 	boolean shuffleQuestion = true;
 	boolean deleted;

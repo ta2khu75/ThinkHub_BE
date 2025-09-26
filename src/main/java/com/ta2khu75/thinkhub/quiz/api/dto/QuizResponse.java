@@ -1,6 +1,5 @@
 package com.ta2khu75.thinkhub.quiz.api.dto;
 
-import java.time.Instant;
 import java.util.Set;
 
 import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;
@@ -12,12 +11,13 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuizResponse implements BaseClassResponse<String> {
-	String id;
+public class QuizResponse extends BaseClassResponse<String> {
 	String title;
 	Integer duration;
 	String description;
@@ -30,6 +30,4 @@ public class QuizResponse implements BaseClassResponse<String> {
 	ResultVisibility resultVisibility;
 	boolean shuffleQuestion;
 	boolean completed;
-	Instant createdAt;
-	Instant updatedAt;
 }

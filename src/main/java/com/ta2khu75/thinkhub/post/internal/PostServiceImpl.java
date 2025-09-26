@@ -1,5 +1,6 @@
 package com.ta2khu75.thinkhub.post.internal;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ta2khu75.thinkhub.post.api.PostApi;
 import com.ta2khu75.thinkhub.post.api.dto.PostRequest;
@@ -28,7 +30,10 @@ import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
-import com.ta2khu75.thinkhub.shared.service.BaseService;
+import com.ta2khu75.thinkhub.shared.service.BaseFileService;
+import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService;
+import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService.Folder;
+
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
@@ -36,38 +41,41 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper> implements PostApi {
+public class PostServiceImpl extends BaseFileService<Post, Long, PostRepository, PostMapper> implements PostApi {
 	private final ApplicationEventPublisher events;
 	private final PostUserPort userPort;
 	private final PostTagPort tagPort;
 
-	public PostServiceImpl(PostRepository repository, PostMapper mapper, ApplicationEventPublisher events,
-			PostUserPort userPort, PostTagPort tagPort) {
-		super(repository, mapper);
+
+	public PostServiceImpl(PostRepository repository, PostMapper mapper, FirebaseService fireBaseService,
+			ApplicationEventPublisher events, PostUserPort userPort, PostTagPort tagPort) {
+		super(repository, mapper, fireBaseService);
 		this.events = events;
 		this.userPort = userPort;
 		this.tagPort = tagPort;
 	}
 
 	@Override
-	public PostResponse create(@Valid PostRequest request) {
-		validateExistence(request);
+	public PostResponse create(@Valid PostRequest request, MultipartFile file) throws IOException {
+		this.validateExistence(request);
 		Post post = mapper.toEntity(request);
 		post.setTagIds(this.getTagIds(request));
-		post.setQuizIds(
-				request.quizIds().stream().map(quizId -> decode(quizId, IdConfig.QUIZ)).collect(Collectors.toSet()));
+		post.setQuizIds(this.getQuizIds(request));
 		post.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
+		this.saveFile(post, file, Folder.POST_FOLDER, Post::setImageUrl);
 		PostResponse response = this.save(post);
 		events.publishEvent(new PostCreatedEvent(post.getAuthorId(), post.getId()));
 		return response;
 	}
 
 	@Override
-	public PostResponse update(Long id, @Valid PostRequest request) {
+	public PostResponse update(Long id, @Valid PostRequest request, MultipartFile file) throws IOException {
 		validateExistence(request);
 		Post post = this.readEntity(id);
 		mapper.update(request, post);
 		post.setTagIds(this.getTagIds(request));
+		post.setQuizIds(this.getQuizIds(request));
+		this.saveFile(post, file, Folder.POST_FOLDER, Post::setImageUrl);
 		return this.save(post);
 	}
 
@@ -98,8 +106,7 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 
 	private void validateExistence(PostRequest request) {
 		events.publishEvent(new CheckExistsEvent<>(EntityType.CATEGORY, request.categoryId()));
-		request.quizIds().forEach(
-				quizId -> events.publishEvent(new CheckExistsEvent<>(EntityType.QUIZ, decode(quizId, IdConfig.QUIZ))));
+		this.getQuizIds(request).forEach(quizId -> events.publishEvent(new CheckExistsEvent<>(EntityType.QUIZ, quizId)));
 	}
 
 	private Set<Long> getTagIds(PostRequest request) {
@@ -109,6 +116,9 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 				return tagDto.id();
 			return tagPort.create(tag).id();
 		}).collect(Collectors.toSet());
+	}
+	private Set<Long> getQuizIds(PostRequest request) {
+		return request.quizIds().stream().map(quizId -> decode(quizId, IdConfig.QUIZ)).collect(Collectors.toSet());
 	}
 
 	private PostResponse save(Post post) {

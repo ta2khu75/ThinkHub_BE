@@ -1,16 +1,19 @@
 package com.ta2khu75.thinkhub.post.api;
 
+import java.io.IOException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ta2khu75.thinkhub.post.api.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.api.dto.PostSearch;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
-import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
+import com.ta2khu75.thinkhub.shared.api.controller.CrudFileController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
@@ -22,11 +25,12 @@ import jakarta.validation.Valid;
 @Tag(name = "Post", description = "Create, manage, and interact with posts including commenting and reporting.")
 @ApiController("${app.api-prefix}/posts")
 public class PostController extends BaseController<PostApi>
-		implements CrudController<PostRequest, PostResponse, String>, IdDecodable {
+		implements CrudFileController<PostRequest, PostResponse, String>,IdDecodable {
 	protected PostController(PostApi service) {
 		super(service);
 	}
 
+	
 	@GetMapping
 	@Operation(summary = "Search posts", description = "Look up posts using filters, sorting, and pagination to explore content.")
 	public ResponseEntity<PageResponse<PostResponse>> search(PostSearch search) {
@@ -35,14 +39,14 @@ public class PostController extends BaseController<PostApi>
 
 	@Override
 	@Operation(summary = "Create a new post", description = "Publish a new post to share content with others.")
-	public ResponseEntity<PostResponse> create(@Valid PostRequest request) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
+	public ResponseEntity<PostResponse> create(@Valid PostRequest post, MultipartFile image) throws IOException {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(post, image));
 	}
 
 	@Override
 	@Operation(summary = "Update a post", description = "Edit the content or metadata of an existing post.")
-	public ResponseEntity<PostResponse> update(String id, @Valid PostRequest request) {
-		return ResponseEntity.ok(service.update(decodeId(id), request));
+	public ResponseEntity<PostResponse> update(String id, @Valid PostRequest post, MultipartFile image) throws IOException {
+		return ResponseEntity.ok(service.update(decodeId(id), post, image));
 	}
 
 	@Override
