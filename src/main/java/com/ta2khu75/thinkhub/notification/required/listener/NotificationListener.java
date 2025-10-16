@@ -36,6 +36,6 @@ public class NotificationListener {
 	public void onReportCreated(ReportCreatedEvent event) {
 		List<Long> userIds = userApi.readUserIdsByRoleName(RoleDefault.ADMIN.name());
 		userIds.forEach(
-				userId -> api.create(new NotificationRequest(userId, event.targetId(), NotificationTargetType.REPORT)));
+				userId -> api.create(new NotificationRequest(userId, event.id(), NotificationTargetType.REPORT)));
 	}
 }

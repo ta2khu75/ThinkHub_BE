@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReportResponse extends BaseClassResponse<ReportIdDto> {
+public class ReportResponse extends BaseClassResponse<Long> {
 	ReportType type;
 	AuthorResponse author;
 	ReportStatus status;

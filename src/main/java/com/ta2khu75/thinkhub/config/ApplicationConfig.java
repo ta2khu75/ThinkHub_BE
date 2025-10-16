@@ -2,6 +2,7 @@ package com.ta2khu75.thinkhub.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -12,10 +13,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class ApplicationConfig implements WebMvcConfigurer {
+	@Value("${app.frontend-url}")
+	private String frontendUrl;
 
 	@Override
 	public void addCorsMappings(@NonNull CorsRegistry registry) {
-		registry.addMapping("/api/**").allowedOrigins("http://localhost:3000").allowedMethods("*").allowedHeaders("*")
+		registry.addMapping("/api/**").allowedOrigins(frontendUrl).allowedMethods("*").allowedHeaders("*")
 				.exposedHeaders("www-authenticate").allowCredentials(true);
 	}
 

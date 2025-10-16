@@ -25,23 +25,25 @@ public interface PostMapper
 
 	@Override
 	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "createdAt", ignore = true)
-	@Mapping(target = "updatedAt", ignore = true)
+	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "viewCount", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "quizIds", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
+	@Mapping(target = "createdAt", ignore = true)
+	@Mapping(target = "updatedAt", ignore = true)
 	Post toEntity(PostRequest request);
 
 	@Override
 	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "createdAt", ignore = true)
-	@Mapping(target = "updatedAt", ignore = true)
+	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "viewCount", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
+	@Mapping(target = "createdAt", ignore = true)
+	@Mapping(target = "updatedAt", ignore = true)
 	void update(PostRequest request, @MappingTarget Post entity);
 
 	default TagDto toTagDto(Long id) {

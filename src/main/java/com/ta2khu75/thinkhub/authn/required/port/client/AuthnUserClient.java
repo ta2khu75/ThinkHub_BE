@@ -25,4 +25,19 @@ public class AuthnUserClient extends BaseClient<UserApi> implements AuthnUserPor
 	public UserResponse create(CreateUserRequest request) {
 		return api.create(request);
 	}
+
+	@Override
+	public UserResponse readByEmail(String email) {
+		return api.readByEmail(email);
+	}
+
+	@Override
+	public UserDto readDtoByEmail(String email) {
+		return api.readDtoByEmail(email);
+	}
+
+	@Override
+	public UserDto createDto(CreateUserRequest request) {
+		return api.createDto(request);
+	}
 }

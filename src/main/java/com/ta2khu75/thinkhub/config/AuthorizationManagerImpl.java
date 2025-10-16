@@ -59,6 +59,8 @@ public class AuthorizationManagerImpl implements AuthorizationManager<HttpServle
 	public AuthorizationResult authorize(Supplier<Authentication> authentication, HttpServletRequest object) {
 		String requestUrl = object.getRequestURI();
 		String httpMethod = object.getMethod();
+		System.out.println(requestUrl);
+		System.out.println(httpMethod);
 		try {
 			String username = SecurityUtil.getCurrentUsername();
 			System.out.println("username: " + username);

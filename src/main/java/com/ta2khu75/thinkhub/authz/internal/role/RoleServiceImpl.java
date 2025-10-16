@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
 import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
@@ -83,6 +84,7 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	}
 
 	@Override
+	@Transactional
 	public RoleDto readDto(Long id) {
 		Role role = this.readEntity(id);
 		return mapper.toDto(role);

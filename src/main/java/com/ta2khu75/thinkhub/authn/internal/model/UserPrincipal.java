@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.authn.internal.model;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -11,24 +11,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
 import com.ta2khu75.thinkhub.user.api.dto.UserDto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+public record UserPrincipal(UserDto user, RoleDto role, AuthProvider provider) implements UserDetails, Serializable {
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class UserPrincipal implements UserDetails {
 	private static final long serialVersionUID = 7209939028389672571L;
-	UserDto user;
-	RoleDto role;
-	AuthProvider provider;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(String.format("ROLE_%s", role.name())));
-		return authorities;
+		return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
 	}
 
 	@Override
@@ -49,5 +38,15 @@ public class UserPrincipal implements UserDetails {
 	@Override
 	public boolean isAccountNonLocked() {
 		return user.status().nonLocked();
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
 	}
 }

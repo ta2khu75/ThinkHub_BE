@@ -3,9 +3,8 @@ package com.ta2khu75.thinkhub.report.internal.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ta2khu75.thinkhub.report.internal.entity.Report;
-import com.ta2khu75.thinkhub.report.internal.entity.ReportId;
 
-public interface ReportRepository extends JpaRepository<Report, ReportId> {
+public interface ReportRepository extends JpaRepository<Report, Long> {
 	
 //	@Query("SELECT r FROM Report r WHERE "
 //			+ "(:authorId IS NULL or r.author.id = :authorId) "

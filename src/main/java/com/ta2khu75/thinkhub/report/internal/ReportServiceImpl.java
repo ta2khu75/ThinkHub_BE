@@ -1,18 +1,15 @@
 package com.ta2khu75.thinkhub.report.internal;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.report.api.ReportApi;
-import com.ta2khu75.thinkhub.report.api.dto.ReportIdDto;
 import com.ta2khu75.thinkhub.report.api.dto.ReportRequest;
 import com.ta2khu75.thinkhub.report.api.dto.ReportResponse;
 import com.ta2khu75.thinkhub.report.api.dto.ReportSearch;
-import com.ta2khu75.thinkhub.report.api.dto.ReportStatusRequest;
-import com.ta2khu75.thinkhub.report.api.dto.ReportUpdateRequest;
+import com.ta2khu75.thinkhub.report.api.event.ReportCreatedEvent;
 import com.ta2khu75.thinkhub.report.internal.entity.Report;
-import com.ta2khu75.thinkhub.report.internal.entity.ReportId;
 import com.ta2khu75.thinkhub.report.internal.entity.ReportStatus;
-import com.ta2khu75.thinkhub.report.internal.enums.ReportTargetType;
 import com.ta2khu75.thinkhub.report.internal.mapper.ReportMapper;
 import com.ta2khu75.thinkhub.report.internal.repository.ReportRepository;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
@@ -20,59 +17,42 @@ import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
-import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.encode;
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.UserApi;
 
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ReportServiceImpl extends BaseService<Report, ReportId, ReportRepository, ReportMapper>
-		implements ReportApi {
+public class ReportServiceImpl extends BaseService<Report, Long, ReportRepository, ReportMapper> implements ReportApi {
 	private final UserApi accountService;
+	private final ApplicationEventPublisher events;
 
-	public ReportServiceImpl(ReportRepository repository, ReportMapper mapper, UserApi accountService) {
+	public ReportServiceImpl(ReportRepository repository, ReportMapper mapper, UserApi accountService,
+			ApplicationEventPublisher events) {
 		super(repository, mapper);
 		this.accountService = accountService;
+		this.events = events;
 	}
 
 	@Override
-	public ReportResponse read(String targetId, ReportTargetType targetType) {
-		ReportId id = toReportId(new ReportIdDto(SecurityUtil.getCurrentUserId(), targetId, targetType));
-		Report report = readEntity(id);
-		return toResponse(report);
-	}
-
-	public ReportResponse create(Long targetId, ReportTargetType targetType, ReportRequest request) {
+	public ReportResponse create(ReportRequest request) {
 		Long authorId = SecurityUtil.getCurrentUserIdDecode();
-		ReportId id = new ReportId(authorId, targetId, targetType);
 		Report report = mapper.toEntity(request);
-		report.setId(id);
+		report.setTargetId(this.convertTargetId(request));
+		report.setAuthorId(authorId);
 		report = repository.save(report);
+		events.publishEvent(new ReportCreatedEvent(report.getId()));
 		return toResponse(report);
 	}
 
-	private ReportResponse toResponse(Report report) {
-		AuthorResponse author = accountService.readAuthor(report.getId().getAuthorId());
-		ReportIdDto id = toReportIdDto(report.getId());
-		ReportResponse response = mapper.convert(report);
-		response.setId(id);
-		response.setAuthor(author);
-		return response;
-
-	}
-
 	@Override
-	public ReportResponse update(ReportUpdateRequest request) {
-		Long authorId = SecurityUtil.getCurrentUserIdDecode();
-		ReportId id = toReportId(request.id());
-		if (!id.getAuthorId().equals(authorId)) {
-			throw new InvalidDataException("You can only update your own report");
-		}
-		Report report = readEntity(id);
+	public ReportResponse update(Long id, @Valid ReportRequest request) {
+		Report report = this.readEntity(id);
+		report.setType(request.type());
 		if (report.getStatus().equals(ReportStatus.PENDING)) {
 			report.setType(request.type());
 			repository.save(report);
@@ -82,51 +62,50 @@ public class ReportServiceImpl extends BaseService<Report, ReportId, ReportRepos
 	}
 
 	@Override
-	public void delete(ReportIdDto dto) {
-		ReportId id = toReportId(dto);
-		repository.deleteById(id);
-	}
-
-	public PageResponse<ReportResponse> search(ReportSearch search) {
-		return null;
+	public ReportResponse read(Long id) {
+		Report report = readEntity(id);
+		return toResponse(report);
 	}
 
 	@Override
-	public ReportResponse updateStatus(ReportStatusRequest request) {
-		ReportId id = toReportId(request.id());
+	public void delete(Long id) {
+		repository.deleteById(id);
+	}
+
+	@Override
+	public ReportResponse updateStatus(Long id, ReportStatus status) {
 		Report report = this.readEntity(id);
-		report.setStatus(request.status());
+		report.setStatus(status);
 		report = repository.save(report);
 		return toResponse(report);
 	}
 
-	private ReportIdDto toReportIdDto(ReportId id) {
-		String authorId = encode(id.getAuthorId(), IdConfig.USER);
-		switch (id.getTargetType()) {
+	private Long convertTargetId(ReportRequest request) {
+		String targetId = request.targetId();
+		switch (request.targetType()) {
 		case POST:
-			return new ReportIdDto(authorId, encode(id.getTargetId(), IdConfig.POST), id.getTargetType());
+			return decode(targetId, IdConfig.POST);
 		case QUIZ:
-			return new ReportIdDto(authorId, encode(id.getTargetId(), IdConfig.QUIZ), id.getTargetType());
+			return decode(targetId, IdConfig.QUIZ);
 		case COMMENT:
-			return new ReportIdDto(authorId, id.getTargetId().toString(), id.getTargetType());
+			return Long.valueOf(targetId);
 		default:
-			throw new IllegalArgumentException("Unexpected value: " + id.getTargetType());
+			throw new IllegalArgumentException("Unexpected value: " + request.targetType());
 		}
 	}
 
-	private ReportId toReportId(ReportIdDto dto) {
-		Long authorId = decode(dto.authorId(), IdConfig.USER);
-		switch (dto.targetType()) {
-		case POST:
-			return new ReportId(authorId, decode(dto.targetId(), IdConfig.POST), dto.targetType());
-		case QUIZ:
-			return new ReportId(authorId, decode(dto.targetId(), IdConfig.QUIZ), dto.targetType());
-		case COMMENT:
-			return new ReportId(authorId, Long.valueOf(dto.targetId()), dto.targetType());
-		default:
-			throw new IllegalArgumentException("Unexpected value: " + dto.targetType());
-		}
+	private ReportResponse toResponse(Report report) {
+		AuthorResponse author = accountService.readAuthor(report.getAuthorId());
+		ReportResponse response = mapper.convert(report);
+		response.setAuthor(author);
+		return response;
 	}
+
+	@Override
+	public PageResponse<ReportResponse> search(ReportSearch search) {
+		return null;
+	}
+
 //	BlogRepository blogRepository;
 //	BlogMapper blogMapper;
 //	QuizRepository quizRepository;

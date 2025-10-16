@@ -1,21 +1,20 @@
 package com.ta2khu75.thinkhub.report.api.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ta2khu75.thinkhub.report.api.ReportApi;
-import com.ta2khu75.thinkhub.report.api.dto.ReportIdDto;
+import com.ta2khu75.thinkhub.report.api.dto.ReportRequest;
 import com.ta2khu75.thinkhub.report.api.dto.ReportResponse;
 import com.ta2khu75.thinkhub.report.api.dto.ReportSearch;
-import com.ta2khu75.thinkhub.report.api.dto.ReportStatusRequest;
-import com.ta2khu75.thinkhub.report.api.dto.ReportUpdateRequest;
+import com.ta2khu75.thinkhub.report.internal.entity.ReportStatus;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +23,8 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Report", description = "Manage user-generated reports for inappropriate or flagged content.")
 @ApiController("${app.api-prefix}/reports")
-public class ReportController extends BaseController<ReportApi> {
+public class ReportController extends BaseController<ReportApi>
+		implements CrudController<ReportRequest, ReportResponse, Long> {
 
 	public ReportController(ReportApi service) {
 		super(service);
@@ -36,22 +36,34 @@ public class ReportController extends BaseController<ReportApi> {
 		return ResponseEntity.ok(service.search(search));
 	}
 
-	@PutMapping
+	@Override
+	@Operation(summary = "Create a report", description = "Permanently create a report from the system.")
+	public ResponseEntity<ReportResponse> create(@Valid ReportRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
+	}
+
+	@Override
 	@Operation(summary = "Update report details", description = "Modify report metadata, notes, or related internal information.")
-	public ResponseEntity<ReportResponse> update(@Valid @RequestBody ReportUpdateRequest request) {
-		return ResponseEntity.ok(service.update(request));
+	public ResponseEntity<ReportResponse> update(Long id, @Valid ReportRequest request) {
+		return ResponseEntity.ok(service.update(id, request));
 	}
 
-	@PatchMapping("status")
+	@PutMapping("status/{id}/{status}")
 	@Operation(summary = "Update report status", description = "Change the status of a report, such as marking it as resolved or dismissed.")
-	public ResponseEntity<ReportResponse> updateStatus(@Valid @RequestBody ReportStatusRequest request) {
-		return ResponseEntity.ok(service.updateStatus(request));
+	public ResponseEntity<ReportResponse> updateStatus(@PathVariable Long id, @PathVariable ReportStatus status) {
+		return ResponseEntity.ok(service.updateStatus(id, status));
 	}
 
-	@DeleteMapping
+	@Override
 	@Operation(summary = "Delete a report", description = "Permanently remove a report from the system.")
-	public ResponseEntity<Void> create(@Valid @RequestBody ReportIdDto request) {
-		service.delete(request);
+	public ResponseEntity<Void> delete(Long id) {
+		service.delete(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@Override
+	@Operation(summary = "Read a report", description = "Permanently read a report from the system.")
+	public ResponseEntity<ReportResponse> read(Long id) {
+		return ResponseEntity.ok(service.read(id));
 	}
 }

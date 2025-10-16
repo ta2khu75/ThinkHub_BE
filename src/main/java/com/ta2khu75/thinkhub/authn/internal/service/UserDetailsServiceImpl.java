@@ -34,6 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			RoleDto role = rolePort.readDto(user.status().roleId());
 			return new UserPrincipal(user, role, authProvider);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new UsernameNotFoundException("Bad credentials");
 		}
 	}

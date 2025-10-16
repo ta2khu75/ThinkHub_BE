@@ -60,15 +60,14 @@ public class AuthnController extends BaseController<AuthnApi> {
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
 				.body(this.makeAuthResponse(response));
 	}
-	@PostMapping("/google")
-	public ResponseEntity<AuthResponse> authenticationWithGoogle(GoogleRequest request) throws GeneralSecurityException, IOException {
-		
-		AuthResponse response = service.authenticationWithGoogle(request);
-		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
-		ResponseCookie cookieAccess = createCookie(ACCESS_TOKEN, response.accessToken());
-		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
-				.body(this.makeAuthResponse(response));
-	}
+//	@PostMapping("/google")
+//	public ResponseEntity<AuthResponse> authenticationWithGoogle(@Valid @RequestBody GoogleRequest request) throws GeneralSecurityException, IOException {
+//		AuthResponse response = service.authenticationWithGoogle(request);
+//		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
+//		ResponseCookie cookieAccess = createCookie(ACCESS_TOKEN, response.accessToken());
+//		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
+//				.body(this.makeAuthResponse(response));
+//	}
 
 	@PostMapping("/refresh-token")
 	@Operation(summary = "Refresh access token", description = "Use the refresh token from cookie to get a new access token.")

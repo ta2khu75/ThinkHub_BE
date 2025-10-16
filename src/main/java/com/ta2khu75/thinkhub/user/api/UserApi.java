@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
-import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 import com.ta2khu75.thinkhub.shared.service.SearchService;
 import com.ta2khu75.thinkhub.user.api.dto.CreateUserRequest;
@@ -28,6 +27,8 @@ public interface UserApi extends SearchService<UserSearch, UserResponse>, Exists
 	void delete(Long id);
 
 	// dto
+	UserDto createDto(CreateUserRequest request);
+	
 	UserDto readDtoByEmail(String email);
 
 	UserDto readDtoByUsername(String username);

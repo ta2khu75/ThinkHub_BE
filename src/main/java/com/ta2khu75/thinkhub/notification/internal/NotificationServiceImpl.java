@@ -30,20 +30,20 @@ import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 public class NotificationServiceImpl
 		extends BaseService<Notification, NotificationId, NotificationRepository, NotificationMapper>
 		implements NotificationApi {
-	private final PostApi postService;
-	private final QuizApi quizService;
-	private final CommentApi commentService;
+	private final PostApi postApi;
+	private final QuizApi quizApi;
+	private final CommentApi commentApi;
 	private final ReportApi reportApi;
 	private final ApplicationEventPublisher events;
 
-	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper, PostApi postService,
-			QuizApi quizService, CommentApi commentService, ReportApi reportApi, ApplicationEventPublisher events) {
+	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper, PostApi postApi,
+			QuizApi quizApi, CommentApi commentApi, ReportApi reportApi, ApplicationEventPublisher events) {
 		super(repository, mapper);
 		this.events = events;
-		this.postService = postService;
-		this.quizService = quizService;
-		this.reportApi=reportApi;
-		this.commentService = commentService;
+		this.postApi = postApi;
+		this.quizApi = quizApi;
+		this.reportApi = reportApi;
+		this.commentApi = commentApi;
 	}
 
 	@Override
@@ -90,13 +90,13 @@ public class NotificationServiceImpl
 		Long targetId = notification.getId().getTargetId();
 		switch (notification.getId().getTargetType()) {
 		case POST:
-			return postService.read(targetId);
+			return postApi.read(targetId);
 		case QUIZ:
-			return quizService.read(targetId);
+			return quizApi.read(targetId);
 		case COMMENT:
-			return commentService.read(targetId);
-//		case REPORT:
-//			return reportApi.rea
+			return commentApi.read(targetId);
+		case REPORT:
+			return reportApi.read(targetId);
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + notification.getId().getTargetType());
 		}
@@ -112,6 +112,8 @@ public class NotificationServiceImpl
 			String quizId = IdConverterUtil.encode(id.getTargetId(), IdConfig.QUIZ);
 			return new NotificationIdDto(userId, quizId, id.getTargetType());
 		case COMMENT:
+			return new NotificationIdDto(userId, id.getTargetId().toString(), id.getTargetType());
+		case REPORT:
 			return new NotificationIdDto(userId, id.getTargetId().toString(), id.getTargetType());
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + id.getTargetType());
@@ -129,18 +131,20 @@ public class NotificationServiceImpl
 			return new NotificationId(userId, quizId, id.targetType());
 		case COMMENT:
 			return new NotificationId(userId, Long.valueOf(id.targetId()), id.targetType());
+		case REPORT:
+			return new NotificationId(userId, Long.valueOf(id.targetId()), id.targetType());
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + id.targetType());
 		}
 	}
 //	private final BlogService blogService;
-//	private final QuizService quizService;
+//	private final quizApi quizApi;
 //
 //	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper,
-//			BlogService blogService, QuizService quizService) {
+//			BlogService blogService, quizApi quizApi) {
 //		super(repository, mapper);
 //		this.blogService = blogService;
-//		this.quizService = quizService;
+//		this.quizApi = quizApi;
 //	}
 //
 ////	@Override
@@ -176,7 +180,7 @@ public class NotificationServiceImpl
 //		case BLOG:
 //			return blogService.read(Base62.encodeWithSalt(notification.getId().getTargetId(), SaltedType.BLOG));
 //		case QUIZ:
-//			return quizService.read(Base62.encodeWithSalt(notification.getId().getTargetId(), SaltedType.QUIZ));
+//			return quizApi.read(Base62.encodeWithSalt(notification.getId().getTargetId(), SaltedType.QUIZ));
 //		default:
 //			throw new IllegalArgumentException("Unsupported target type: " + notification.getId().getTargetType());
 //		}

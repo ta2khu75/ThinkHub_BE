@@ -183,4 +183,22 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 		return repository.findUserIdsByRoleId(role.id());
 	}
 
+	@Override
+	public UserDto createDto(CreateUserRequest request) {
+		if (repository.existsByEmail(request.email().toLowerCase()))
+			throw new AlreadyExistsException("Email already exists");
+		User user = mapper.toEntity(request);
+		user.setUsername(request.firstName() + " " + request.lastName());
+		UserStatus status = mapper.toEntity(request.status());
+		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
+		user.setStatus(status);
+		try {
+			user = repository.save(user);
+		} catch (DataIntegrityViolationException e) {
+			e.printStackTrace();
+			throw new AlreadyExistsException(e.getMessage());
+		}
+		return mapper.toDto(user);
+	}
+
 }

@@ -12,6 +12,5 @@ public enum ReportType {
 	FRAUDULENT_ACTIVITY("Hoạt động lừa đảo hoặc gây nguy hại"),
 	ILLEGAL_ACTIVITY("Nội dung liên quan đến chất cấm hoặc hoạt động bất hợp pháp"),
 	PRIVACY_VIOLATION("Vi phạm quyền riêng tư"), HARASSMENT("Xúc phạm hoặc quấy rối");
-
 	private final String description;
 }

@@ -1,10 +1,7 @@
 package com.ta2khu75.thinkhub.authn.internal;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,17 +16,14 @@ import com.ta2khu75.thinkhub.authn.api.AuthnApi;
 import com.ta2khu75.thinkhub.authn.api.dto.AuthResponse;
 import com.ta2khu75.thinkhub.authn.api.dto.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.CreateAuthProviderRequest;
-import com.ta2khu75.thinkhub.authn.api.dto.GoogleRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.LoginRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.RegisterRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.TokenResponse;
 import com.ta2khu75.thinkhub.authn.internal.config.TokenType;
 import com.ta2khu75.thinkhub.authn.internal.model.AuthProvider;
-import com.ta2khu75.thinkhub.authn.internal.model.GoogleUser;
 import com.ta2khu75.thinkhub.authn.internal.model.ProviderType;
 import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
 import com.ta2khu75.thinkhub.authn.internal.repository.AuthProviderRepository;
-import com.ta2khu75.thinkhub.authn.internal.service.GoogleAuthService;
 import com.ta2khu75.thinkhub.authn.internal.service.JwtService;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
@@ -49,7 +43,10 @@ import com.ta2khu75.thinkhub.user.api.dto.UserRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
 import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 class AuthnServiceImpl implements AuthnApi, IdDecodable {
 	private final AuthProviderRepository repository;
 	private final AuthnUserPort userPort;
@@ -58,21 +55,7 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 	private final JwtService jwtService;
 	private final RedisService redisService;
 	private final PasswordEncoder passwordEncoder;
-	private final GoogleAuthService googleService;
 
-	public AuthnServiceImpl(AuthProviderRepository repository, AuthnUserPort userPort, AuthnAuthzPort authzPort,
-			GoogleAuthService googleService, AuthenticationManager authenticationManager, JwtService jwtService,
-			RedisService redisService, PasswordEncoder passwordEncoder) {
-		super();
-		this.repository = repository;
-		this.userPort = userPort;
-		this.authzPort = authzPort;
-		this.authenticationManager = authenticationManager;
-		this.jwtService = jwtService;
-		this.redisService = redisService;
-		this.passwordEncoder = passwordEncoder;
-		this.googleService = googleService;
-	}
 
 	@Override
 	public AuthResponse login(LoginRequest request) {
@@ -141,8 +124,8 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 	}
 
 	private AuthResponse makeAuthResponse(UserPrincipal auth) {
-		UserDto user = auth.getUser();
-		RoleDto role = auth.getRole();
+		UserDto user = auth.user();
+		RoleDto role = auth.role();
 		TokenResponse refreshToken = jwtService.createJwt(auth, TokenType.REFRESH);
 		TokenResponse accessToken = jwtService.createJwt(auth, TokenType.ACCESS);
 		UserResponse userResponse = new UserResponse(user.id(), user.firstName(), user.lastName(), user.username(),
@@ -173,35 +156,57 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 		return repository.count();
 	}
 
-	@Override
-	public AuthResponse authenticationWithGoogle(GoogleRequest googleRequest)
-			throws GeneralSecurityException, IOException {
-		GoogleUser googleUser = googleService.verifyToken(googleRequest.idToken());
-		Optional<AuthProvider> authProviderOptional = repository.findByEmailAndProvider(googleUser.email(),
-				ProviderType.GOOGLE);
-		if (authProviderOptional.isPresent()) {
-			AuthProvider authProvider = authProviderOptional.get();
-			Authentication authentication = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(authProvider.getEmail().toLowerCase(), null));
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-			return this.makeAuthResponse(userPrincipal);
-		}
-		RoleResponse role = authzPort.readByName(RoleDefault.USER.name());
-		UserStatusRequest status = new UserStatusRequest(true, true, role.id());
-		CreateUserRequest userRequest = new CreateUserRequest(googleUser.name(), googleUser.name(), googleUser.email(),
-				null, null, status);
-		UserResponse userResponse = userPort.create(userRequest);
-		AuthProvider authProvider = new AuthProvider();
-		authProvider.setEmail(googleUser.email());
-		authProvider.setUserId(decodeId(userResponse.id()));
-		authProvider.setProvider(ProviderType.GOOGLE);
-		authProvider = repository.save(authProvider);
-		Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(authProvider.getEmail().toLowerCase(), null));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-		return this.makeAuthResponse(userPrincipal);
-	}
+//	@Override
+//	public AuthResponse authenticationWithGoogle(GoogleUser googleUser) {
+//		AuthProvider authProviderr = repository.findByEmailAndProvider(googleUser.email(), ProviderType.GOOGLE)
+//				.orElseGet(() -> {
+//					UserResponse user;
+//					try {
+//						user = userPort.readByEmail(googleUser.email());
+//					} catch (Exception e) {
+//						RoleResponse role = authzPort.readByName(RoleDefault.USER.name());
+//						UserStatusRequest status = new UserStatusRequest(true, true, role.id());
+//						CreateUserRequest userRequest = new CreateUserRequest(googleUser.name(), googleUser.name(),
+//								googleUser.email(), null, null, status);
+//						user = userPort.create(userRequest);
+//					}
+//					AuthProvider authProvider = new AuthProvider();
+//					authProvider.setEmail(googleUser.email());
+//					authProvider.setUserId(decodeId(user.id()));
+//					authProvider.setProvider(ProviderType.GOOGLE);
+//					return repository.save(authProvider);
+//				});
+//		Authentication authentication = authenticationManager
+//				.authenticate(new UsernamePasswordAuthenticationToken(authProviderr.getEmail().toLowerCase(), null));
+//		SecurityContextHolder.getContext().setAuthentication(authentication);
+//		UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+//		return this.makeAuthResponse(userPrincipal);
+//		Optional<AuthProvider> authProviderOptional = repository.findByEmailAndProvider(googleUser.email(),
+//				ProviderType.GOOGLE);
+//		
+//		if (authProviderOptional.isPresent()) {
+//			AuthProvider authProvider = authProviderOptional.get();
+//			Authentication authentication = authenticationManager
+//					.authenticate(new UsernamePasswordAuthenticationToken(authProvider.getEmail().toLowerCase(), null));
+//			SecurityContextHolder.getContext().setAuthentication(authentication);
+//			UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+//			return this.makeAuthResponse(userPrincipal);
+//		}
+//		RoleResponse role = authzPort.readByName(RoleDefault.USER.name());
+//		UserStatusRequest status = new UserStatusRequest(true, true, role.id());
+//		CreateUserRequest userRequest = new CreateUserRequest(googleUser.name(), googleUser.name(), googleUser.email(),
+//				null, null, status);
+//		UserResponse userResponse = userPort.create(userRequest);
+//		AuthProvider authProvider = new AuthProvider();
+//		authProvider.setEmail(googleUser.email());
+//		authProvider.setUserId(decodeId(userResponse.id()));
+//		authProvider.setProvider(ProviderType.GOOGLE);
+//		authProvider = repository.save(authProvider);
+//		Authentication authentication = authenticationManager
+//				.authenticate(new UsernamePasswordAuthenticationToken(authProvider.getEmail().toLowerCase(), null));
+//		SecurityContextHolder.getContext().setAuthentication(authentication);
+//		UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+//		return this.makeAuthResponse(userPrincipal);
+//	}
 
 }

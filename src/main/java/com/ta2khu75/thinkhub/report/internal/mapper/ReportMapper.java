@@ -2,6 +2,7 @@ package com.ta2khu75.thinkhub.report.internal.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.report.api.dto.ReportRequest;
@@ -19,10 +20,20 @@ public interface ReportMapper extends Converter<Report, ReportResponse>, PageMap
 	ReportResponse convert(Report source);
 
 	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "targetId", ignore = true)
+	@Mapping(target = "authorId", ignore = true)
 	@Mapping(target = "status", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
 	Report toEntity(ReportRequest request);
+
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "targetId", ignore = true)
+	@Mapping(target = "authorId", ignore = true)
+	@Mapping(target = "status", ignore = true)
+	@Mapping(target = "createdAt", ignore = true)
+	@Mapping(target = "updatedAt", ignore = true)
+	void update(ReportRequest request, @MappingTarget Report report);
 //
 //	@Mapping(target = "id", ignore = true)
 //	@Mapping(target = "author", ignore = true)

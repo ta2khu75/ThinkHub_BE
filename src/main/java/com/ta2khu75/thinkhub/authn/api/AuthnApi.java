@@ -9,6 +9,7 @@ import com.ta2khu75.thinkhub.authn.api.dto.CreateAuthProviderRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.GoogleRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.LoginRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.RegisterRequest;
+import com.ta2khu75.thinkhub.authn.internal.model.ProviderUser;
 
 public interface AuthnApi {
 	AuthResponse login(LoginRequest request);
@@ -25,5 +26,5 @@ public interface AuthnApi {
 	
 	long count();
 	
-	AuthResponse authenticationWithGoogle(GoogleRequest googleRequest) throws GeneralSecurityException, IOException;
+//	AuthResponse authenticationWithGoogle(GoogleUser googleUser);
 }

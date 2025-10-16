@@ -31,8 +31,8 @@ public class JwtService {
 	private final JwtProperties jwtProperties;
 
 	public TokenResponse createJwt(UserPrincipal auth, TokenType tokenType) {
-		UserDto account = auth.getUser();
-		RoleDto role = auth.getRole();
+		UserDto user= auth.user();
+		RoleDto role = auth.role();
 		Instant now = Instant.now();
 		TokenConfig tokenConfig = jwtProperties.getConfigByType(tokenType);
 		JwtEncoder jwtEncoder = jwtProviderFactory.getEncoder(tokenType);
@@ -42,13 +42,13 @@ public class JwtService {
 		switch (tokenType) {
 		case ACCESS: {
 			claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity)
-					.subject(account.id()).claim("username", account.username()).claim("scope", "ROLE_" + role.name())
+					.subject(user.id()).claim("username", user.username()).claim("scope", "ROLE_" + role.name())
 					.build();
 			break;
 		}
 		case REFRESH: {
 			claims = JwtClaimsSet.builder().id(UUID.randomUUID().toString()).issuer("com.ta2khu75").issuedAt(now)
-					.expiresAt(validity).subject(account.id()).build();
+					.expiresAt(validity).subject(user.id()).build();
 			break;
 		}
 		default:
