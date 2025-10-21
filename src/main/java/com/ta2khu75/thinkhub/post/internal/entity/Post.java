@@ -8,6 +8,7 @@ import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
 import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -15,6 +16,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.PrePersist;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,9 +39,11 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	String title;
 	@Column(nullable = false, columnDefinition = "TEXT")
 	String content;
-	String imageUrl;
+	@Column(nullable = false)
+	String slug;
 	int viewCount;
 	boolean deleted;
+	Long mediaId;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	AccessModifier accessModifier;
@@ -56,5 +60,10 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	@Override
 	public IdConfig getIdConfig() {
 		return IdConfig.POST;
+	}
+
+	@PrePersist
+	public void makeSlug() {
+		slug = SlugUtil.toSlug(title);
 	}
 }

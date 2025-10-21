@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record PostRequest(@NotNull(message = "Title must not be null") String title,
 		@NotNull(message = "Content must not be null") String content, Set<String> quizIds,
-		@NotNull(message = "Category id must not be null") Long categoryId,
+		@NotNull(message = "Category id must not be null") Long categoryId, Long mediaId,
 		@NotNull(message = "Access modifier must not be null") AccessModifier accessModifier,
 		@NotEmpty(message = "Blog tags must not be empty") Set<String> tags) {
 }

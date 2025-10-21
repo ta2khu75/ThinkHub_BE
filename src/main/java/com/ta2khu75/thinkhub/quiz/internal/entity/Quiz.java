@@ -17,6 +17,7 @@ import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
 import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
 import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 
 @Entity
 @Data
@@ -38,7 +39,9 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	Integer duration;
 	@Column(nullable = false, length = 255)
 	String description;
-	String imageUrl;
+	@Column(nullable = false)
+	String slug;
+	Long mediaId;
 	boolean shuffleQuestion = true;
 	boolean deleted;
 	boolean completed;
@@ -69,4 +72,10 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	public IdConfig getIdConfig() {
 		return IdConfig.QUIZ;
 	}
+
+	@PrePersist
+	public void makeSlug() {
+		slug = SlugUtil.toSlug(title);
+	}
+
 }

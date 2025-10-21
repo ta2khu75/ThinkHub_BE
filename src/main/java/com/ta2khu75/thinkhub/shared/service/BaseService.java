@@ -22,4 +22,10 @@ public abstract class BaseService<T, ID, R extends JpaRepository<T, ID>, M> {
 		return repository.findById(id)
 				.orElseThrow(() -> new NotFoundException("Could not find " + clazz.getSimpleName() + " with id " + id));
 	}
+
+	public void checkExists(ID id) {
+		if (!repository.existsById(id)) {
+			throw new NotFoundException("Could not find " + clazz.getSimpleName() + " with id " + id);
+		}
+	}
 }

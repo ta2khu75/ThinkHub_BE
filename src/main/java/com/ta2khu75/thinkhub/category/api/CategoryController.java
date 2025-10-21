@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.ta2khu75.thinkhub.category.api.dto.CategoryRequest;
@@ -11,10 +12,12 @@ import com.ta2khu75.thinkhub.category.api.dto.CategoryResponse;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
+import com.ta2khu75.thinkhub.shared.group.Create;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.groups.Default;
 
 @Tag(name = "Category", description = "Manage content categories for organizing and classifying items within the system.")
 @ApiController("${app.api-prefix}/categories")
@@ -27,6 +30,7 @@ public class CategoryController extends BaseController<CategoryApi>
 
 	@Override
 	@Operation(summary = "Create a new category", description = "Add a new category to help organize or classify content.")
+	@Validated({ Default.class, Create.class })
 	public ResponseEntity<CategoryResponse> create(@Valid CategoryRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
 	}

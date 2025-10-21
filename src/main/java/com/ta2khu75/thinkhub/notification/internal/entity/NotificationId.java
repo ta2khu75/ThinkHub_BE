@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class NotificationId implements Serializable {
 	private static final long serialVersionUID = 6760439381782529866L;
 	private Long userId;
-	private Long targetId;
+	private String targetId;
 	@Enumerated(EnumType.STRING)
 	private NotificationTargetType targetType;
 }

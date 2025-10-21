@@ -1,6 +1,5 @@
 package com.ta2khu75.thinkhub.post.api.dto;
 
-
 import java.util.Set;
 
 import com.ta2khu75.thinkhub.shared.api.dto.BaseClassResponse;
@@ -19,8 +18,10 @@ import lombok.experimental.FieldDefaults;
 public class PostResponse extends BaseClassResponse<String> {
 	String title;
 	String content;
+	String slug;
 	Set<TagDto> tags;
 	AuthorResponse author;
+	String imageUrl;
 	Long categoryId;
 	int viewCount;
 	AccessModifier accessModifier;

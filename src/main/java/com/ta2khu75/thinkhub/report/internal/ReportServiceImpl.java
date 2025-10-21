@@ -42,7 +42,7 @@ public class ReportServiceImpl extends BaseService<Report, Long, ReportRepositor
 	public ReportResponse create(ReportRequest request) {
 		Long authorId = SecurityUtil.getCurrentUserIdDecode();
 		Report report = mapper.toEntity(request);
-		report.setTargetId(this.convertTargetId(request));
+		report.setTargetId(String.valueOf(this.convertTargetId(request)));
 		report.setAuthorId(authorId);
 		report = repository.save(report);
 		events.publishEvent(new ReportCreatedEvent(report.getId()));

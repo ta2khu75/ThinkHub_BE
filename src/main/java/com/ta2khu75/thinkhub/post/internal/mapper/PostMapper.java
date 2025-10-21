@@ -20,12 +20,13 @@ public interface PostMapper
 
 	@Mapping(target = "id", source = "source")
 	@Mapping(target = "author", ignore = true)
+	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "tags", source = "tagIds")
 	PostResponse convert(Post source);
 
 	@Override
 	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "imageUrl", ignore = true)
+	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "viewCount", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
@@ -37,10 +38,10 @@ public interface PostMapper
 
 	@Override
 	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "imageUrl", ignore = true)
-	@Mapping(target = "viewCount", ignore = true)
+	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
+	@Mapping(target = "viewCount", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)

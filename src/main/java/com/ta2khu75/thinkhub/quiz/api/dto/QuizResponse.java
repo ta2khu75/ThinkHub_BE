@@ -20,11 +20,12 @@ import lombok.experimental.FieldDefaults;
 public class QuizResponse extends BaseClassResponse<String> {
 	String title;
 	Integer duration;
-	String description;
+	String slug;
 	QuizLevel level;
 	String imageUrl;
 	Long categoryId;
 	Set<TagDto> tags;
+	String description;
 	AuthorResponse author;
 	AccessModifier accessModifier;
 	ResultVisibility resultVisibility;

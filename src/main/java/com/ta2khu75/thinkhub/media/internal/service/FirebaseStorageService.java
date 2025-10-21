@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.shared.service.clazz;
+package com.ta2khu75.thinkhub.media.internal.service;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,30 +13,23 @@ import com.google.cloud.storage.*;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
+import com.ta2khu75.thinkhub.media.internal.entity.MediaOwnerType;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
-public class FirebaseService {
+public class FirebaseStorageService implements StorageStrategy {
 	private final Storage storage;
 	@Value("${firebase.storage-bucket}")
 	private String storageBucket;
 
-	private String getExtension(MultipartFile file) {
-		String fileName = file.getOriginalFilename();
-		return fileName.substring(fileName.lastIndexOf("."));
-	}
-
-	private String getFileNameFromMediaLink(String mediaLink) {
-		URI uri = URI.create(mediaLink);
-		String path = uri.getPath(); // Lấy phần đường dẫn của URL
-		return path.substring(path.indexOf('/') + 1); // Bỏ dấu "/" ở đầu
-	}
-
-	public String upload(Folder folder, MultipartFile file) throws IOException {
+	@Override
+	public String upload(MediaOwnerType ownerType, MultipartFile file) throws IOException {
 		String fileName = UUID.randomUUID().toString().concat(this.getExtension(file));
-		String filePath = String.format("BACKEND/%s/%s", folder.name(), fileName); // to generated
+		String filePath = String.format("BACKEND/%s/%s", ownerType.name(), fileName); // to generated
 		Bucket bucket = storage.get(storageBucket);
 		Blob blob = bucket.create(filePath, file.getInputStream(), file.getContentType());
 		blob.toBuilder().setAcl(Collections.singletonList(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER))).build()
@@ -44,19 +37,27 @@ public class FirebaseService {
 		return String.format("https://storage.googleapis.com/%s/%s", storageBucket, filePath);
 	}
 
-	public boolean delete(String fileLink) {
+	public void delete(String url) {
 		try {
-			String fileName = getFileNameFromMediaLink(fileLink);
+			String fileName = getFileNameFromUrl(url);
 			boolean deleted = storage.delete(storageBucket, fileName);
-			return deleted;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+			if (!deleted) {
+				log.warn("File {} not exist in bucket {}", fileName, storageBucket);
+			}
+		} catch (StorageException e) {
+			log.error("Xóa file thất bại: {}", e.getMessage(), e);
+			throw e;
 		}
 	}
 
-	public enum Folder {
-		ACCOUNT_FOLDER, QUIZ_FOLDER, ANSWER_FOLDER, POST_FOLDER;
+	private String getExtension(MultipartFile file) {
+		String fileName = file.getOriginalFilename();
+		return fileName.substring(fileName.lastIndexOf("."));
 	}
 
+	private String getFileNameFromUrl(String url) {
+		URI uri = URI.create(url);
+		String path = uri.getPath(); // Lấy phần đường dẫn của URL
+		return path.substring(path.indexOf('/') + 1); // Bỏ dấu "/" ở đầu
+	}
 }

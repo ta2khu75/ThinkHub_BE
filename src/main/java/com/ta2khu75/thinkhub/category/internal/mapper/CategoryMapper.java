@@ -13,17 +13,20 @@ import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
 @Mapper(config = MapperSpringConfig.class)
 public interface CategoryMapper extends Converter<Category, CategoryResponse> {
 	@Override
+	@Mapping(target = "imageUrl", ignore = true)
+	@Mapping(target = "defaultImageUrl", ignore = true)
 	CategoryResponse convert(Category source);
 
 	@Mapping(target = "id", ignore = true)
-	
+	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
 	@Mapping(target = "updatedBy", ignore = true)
 	@Mapping(target = "createdBy", ignore = true)
 	Category toEntity(CategoryRequest request);
-	
+
 	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
 	@Mapping(target = "updatedBy", ignore = true)

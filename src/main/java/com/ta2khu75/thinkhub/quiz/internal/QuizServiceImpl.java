@@ -1,6 +1,5 @@
 package com.ta2khu75.thinkhub.quiz.internal;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,7 +12,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.ta2khu75.thinkhub.quiz.api.QuizApi;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizDetailResponse;
@@ -24,6 +22,7 @@ import com.ta2khu75.thinkhub.quiz.api.event.QuizCreatedEvent;
 import com.ta2khu75.thinkhub.quiz.internal.entity.Quiz;
 import com.ta2khu75.thinkhub.quiz.internal.mapper.QuizMapper;
 import com.ta2khu75.thinkhub.quiz.internal.repository.QuizRepository;
+import com.ta2khu75.thinkhub.quiz.required.port.QuizMediaPort;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizTagPort;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizUserPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
@@ -33,9 +32,7 @@ import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
-import com.ta2khu75.thinkhub.shared.service.BaseFileService;
-import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService;
-import com.ta2khu75.thinkhub.shared.service.clazz.FirebaseService.Folder;
+import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
@@ -44,40 +41,41 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMapper> implements QuizApi {
+class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper> implements QuizApi {
+
 	private final ApplicationEventPublisher events;
 	private final QuizTagPort tagPort;
 	private final QuizUserPort userPort;
+	private final QuizMediaPort mediaPort;
 
-	public QuizServiceImpl(QuizRepository repository, QuizMapper mapper, FirebaseService fireBaseService,
-			ApplicationEventPublisher events, QuizTagPort tagPort, QuizUserPort accountPort) {
-		super(repository, mapper, fireBaseService);
+	public QuizServiceImpl(QuizRepository repository, QuizMapper mapper, ApplicationEventPublisher events,
+			QuizTagPort tagPort, QuizUserPort userPort, QuizMediaPort mediaPort) {
+		super(repository, mapper);
 		this.events = events;
 		this.tagPort = tagPort;
-		this.userPort = accountPort;
+		this.userPort = userPort;
+		this.mediaPort = mediaPort;
 	}
 
 	@Override
-	public QuizResponse create(@Valid QuizRequest request, MultipartFile file) throws IOException {
+	public QuizResponse create(@Valid QuizRequest request) {
 		this.validateExistence(request);
 		Quiz quiz = mapper.toEntity(request);
 		quiz.setTagIds(getTagIds(request));
 		quiz.setPostIds(this.getPostIds(request));
 		quiz.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
-		this.saveFile(quiz, file, Folder.QUIZ_FOLDER, Quiz::setImageUrl);
 		QuizResponse response = this.save(quiz);
 		events.publishEvent(new QuizCreatedEvent(quiz.getAuthorId(), quiz.getId()));
 		return response;
 	}
 
 	@Override
-	public QuizResponse update(Long id, @Valid QuizRequest request, MultipartFile file) throws IOException {
+	public QuizResponse update(Long id, @Valid QuizRequest request) {
 		this.validateExistence(request);
 		Quiz quiz = readEntity(id);
 		mapper.update(request, quiz);
 		quiz.setTagIds(this.getTagIds(request));
 		quiz.setPostIds(this.getPostIds(request));
-		this.saveFile(quiz, file, Folder.QUIZ_FOLDER, Quiz::setImageUrl);
 		return save(quiz);
 	}
 
@@ -146,6 +144,10 @@ class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMa
 		Set<TagDto> tags = quiz.getTagIds().stream().map(tagMap::get).filter(Objects::nonNull)
 				.collect(Collectors.toSet());
 		response.setTags(tags);
+		if (quiz.getMediaId() != null) {
+			String url = mediaPort.read(quiz.getMediaId()).url();
+			response.setImageUrl(url);
+		}
 		return response;
 	}
 
@@ -171,6 +173,9 @@ class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMa
 	private void validateExistence(QuizRequest request) {
 		events.publishEvent(new CheckExistsEvent<>(EntityType.CATEGORY, request.categoryId()));
 		getPostIds(request).forEach(postId -> events.publishEvent(new CheckExistsEvent<>(EntityType.POST, postId)));
+		if (request.mediaId() != null) {
+			events.publishEvent(new CheckExistsEvent<>(EntityType.MEDIA, request.mediaId()));
+		}
 	}
 
 	private Set<Long> getTagIds(QuizRequest request) {
@@ -181,6 +186,7 @@ class QuizServiceImpl extends BaseFileService<Quiz, Long, QuizRepository, QuizMa
 			return tagPort.create(tag).id();
 		}).collect(Collectors.toSet());
 	}
+
 	private Set<Long> getPostIds(QuizRequest request) {
 		return request.postIds().stream().map(postId -> decode(postId, IdConfig.POST)).collect(Collectors.toSet());
 	}

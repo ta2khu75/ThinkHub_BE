@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.config;
+package com.ta2khu75.thinkhub.media.internal.config;
 
 import java.io.IOException;
 import java.io.InputStream;

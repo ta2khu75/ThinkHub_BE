@@ -1,5 +1,16 @@
 package com.ta2khu75.thinkhub.category.api.dto;
 
-public record CategoryResponse(Long id, String name, String description) {
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class CategoryResponse {
+	Long id;
+	String name;
+	String slug;
+	String description;
+	String imageUrl;
+	String defaultImageUrl;
 }

@@ -87,16 +87,17 @@ public class NotificationServiceImpl
 	}
 
 	private Object resolveTarget(Notification notification) {
-		Long targetId = notification.getId().getTargetId();
+		String targetIdString = notification.getId().getTargetId();
+		Long targetIdLong = Long.valueOf(targetIdString);
 		switch (notification.getId().getTargetType()) {
 		case POST:
-			return postApi.read(targetId);
+			return postApi.read(targetIdLong);
 		case QUIZ:
-			return quizApi.read(targetId);
+			return quizApi.read(targetIdLong);
 		case COMMENT:
-			return commentApi.read(targetId);
+			return commentApi.read(targetIdLong);
 		case REPORT:
-			return reportApi.read(targetId);
+			return reportApi.read(targetIdLong);
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + notification.getId().getTargetType());
 		}
@@ -104,17 +105,19 @@ public class NotificationServiceImpl
 
 	private NotificationIdDto toNotificationIdDto(NotificationId id) {
 		String userId = IdConverterUtil.encode(id.getUserId(), IdConfig.USER);
+		String targetIdString = id.getTargetId();
+		Long targetIdLong = Long.valueOf(targetIdString);
 		switch (id.getTargetType()) {
 		case POST:
-			String postId = IdConverterUtil.encode(id.getTargetId(), IdConfig.POST);
+			String postId = IdConverterUtil.encode(targetIdLong, IdConfig.POST);
 			return new NotificationIdDto(userId, postId, id.getTargetType());
 		case QUIZ:
-			String quizId = IdConverterUtil.encode(id.getTargetId(), IdConfig.QUIZ);
+			String quizId = IdConverterUtil.encode(targetIdLong, IdConfig.QUIZ);
 			return new NotificationIdDto(userId, quizId, id.getTargetType());
 		case COMMENT:
-			return new NotificationIdDto(userId, id.getTargetId().toString(), id.getTargetType());
+			return new NotificationIdDto(userId, targetIdString, id.getTargetType());
 		case REPORT:
-			return new NotificationIdDto(userId, id.getTargetId().toString(), id.getTargetType());
+			return new NotificationIdDto(userId, targetIdString, id.getTargetType());
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + id.getTargetType());
 		}
@@ -122,17 +125,18 @@ public class NotificationServiceImpl
 
 	private NotificationId toNotificationId(NotificationIdDto id) {
 		Long userId = IdConverterUtil.decode(id.accountId(), IdConfig.USER);
+		String targetIdString = id.targetId();
 		switch (id.targetType()) {
 		case POST:
-			Long postId = IdConverterUtil.decode(id.targetId(), IdConfig.POST);
-			return new NotificationId(userId, postId, id.targetType());
+			Long postId = IdConverterUtil.decode(targetIdString, IdConfig.POST);
+			return new NotificationId(userId, String.valueOf(postId), id.targetType());
 		case QUIZ:
-			Long quizId = IdConverterUtil.decode(id.targetId(), IdConfig.QUIZ);
-			return new NotificationId(userId, quizId, id.targetType());
+			Long quizId = IdConverterUtil.decode(targetIdString, IdConfig.QUIZ);
+			return new NotificationId(userId, String.valueOf(quizId), id.targetType());
 		case COMMENT:
-			return new NotificationId(userId, Long.valueOf(id.targetId()), id.targetType());
+			return new NotificationId(userId, targetIdString, id.targetType());
 		case REPORT:
-			return new NotificationId(userId, Long.valueOf(id.targetId()), id.targetType());
+			return new NotificationId(userId, targetIdString, id.targetType());
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + id.targetType());
 		}

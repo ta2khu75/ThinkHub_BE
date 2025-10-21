@@ -22,29 +22,31 @@ public interface QuizMapper
 	@Override
 	@Mapping(target = "id", source = "source")
 	@Mapping(target = "tags", source = "tagIds")
+	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "author", ignore = true)
 	QuizResponse convert(Quiz source);
 
 	@Mapping(target = "id", source = "source")
 	@Mapping(target = "tags", source = "tagIds")
+	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "author", ignore = true)
 	@Mapping(target = "posts", ignore = true)
 	QuizDetailResponse toDetailResponse(Quiz source);
 
 	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "postIds", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
-	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
 	Quiz toEntity(QuizRequest request);
 
 	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "deleted", ignore = true)
-	@Mapping(target = "imageUrl", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
