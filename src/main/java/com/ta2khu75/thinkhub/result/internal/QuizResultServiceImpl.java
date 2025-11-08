@@ -28,13 +28,15 @@ import com.ta2khu75.thinkhub.result.internal.mapper.QuizResultMapper;
 import com.ta2khu75.thinkhub.result.internal.repository.QuizResultRepository;
 import com.ta2khu75.thinkhub.result.internal.service.QuizResultCache;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
 @Service
 class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepository, QuizResultMapper>
-		implements QuizResultApi {
+		implements QuizResultApi, IdDecodable {
 	private final QuizApi quizApi;
 	private final QuizResultCache cache;
 
@@ -51,11 +53,12 @@ class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepo
 	}
 
 	@Override
-	public QuizResultResponse take(Long quizId) {
+	public QuizResultResponse take(String quizId) {
+		Long quizIdDecode = decodeId(quizId, IdConfig.QUIZ);
 		QuizDetailResponse quiz = quizApi.readDetail(quizId);
 		quiz.getQuestions().forEach(question -> question.answers().forEach(answer -> answer.setCorrect(false)));
 		QuizResult quizResult = new QuizResult();
-		quizResult.setQuizId(quizId);
+		quizResult.setQuizId(quizIdDecode);
 		quizResult.setEndTime(Instant.now().plusSeconds(quiz.getDuration() * 60L).plusSeconds(30));
 		quizResult.setUserId(SecurityUtil.getCurrentUserIdDecode());
 		QuizResultResponse response = mapper.convert(repository.save(quizResult));
@@ -72,7 +75,7 @@ class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepo
 			Collections.shuffle(questions);
 			quizResponse.setQuestions(questions);
 		}
-		cache.save(RedisKeyBuilder.quizResult(SecurityUtil.getCurrentUserIdDecode(), quizId), response);
+		cache.save(RedisKeyBuilder.quizResult(SecurityUtil.getCurrentUserIdDecode(), quizIdDecode), response);
 		return response;
 	}
 
@@ -117,8 +120,9 @@ class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepo
 	}
 
 	@Override
-	public QuizResultResponse submit(Long id, QuizResultRequest request) {
-		QuizResult quizResult = readEntity(id);
+	public QuizResultResponse submit(String id, QuizResultRequest request) {
+		Long quizResultId = decodeId(id);
+		QuizResult quizResult = readEntity(quizResultId);
 		if (quizResult.getUpdatedAt() != null)
 			return mapper.convert(quizResult);
 		if (!request.userAnswers().isEmpty()) {
@@ -131,13 +135,12 @@ class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepo
 	}
 
 	@Override
-	public QuizResultResponse readDetail(Long id) {
-		QuizResult quizResult = readEntity(id);
+	public QuizResultResponse readDetail(String id) {
+		Long quizResultId = decodeId(id);
+		QuizResult quizResult = readEntity(quizResultId);
 		Long quizId = quizResult.getQuizId();
 		QuizResultResponse response = mapper.convert(quizResult);
 		QuizDetailResponse quiz = quizApi.readDetail(quizId);
-		if (quiz == null)
-			quiz = quizApi.readDetail(quizId);
 		response.setQuiz(quiz);
 		return response;
 	}
@@ -158,16 +161,28 @@ class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepo
 	}
 
 	@Override
-	public QuizResultResponse readByQuizId(Long quizId) {
+	public QuizResultResponse readByQuizId(String quizId) {
+		Long quizIdDecode = decodeQuiz(quizId);
 		Long userId = SecurityUtil.getCurrentUserIdDecode();
 		try {
-			QuizResultResponse response = cache.findById(RedisKeyBuilder.quizResult(userId, quizId));
+			QuizResultResponse response = cache.findById(RedisKeyBuilder.quizResult(userId, quizIdDecode));
 			return response;
 		} catch (Exception e) {
 			e.printStackTrace();
 			Optional<QuizResult> quizResult = repository.findByUserIdAndQuizIdAndEndTimeAfterAndUpdatedAtIsNull(userId,
-					quizId, Instant.now());
+					quizIdDecode, Instant.now());
 			return quizResult.map(mapper::convert).orElse(null);
 		}
 	}
+
+	private Long decodeQuiz(String id) {
+		return decodeId(id, IdConfig.QUIZ);
+
+	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.QUIZ_RESULT;
+	}
+
 }

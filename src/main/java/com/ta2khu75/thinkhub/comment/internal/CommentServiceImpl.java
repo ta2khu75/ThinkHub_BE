@@ -48,7 +48,7 @@ public class CommentServiceImpl extends BaseService<Comment, Long, CommentReposi
 
 	@Override
 	public CommentResponse create(Long targetId, CommentTargetType targetType, CommentRequest request) {
-		AuthorResponse author = accountService.readAuthor(SecurityUtil.getCurrentUserIdDecode());
+		AuthorResponse author = accountService.readAuthor(SecurityUtil.getCurrentUserId());
 		Comment comment = mapper.toEntity(request);
 		comment.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
 		comment.setTargetId(targetId);
@@ -63,7 +63,7 @@ public class CommentServiceImpl extends BaseService<Comment, Long, CommentReposi
 		Comment comment = this.readEntity(id);
 		if (comment.getAuthorId().equals(SecurityUtil.getCurrentUserIdDecode())) {
 			comment.setContent(request.getContent());
-			AuthorResponse author = accountService.readAuthor(comment.getAuthorId());
+			AuthorResponse author = accountService.readAuthor(SecurityUtil.getCurrentUserId());
 			CommentResponse response = mapper.convert(repository.save(comment));
 			response.setAuthor(author);
 			return response;

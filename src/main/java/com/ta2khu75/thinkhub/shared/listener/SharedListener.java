@@ -20,6 +20,6 @@ public class SharedListener {
 	@EventListener
 	public void handleCheckExistsEvent(CheckExistsEvent<?> event) {
 		ExistsService<Object> existsService = registry.getService(event.entityType());
-		existsService.checkExists(event.id());
+		existsService.ensureExists(event.id());
 	}
 }

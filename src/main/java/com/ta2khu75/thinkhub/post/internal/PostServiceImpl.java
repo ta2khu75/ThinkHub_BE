@@ -29,6 +29,7 @@ import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
@@ -37,7 +38,8 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper> implements PostApi {
+public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper>
+		implements PostApi, IdDecodable {
 	private final ApplicationEventPublisher events;
 	private final PostUserPort userPort;
 	private final PostTagPort tagPort;
@@ -60,18 +62,25 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 		post.setQuizIds(this.getQuizIds(request));
 		post.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
 		PostResponse response = this.save(post);
-		events.publishEvent(new PostCreatedEvent(post.getAuthorId(), post.getId()));
+		events.publishEvent(new PostCreatedEvent(response.getAuthor().id(), post.getId()));
 		return response;
 	}
 
 	@Override
-	public PostResponse update(Long id, @Valid PostRequest request) {
+	public PostResponse update(String id, @Valid PostRequest request) {
 		validateExistence(request);
-		Post post = this.readEntity(id);
+		Long postId = decodeId(id);
+		Post post = this.readEntity(postId);
 		mapper.update(request, post);
 		post.setTagIds(this.getTagIds(request));
 		post.setQuizIds(this.getQuizIds(request));
 		return this.save(post);
+	}
+
+	@Override
+	public PostResponse read(String id) {
+		Long postId = decodeId(id);
+		return mapper.convert(readEntity(postId));
 	}
 
 	@Override
@@ -80,8 +89,9 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 	}
 
 	@Override
-	public void delete(Long id) {
-		Post post = readEntity(id);
+	public void delete(String id) {
+		Long postId = decodeId(id);
+		Post post = readEntity(postId);
 		post.setDeleted(true);
 		repository.save(post);
 	}
@@ -175,13 +185,26 @@ public class PostServiceImpl extends BaseService<Post, Long, PostRepository, Pos
 	}
 
 	@Override
-	public PostResponse readDetail(Long id) {
-		Post post = readEntity(id);
-		PostResponse response = mapper.convert(readEntity(id));
+	public PostResponse readDetail(String id) {
+		Long postId = decodeId(id);
+		Post post = readEntity(postId);
+		PostResponse response = mapper.convert(readEntity(postId));
 		AuthorResponse author = userPort.readAuthor(post.getAuthorId());
 		Set<TagDto> tags = tagPort.readAllByIds(post.getTagIds());
 		response.setAuthor(author);
 		response.setTags(tags);
 		return response;
 	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.USER;
+	}
+
+	@Override
+	public void ensureExists(String id) {
+		Long postId = decodeId(id);
+		this.assertExists(postId);
+	}
+
 }

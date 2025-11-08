@@ -77,4 +77,9 @@ public class MediaServiceImpl extends BaseService<Media, Long, MediaRepository, 
 		return mapper.convert(readEntity(id));
 	}
 
+	@Override
+	public void ensureExists(Long id) {
+		this.assertExists(id);
+	}
+
 }

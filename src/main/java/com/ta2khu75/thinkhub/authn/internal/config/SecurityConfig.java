@@ -1,7 +1,9 @@
 package com.ta2khu75.thinkhub.authn.internal.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -21,11 +23,10 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 
 import com.ta2khu75.thinkhub.authn.internal.service.OAuth2LoginSuccessHandler;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -33,21 +34,31 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 	private final AccessDeniedHandler accessDeniedHandler;
-	private final AuthorizationManager<HttpServletRequest> authorizationManager;
+	private final AuthorizationManager<RequestAuthorizationContext> authorizationManager;
 	private final AuthenticationEntryPoint authenticationEntryPoint;
 	private final JwtProviderFactory jwtProviderFactory;
 	private final UserDetailsService userDetailsService;
 	private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService;
 	private final OidcUserService oidcUserService;
 	private final OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
+	@Value("${springdoc.swagger-ui.path}")
+	private String swaggerUiPath;
+	@Value("${springdoc.api-docs.path}")
+	private String swaggerApiPath;
+
+	private String[] swaggerWhitelist() {
+		return new String[] { swaggerUiPath, swaggerUiPath + "/**", // tất cả asset swagger-ui
+				swaggerApiPath, swaggerApiPath + "/**", // bao gồm /swagger-config
+		};
+	}
 
 	@Bean
 	SecurityFilterChain securityFilter(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-				.addFilterBefore(new AuthorizationFilter(authorizationManager), AuthorizationFilter.class)
 				.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
-				.authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+				.authorizeHttpRequests(authz -> authz.requestMatchers(HttpMethod.GET, swaggerWhitelist()).permitAll()
+						.anyRequest().access(authorizationManager))
 				.oauth2Login(oauth2 -> oauth2
 						.userInfoEndpoint(user -> user.oidcUserService(oidcUserService).userService(oauth2UserService))
 						.successHandler(oauth2LoginSuccessHandler))

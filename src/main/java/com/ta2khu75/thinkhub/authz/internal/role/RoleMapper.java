@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.authz.internal.permission.Permission;
@@ -20,7 +20,7 @@ public interface RoleMapper extends Converter<Role, RoleResponse>, BaseMapper<Ro
 	@Mapping(target = "permissions", ignore = true)
 	Role toEntity(RoleRequest request);
 
-	RoleDto toDto(Role role);
+	RoleSummary toSummary(Role role);
 
 	@Override
 	@Mapping(target = "id", ignore = true)

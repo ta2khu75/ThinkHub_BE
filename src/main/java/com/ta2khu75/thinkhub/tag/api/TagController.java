@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @ApiController("${app.api-prefix}/tags")
-@Tag(name = "Tag Management", description = "APIs for managing tags")
+@Tag(name = "Tag", description = "APIs for managing tags")
 public class TagController extends BaseController<TagApi> {
 	protected TagController(TagApi service) {
 		super(service);

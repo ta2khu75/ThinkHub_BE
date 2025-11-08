@@ -18,21 +18,21 @@ import com.ta2khu75.thinkhub.authn.internal.config.JwtProviderFactory;
 import com.ta2khu75.thinkhub.authn.internal.config.TokenConfig;
 import com.ta2khu75.thinkhub.authn.internal.config.TokenType;
 import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
-import com.ta2khu75.thinkhub.user.api.dto.UserDto;
-
+import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class JwtService {
+
 	private final JwtProviderFactory jwtProviderFactory;
 	private final JwtProperties jwtProperties;
 
 	public TokenResponse createJwt(UserPrincipal auth, TokenType tokenType) {
-		UserDto user= auth.user();
-		RoleDto role = auth.role();
+		UserSummary user = auth.user();
+		RoleSummary role = auth.role();
 		Instant now = Instant.now();
 		TokenConfig tokenConfig = jwtProperties.getConfigByType(tokenType);
 		JwtEncoder jwtEncoder = jwtProviderFactory.getEncoder(tokenType);
@@ -41,9 +41,8 @@ public class JwtService {
 		JwtClaimsSet claims;
 		switch (tokenType) {
 		case ACCESS: {
-			claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity)
-					.subject(user.id()).claim("username", user.username()).claim("scope", "ROLE_" + role.name())
-					.build();
+			claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity).subject(user.id())
+					.claim("username", user.username()).claim("scope", "ROLE_" + role.name()).build();
 			break;
 		}
 		case REFRESH: {

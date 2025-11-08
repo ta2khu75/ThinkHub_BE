@@ -63,7 +63,7 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	}
 
 	@PrePersist
-	public void makeSlug() {
+	public void prePersist() {
 		slug = SlugUtil.toSlug(title);
 	}
 }

@@ -18,7 +18,7 @@ import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Media", description = "Create, update and delete media")
-@ApiController("${app.api-prefix}/media")
+@ApiController("${app.api-prefix}/medias")
 public class MediaController extends BaseController<MediaApi> {
 
 	protected MediaController(MediaApi service) {

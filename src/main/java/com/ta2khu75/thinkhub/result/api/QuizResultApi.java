@@ -6,12 +6,12 @@ import com.ta2khu75.thinkhub.result.api.dto.QuizResultSearch;
 import com.ta2khu75.thinkhub.shared.service.SearchService;
 
 public interface QuizResultApi extends SearchService<QuizResultSearch, QuizResultResponse> {
-	QuizResultResponse take(Long quizId);
+	QuizResultResponse take(String quizId);
 
-	QuizResultResponse readByQuizId(Long quizId);
+	QuizResultResponse readByQuizId(String quizId);
 
-	QuizResultResponse submit(Long id, QuizResultRequest request);
+	QuizResultResponse submit(String id, QuizResultRequest request);
 
-	QuizResultResponse readDetail(Long id);
+	QuizResultResponse readDetail(String id);
 
 }

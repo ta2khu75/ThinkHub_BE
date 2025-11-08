@@ -1,7 +1,5 @@
 package com.ta2khu75.thinkhub.authn.api;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.time.Instant;
 
 import org.springframework.http.HttpHeaders;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ta2khu75.thinkhub.authn.api.dto.AuthResponse;
 import com.ta2khu75.thinkhub.authn.api.dto.ChangePasswordRequest;
-import com.ta2khu75.thinkhub.authn.api.dto.GoogleRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.LoginRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.RegisterRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.TokenResponse;
@@ -26,8 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 
-@Tag(name = "Authentication", description = "Handle user login, registration, logout and token refresh.")
-@ApiController("${app.api-prefix}/authn")
+@Tag(name = "Authn", description = "Handle user login, registration, logout and token refresh.") @ApiController("${app.api-prefix}/authn")
 public class AuthnController extends BaseController<AuthnApi> {
 	private static final String REFRESH_TOKEN = "refresh_token";
 	private static final String ACCESS_TOKEN = "access_token";
@@ -37,8 +33,7 @@ public class AuthnController extends BaseController<AuthnApi> {
 	}
 
 	@PostMapping("/register")
-	@Operation(summary = "Register a new user", description = "Create a new user account with email and password. A confirmation email may be sent.")
-	public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
+	@Operation(summary = "Register a new user" , description = "Create a new user account with email and password. A confirmation email may be sent.") public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
 		service.register(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -60,14 +55,6 @@ public class AuthnController extends BaseController<AuthnApi> {
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
 				.body(this.makeAuthResponse(response));
 	}
-//	@PostMapping("/google")
-//	public ResponseEntity<AuthResponse> authenticationWithGoogle(@Valid @RequestBody GoogleRequest request) throws GeneralSecurityException, IOException {
-//		AuthResponse response = service.authenticationWithGoogle(request);
-//		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
-//		ResponseCookie cookieAccess = createCookie(ACCESS_TOKEN, response.accessToken());
-//		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
-//				.body(this.makeAuthResponse(response));
-//	}
 
 	@PostMapping("/refresh-token")
 	@Operation(summary = "Refresh access token", description = "Use the refresh token from cookie to get a new access token.")
@@ -99,5 +86,5 @@ public class AuthnController extends BaseController<AuthnApi> {
 		long remainingMillis = expirationTime - Instant.now().toEpochMilli();
 		return Math.max(remainingMillis / 1000, 0);
 	}
-	
+
 }

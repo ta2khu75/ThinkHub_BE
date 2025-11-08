@@ -1,11 +1,9 @@
 package com.ta2khu75.thinkhub.user.api;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -13,8 +11,7 @@ import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
-import com.ta2khu75.thinkhub.shared.service.IdDecodable;
+import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.dto.UserRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
 import com.ta2khu75.thinkhub.user.api.dto.UserSearch;
@@ -26,7 +23,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @ApiController("${app.api-prefix}/users")
-public class UserController extends BaseController<UserApi> implements IdDecodable {
+@Tag(name = "User")
+public class UserController extends BaseController<UserApi> {
 
 	protected UserController(UserApi service) {
 		super(service);
@@ -41,13 +39,18 @@ public class UserController extends BaseController<UserApi> implements IdDecodab
 	@DeleteMapping("{id}")
 	@Operation(summary = "Delete an account", description = "Delete an existing user account by its ID.")
 	ResponseEntity<Void> delete(@PathVariable String id) {
-		service.delete(this.decodeUserId(id));
+		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("{id}")
 	ResponseEntity<UserResponse> read(@PathVariable String id) {
-		return ResponseEntity.ok(service.read(this.decodeUserId(id)));
+		return ResponseEntity.ok(service.read(id));
+	}
+
+	@GetMapping("me")
+	ResponseEntity<UserResponse> readMe() {
+		return ResponseEntity.ok(service.read(SecurityUtil.getCurrentUserId()));
 	}
 
 	@GetMapping
@@ -56,22 +59,16 @@ public class UserController extends BaseController<UserApi> implements IdDecodab
 		return ResponseEntity.ok(service.search(search));
 	}
 
-	@PutMapping("{accountId}/profile")
+	@PutMapping("{id}")
 	@Operation(summary = "Update account profile", description = "Update the profile information of a specific user account.")
-	public ResponseEntity<UserResponse> updateProfile(@PathVariable String accountId,
-			@Valid @RequestBody UserRequest request) {
-		return ResponseEntity.ok(service.update(this.decodeId(accountId), request));
+	public ResponseEntity<UserResponse> update(@PathVariable String id, @Valid @RequestBody UserRequest request) {
+		return ResponseEntity.ok(service.update(id, request));
 	}
 
-	@PutMapping("{accountId}/status")
+	@PutMapping("{id}/status")
 	@Operation(summary = "Update account status", description = "Enable, disable, or lock/unlock a specific user account.")
-	public ResponseEntity<UserStatusResponse> updateStatus(@PathVariable String accountId,
+	public ResponseEntity<UserStatusResponse> updateStatus(@PathVariable String id,
 			@Valid @RequestBody UserStatusRequest request) {
-		return ResponseEntity.ok(service.updateStatus(this.decodeId(accountId), request));
-	}
-
-	@Override
-	public IdConfig getIdConfig() {
-		return IdConfig.USER;
+		return ResponseEntity.ok(service.updateStatus(id, request));
 	}
 }

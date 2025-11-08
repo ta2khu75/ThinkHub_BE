@@ -44,25 +44,25 @@ public class QuizController extends BaseController<QuizApi>
 	@Override
 	@Operation(summary = "Update an existing quiz", description = "Modify quiz content or replace its associated image.")
 	public ResponseEntity<QuizResponse> update(String id, QuizRequest quiz) {
-		return ResponseEntity.ok(service.update(decodeId(id), quiz));
+		return ResponseEntity.ok(service.update(id, quiz));
 	}
 
 	@Override
 	@Operation(summary = "Get quiz by ID", description = "Retrieve a quiz’s basic information by its identifier.")
 	public ResponseEntity<QuizResponse> read(String id) {
-		return ResponseEntity.ok(service.read(decodeId(id)));
+		return ResponseEntity.ok(service.read(id));
 	}
 
 	@GetMapping("{id}/detail")
 	@Operation(summary = "Get detailed quiz information", description = "Retrieve a quiz along with all questions, answers, and related data.")
 	public ResponseEntity<QuizResponse> readDetail(String id) {
-		return ResponseEntity.ok(service.readDetail(decodeId(id)));
+		return ResponseEntity.ok(service.readDetail(id));
 	}
 
 	@Override
 	@Operation(summary = "Delete a quiz", description = "Permanently remove a quiz from the system.")
 	public ResponseEntity<Void> delete(String id) {
-		service.delete(decodeId(id));
+		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 

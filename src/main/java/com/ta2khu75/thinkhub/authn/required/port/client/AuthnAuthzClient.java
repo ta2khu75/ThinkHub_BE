@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authz.api.AuthzApi;
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
 
@@ -16,13 +16,18 @@ public class AuthnAuthzClient extends BaseClient<AuthzApi> implements AuthnAuthz
 	}
 
 	@Override
-	public RoleDto readDto(Long id) {
-		return api.readRoleDto(id);
+	public RoleSummary readSummary(Long id) {
+		return api.readRoleSummary(id);
 	}
 
 	@Override
 	public RoleResponse readByName(String name) {
 		return api.readRoleByName(name);
+	}
+
+	@Override
+	public RoleSummary readSummaryByName(String name) {
+		return api.readRoleSummaryByName(name);
 	}
 
 }

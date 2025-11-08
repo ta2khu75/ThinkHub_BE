@@ -10,36 +10,37 @@ import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
 import com.ta2khu75.thinkhub.authn.internal.repository.AuthProviderRepository;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
-import com.ta2khu75.thinkhub.user.api.dto.CreateUserRequest;
-import com.ta2khu75.thinkhub.user.api.dto.UserDto;
-import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
+import com.ta2khu75.thinkhub.user.api.dto.UserStatusSummary;
+import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class OAuth2Service implements IdDecodable {
+
 	private final AuthnUserPort userPort;
 	private final AuthnAuthzPort authzPort;
 	private final AuthProviderRepository repository;
 
 	public UserPrincipal authenticationWithProviderUser(ProviderUser providerUser) {
-		UserDto user;
+		UserSummary user;
 		try {
-			user = userPort.readDtoByEmail(providerUser.email());
+			user = userPort.readSummaryByEmail(providerUser.email());
 		} catch (Exception e) {
 			RoleResponse role = authzPort.readByName(RoleDefault.USER.name());
-			UserStatusRequest status = new UserStatusRequest(true, true, role.id());
-			CreateUserRequest userRequest = new CreateUserRequest(providerUser.firstName(), providerUser.lastName(),
-					providerUser.email(), null, null, status);
-			user = userPort.createDto(userRequest);
+			UserStatusSummary status = new UserStatusSummary(null, true, true, role.id());
+			UserSummary userRequest = new UserSummary(null, providerUser.firstName(), providerUser.lastName(),
+					providerUser.email(), null, status);
+
+			user = userPort.create(userRequest);
 		}
-		RoleDto role = authzPort.readDto(user.status().roleId());
+		RoleSummary role = authzPort.readSummary(user.status().roleId());
 		Optional<AuthProvider> authProviderOptional = repository.findByEmailAndProvider(providerUser.email(),
 				providerUser.provider());
 		AuthProvider authProvider;

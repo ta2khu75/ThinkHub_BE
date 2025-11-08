@@ -1,17 +1,18 @@
 package com.ta2khu75.thinkhub.authn.required.port;
 
-import com.ta2khu75.thinkhub.user.api.dto.CreateUserRequest;
-import com.ta2khu75.thinkhub.user.api.dto.UserDto;
 import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
+import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 public interface AuthnUserPort {
-	UserResponse create(CreateUserRequest request);
+//	UserResponse create(UserCreate request);
 
 	UserResponse readByEmail(String email);
 
-	UserDto createDto(CreateUserRequest request);
+	UserSummary create(UserSummary request);
 
-	UserDto readDto(Long id);
+	UserSummary readSummary(Long id);
 
-	UserDto readDtoByEmail(String email);
+	UserSummary readSummary(String id);
+
+	UserSummary readSummaryByEmail(String email);
 }

@@ -8,9 +8,13 @@ import com.ta2khu75.thinkhub.shared.service.CrudService;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 import com.ta2khu75.thinkhub.shared.service.SearchService;
 
-public interface QuizApi extends CrudService<QuizRequest, QuizResponse, Long>, SearchService<QuizSearch, QuizResponse>,
-		ExistsService<Long> {
+public interface QuizApi extends CrudService<QuizRequest, QuizResponse, String>,
+		SearchService<QuizSearch, QuizResponse>, ExistsService<String> {
+	QuizDetailResponse readDetail(String id);
+
 	QuizDetailResponse readDetail(Long id);
+
+	QuizResponse read(Long id);
 }
 //	List<QuizResponse> readAllByAuthorIdAndKeywork(Long authorId,String keyword);
 //	QuizResponse readDetail(String id);

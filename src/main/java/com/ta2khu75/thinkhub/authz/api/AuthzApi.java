@@ -1,23 +1,18 @@
 package com.ta2khu75.thinkhub.authz.api;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
+import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
 import com.ta2khu75.thinkhub.authz.api.dto.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 
 public interface AuthzApi {
-	List<PermissionGroupResponse> readAllGroups();
-
-	List<RoleResponse> readAllRoles();
-
 	RoleResponse readRole(Long id);
-
-	RoleDto readRoleDto(Long id);
-
-	RoleDto readRoleDtoByName(String name);
 
 	RoleResponse readRoleByName(String name);
 
@@ -25,11 +20,23 @@ public interface AuthzApi {
 
 	RoleResponse updateRole(Long id, RoleRequest request);
 
+	List<RoleResponse> readAllRoles();
+
+	RoleSummary readRoleSummary(Long id);
+
+	RoleSummary readRoleSummaryByName(String name);
+
 	void deleteRole(Long id);
 
-	Long initDefaultRoles();
+	List<PermissionGroupResponse> readAllGroups();
 
-	Set<Long> initPermissionsFromEndpoints();
+	Set<PermissionGroupSummary> readAllGroupSummaryByCodes(Collection<String> codes);
+
+	List<PermissionGroupSummary> saveAllGroups(Collection<PermissionGroupSummary> groups);
+
+	Set<PermissionSummary> readAllPermissionSummaryByCodes(Collection<String> codes);
+
+	List<PermissionSummary> saveAllPermisisons(Collection<PermissionSummary> permissions);
 
 	void assignPermissionsToRole(String roleName, Set<Long> permissionIds);
 }

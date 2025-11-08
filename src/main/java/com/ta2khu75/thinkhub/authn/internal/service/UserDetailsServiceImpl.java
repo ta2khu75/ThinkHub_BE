@@ -11,8 +11,8 @@ import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
 import com.ta2khu75.thinkhub.authn.internal.repository.AuthProviderRepository;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
-import com.ta2khu75.thinkhub.user.api.dto.UserDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
+import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,15 +23,15 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserDetailsServiceImpl implements UserDetailsService {
 	AuthnUserPort userPort;
-	AuthnAuthzPort rolePort;
+	AuthnAuthzPort authzPort;
 	AuthProviderRepository repository;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		try {
 			AuthProvider authProvider = repository.findByEmailAndProvider(username, ProviderType.LOCAL).orElseThrow();
-			UserDto user = userPort.readDto(authProvider.getUserId());
-			RoleDto role = rolePort.readDto(user.status().roleId());
+			UserSummary user = userPort.readSummary(authProvider.getUserId());
+			RoleSummary role = authzPort.readSummary(user.status().roleId());
 			return new UserPrincipal(user, role, authProvider);
 		} catch (Exception e) {
 			e.printStackTrace();

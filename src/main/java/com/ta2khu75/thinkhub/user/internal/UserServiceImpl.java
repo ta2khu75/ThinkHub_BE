@@ -13,59 +13,87 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.authz.api.AuthzApi;
-import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.AlreadyExistsException;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.FunctionUtil;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.UserApi;
-import com.ta2khu75.thinkhub.user.api.dto.CreateUserRequest;
-import com.ta2khu75.thinkhub.user.api.dto.UserDto;
+import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
 import com.ta2khu75.thinkhub.user.api.dto.UserSearch;
 import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserStatusResponse;
+import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 import com.ta2khu75.thinkhub.user.internal.entity.User;
 import com.ta2khu75.thinkhub.user.internal.entity.UserStatus;
 import com.ta2khu75.thinkhub.user.internal.mapper.UserMapper;
 import com.ta2khu75.thinkhub.user.internal.repository.UserRepository;
 import com.ta2khu75.thinkhub.user.internal.repository.UserStatusRepository;
 import com.ta2khu75.thinkhub.user.projection.internal.projection.Author;
+import com.ta2khu75.thinkhub.user.required.port.UserAuthnPort;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper> implements UserApi {
-	public UserServiceImpl(UserRepository repository, UserMapper mapper, UserStatusRepository statusRepository,
-			AuthzApi authzApi, ApplicationEventPublisher events, RedisService redisService) {
+class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper> implements UserApi, IdDecodable {
+
+//	public UserServiceImpl(UserRepository repository, UserMapper mapper, UserAuthnPort authnPort,
+//			RedisService redisService, UserStatusRepository statusRepository, ApplicationEventPublisher events) {
+//		super(repository, mapper);
+////		this.authnPort = authnPort;
+//		this.redisService = redisService;
+//		this.statusRepository = statusRepository;
+//		this.events = events;
+//	}
+
+	RedisService redisService;
+
+	public UserServiceImpl(UserRepository repository, UserMapper mapper, RedisService redisService,
+			UserStatusRepository statusRepository, ApplicationEventPublisher events) {
 		super(repository, mapper);
-		this.statusRepository = statusRepository;
 		this.redisService = redisService;
-		this.authzApi= authzApi;
+		this.statusRepository = statusRepository;
 		this.events = events;
 	}
 
-	AuthzApi authzApi;
-	RedisService redisService;
 	UserStatusRepository statusRepository;
 	ApplicationEventPublisher events;
 
+//	@Override
+//	public UserSummary createSummary(UserCreate request) {
+//		if (repository.existsByEmail(request.email().toLowerCase()))
+//			throw new AlreadyExistsException("Email already exists");
+//		User user = mapper.toEntity(request);
+//		user.setUsername(request.firstName() + " " + request.lastName());
+//		UserStatus status = mapper.toEntity(request.status());
+//		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
+//		user.setStatus(status);
+//		try {
+//			user = repository.save(user);
+//		} catch (DataIntegrityViolationException e) {
+//			e.printStackTrace();
+//			throw new AlreadyExistsException(e.getMessage());
+//		}
+//		return mapper.toSummary(user);
+//	}
+
 	@Override
-	public UserResponse create(CreateUserRequest request) {
-		if (repository.existsByEmail(request.email().toLowerCase()))
+	public UserSummary create(UserSummary summary) {
+		if (repository.existsByEmail(summary.email().toLowerCase()))
 			throw new AlreadyExistsException("Email already exists");
-		User user = mapper.toEntity(request);
-		user.setUsername(request.firstName() + " " + request.lastName());
-		UserStatus status = mapper.toEntity(request.status());
+		User user = mapper.toEntity(summary);
+		user.setUsername(summary.firstName() + " " + summary.lastName());
+		UserStatus status = mapper.toEntity(summary.status());
 		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
 		user.setStatus(status);
 		try {
@@ -74,27 +102,30 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 			e.printStackTrace();
 			throw new AlreadyExistsException(e.getMessage());
 		}
-		return mapper.convert(user);
+		return mapper.toSummary(user);
 	}
 
 	@Override
-	public UserResponse update(Long userId, UserRequest request) {
-		if (!SecurityUtil.getCurrentUserIdDecode().equals(userId))
+	public UserResponse update(String userId, UserRequest request) {
+		Long id = decodeId(userId);
+		if (!SecurityUtil.getCurrentUserIdDecode().equals(id))
 			throw new InvalidDataException("You can't update other's user");
-		User user = this.readEntity(userId);
+		User user = this.readEntity(id);
 		mapper.update(request, user);
 		repository.save(user);
 		return mapper.convert(user);
 	}
 
 	@Override
-	public UserResponse read(Long userId) {
-		User user = this.readEntity(userId);
+	public UserResponse read(String userId) {
+		Long id = decodeId(userId);
+		User user = this.readEntity(id);
 		return mapper.convert(user);
 	}
 
 	@Override
-	public void delete(Long id) {
+	public void delete(String userId) {
+		Long id = decodeId(userId);
 		UserStatus status = readStatusByUserId(id);
 		status.setDeleted(true);
 		statusRepository.save(status);
@@ -112,8 +143,9 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 	}
 
 	@Override
-	public UserStatusResponse updateStatus(Long userId, UserStatusRequest request) {
-		UserStatus status = readStatusByUserId(userId);
+	public UserStatusResponse updateStatus(String userId, UserStatusRequest request) {
+		Long id = decodeId(userId);
+		UserStatus status = readStatusByUserId(id);
 		mapper.update(request, status);
 		if (!status.getRoleId().equals(request.roleId())) {
 			events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, request.roleId()));
@@ -121,9 +153,9 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 		}
 		status = statusRepository.save(status);
 		if (status.isNonLocked()) {
-			redisService.delete(RedisKeyBuilder.userLock(userId));
+			redisService.delete(RedisKeyBuilder.userLock(id));
 		} else {
-			redisService.setValue(RedisKeyBuilder.userLock(userId), "");
+			redisService.setValue(RedisKeyBuilder.userLock(id), "");
 		}
 		return mapper.toResponse(status);
 	}
@@ -135,25 +167,33 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 	}
 
 	@Override
-	public UserDto readDtoByEmail(String email) {
-		return repository.findByEmail(email).map(mapper::toDto)
+	public UserSummary readSummaryByEmail(String email) {
+		return repository.findByEmail(email).map(mapper::toSummary)
 				.orElseThrow(() -> new NotFoundException("Could not find account with email: " + email));
 	}
 
 	@Override
-	public UserDto readDto(Long id) {
+	public UserSummary readSummary(String userId) {
+		Long id = decodeId(userId);
 		User user = this.readEntity(id);
-		return mapper.toDto(user);
+		return mapper.toSummary(user);
 	}
 
 	@Override
-	public UserDto readDtoByUsername(String username) {
-		return repository.findByUsername(username).map(mapper::toDto)
+	public UserSummary readSummary(Long userId) {
+		User user = this.readEntity(userId);
+		return mapper.toSummary(user);
+	}
+
+	@Override
+	public UserSummary readDtoByUsername(String username) {
+		return repository.findByUsername(username).map(mapper::toSummary)
 				.orElseThrow(() -> new NotFoundException("Could not find account with username: " + username));
 	}
 
 	@Override
-	public AuthorResponse readAuthor(Long id) {
+	public AuthorResponse readAuthor(String userId) {
+		Long id = decodeId(userId);
 		Author author = repository.findAuthorByUserId(id)
 				.orElseThrow(() -> new NotFoundException("Could not find profile with id: " + id));
 		return mapper.toAuthorResponse(author);
@@ -166,29 +206,40 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 	}
 
 	@Override
-	public void checkExists(Long id) {
-		if (!repository.existsById(id)) {
-			throw new NotFoundException("Could not find category with id: " + id);
-		}
-	}
-
-	@Override
 	public EntityType getEntityType() {
-		return EntityType.ACCOUNT;
+		return EntityType.USER;
 	}
 
 	@Override
-	public List<Long> readUserIdsByRoleName(String roleName) {
-		RoleResponse role = authzApi.readRoleByName(roleName);
-		return repository.findUserIdsByRoleId(role.id());
+	public List<Long> readAllUserIdByRoleId(Long id) {
+		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, id));
+		return repository.findAllUserIdByRoleId(id);
 	}
 
 	@Override
-	public UserDto createDto(CreateUserRequest request) {
+	public IdConfig getIdConfig() {
+		return IdConfig.USER;
+	}
+
+	@Override
+	public AuthorResponse readAuthor(Long id) {
+		Author author = repository.findAuthorByUserId(id)
+				.orElseThrow(() -> new NotFoundException("Could not find profile with id: " + id));
+		return mapper.toAuthorResponse(author);
+	}
+
+	@Override
+	public void ensureExists(Long id) {
+		this.assertExists(id);
+	}
+
+	@Override
+	public UserResponse create(UserCreateRequest request) {
 		if (repository.existsByEmail(request.email().toLowerCase()))
 			throw new AlreadyExistsException("Email already exists");
 		User user = mapper.toEntity(request);
-		user.setUsername(request.firstName() + " " + request.lastName());
+		if (user.getUsername() == null)
+			user.setUsername(request.firstName() + " " + request.lastName());
 		UserStatus status = mapper.toEntity(request.status());
 		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
 		user.setStatus(status);
@@ -198,7 +249,23 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 			e.printStackTrace();
 			throw new AlreadyExistsException(e.getMessage());
 		}
-		return mapper.toDto(user);
+		UserSummary summary = mapper.toSummary(user);
+//		authnPort.create(summary);
+		return mapper.convert(user);
 	}
+//	@Override
+//	public UserResponse create(UserCreateRequest request) {
+//		User user = mapper.toEntity(request);
+//		UserStatus status = mapper.toEntity(request.status());
+//		user.setStatus(status);
+//		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
+//		user = repository.save(user);
+//		UserSummary response = mapper.toSummary(user);
+//		return mapper.convert(user);
+//	}
 
+	@Override
+	public long count() {
+		return repository.count();
+	}
 }

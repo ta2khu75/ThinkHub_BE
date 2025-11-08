@@ -1,12 +1,9 @@
 package com.ta2khu75.thinkhub.post.api;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.ta2khu75.thinkhub.post.api.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
@@ -14,7 +11,6 @@ import com.ta2khu75.thinkhub.post.api.dto.PostSearch;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
-import com.ta2khu75.thinkhub.shared.api.controller.CrudFileController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
@@ -46,26 +42,26 @@ public class PostController extends BaseController<PostApi>
 	@Override
 	@Operation(summary = "Update a post", description = "Edit the content or metadata of an existing post.")
 	public ResponseEntity<PostResponse> update(String id, @Valid PostRequest post) {
-		return ResponseEntity.ok(service.update(decodeId(id), post));
+		return ResponseEntity.ok(service.update(id, post));
 	}
 
 	@Override
 	@Operation(summary = "Delete a post", description = "Permanently remove a post from the system.")
 	public ResponseEntity<Void> delete(String id) {
-		service.delete(decodeId(id));
+		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@Override
 	@Operation(summary = "Get a post", description = "Retrieve detailed information about a specific post.")
 	public ResponseEntity<PostResponse> read(String id) {
-		return ResponseEntity.ok(service.read(decodeId(id)));
+		return ResponseEntity.ok(service.read(id));
 	}
 
 	@GetMapping("{id}/detail")
 	@Operation(summary = "Get a post detail", description = "Returns the detailed information of a specific post.")
 	public ResponseEntity<PostResponse> readDetail(@PathVariable String id) {
-		return ResponseEntity.ok(service.readDetail(decodeId(id)));
+		return ResponseEntity.ok(service.readDetail(id));
 	}
 
 	@Override

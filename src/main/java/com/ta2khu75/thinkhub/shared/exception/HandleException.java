@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,6 +35,8 @@ import com.ta2khu75.thinkhub.shared.api.dto.ApiResponse;
 @RequiredArgsConstructor
 public class HandleException implements ResponseBodyAdvice<Object> {
 	private final HttpServletRequest request;
+	@Value("${app.api-prefix}")
+	private String apiPrefix;
 
 	@ExceptionHandler(value = BaseException.class)
 	public ResponseEntity<ExceptionResponse> handleBaseException(BaseException ex) {
@@ -95,7 +98,8 @@ public class HandleException implements ResponseBodyAdvice<Object> {
 			@NonNull Class<? extends HttpMessageConverter<?>> converterType) {
 		String uri = request.getRequestURI();
 
-		return !uri.startsWith("/swagger") && !uri.startsWith("/v3/api-docs") && !uri.startsWith("/swagger-ui");
+		return !uri.startsWith(apiPrefix + "/swagger") && !uri.startsWith(apiPrefix + "/api-docs")
+				&& !uri.startsWith("/swagger-ui");
 	}
 
 	@Override
