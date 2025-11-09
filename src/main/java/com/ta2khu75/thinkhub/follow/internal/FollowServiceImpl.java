@@ -20,8 +20,10 @@ import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.UserApi;
 
@@ -29,16 +31,17 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-class FollowServiceImpl implements FollowApi {
+class FollowServiceImpl implements FollowApi, IdDecodable {
 	private final FollowRepository repository;
 	private final UserApi accountApi;
 	private final ApplicationEventPublisher events;
 
 	@Override
 	@Transactional
-	public void follow(Long followingId) {
-		events.publishEvent(new CheckExistsEvent<>(EntityType.ACCOUNT, followingId));
+	public void follow(String userId) {
+		events.publishEvent(new CheckExistsEvent<>(EntityType.USER, userId));
 		Long followerId = SecurityUtil.getCurrentUserIdDecode();
+		Long followingId = decodeId(userId);
 		FollowId id = new FollowId(followingId, followerId);
 		if (followerId.equals(followingId)) {
 			throw new InvalidDataException("Cannot follow yourself");
@@ -51,13 +54,14 @@ class FollowServiceImpl implements FollowApi {
 
 	@Override
 	@Transactional
-	public void unFollow(Long followingId) {
+	public void unFollow(String userId) {
 		Long followerId = SecurityUtil.getCurrentUserIdDecode();
+		Long followingId = decodeId(userId);
 		repository.deleteById(new FollowId(followingId, followerId));
 	}
 
 	@Override
-	public PageResponse<AuthorResponse> readAuthorPage(Long userId, FollowDirection direction, Search search) {
+	public PageResponse<AuthorResponse> readAuthorPage(String userId, FollowDirection direction, Search search) {
 		return mapToAuthorResponse(this.readPage(userId, direction, search));
 	}
 
@@ -69,13 +73,15 @@ class FollowServiceImpl implements FollowApi {
 	}
 
 	@Override
-	public FollowStatusResponse isFollowing(Long followingId) {
+	public FollowStatusResponse isFollowing(String userId) {
 		Long followerId = SecurityUtil.getCurrentUserIdDecode();
+		Long followingId = decodeId(userId);
 		return new FollowStatusResponse(repository.existsById(new FollowId(followingId, followerId)));
 	}
 
 	@Override
-	public PageResponse<FollowResponse> readPage(Long userId, FollowDirection direction, Search search) {
+	public PageResponse<FollowResponse> readPage(String userIdString, FollowDirection direction, Search search) {
+		Long userId = decodeId(userIdString);
 		Pageable pageable = search.toPageable();
 		Page<Follow> page;
 		PageResponse<FollowResponse> pageResponse;
@@ -93,6 +99,11 @@ class FollowServiceImpl implements FollowApi {
 					followingResponse);
 		}
 		return pageResponse;
+	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.USER;
 	}
 
 }

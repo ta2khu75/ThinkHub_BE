@@ -29,27 +29,23 @@ public class CategoryController extends BaseController<CategoryApi>
 	}
 
 	@Override
-	@Operation(summary = "Create a new category", description = "Add a new category to help organize or classify content.")
 	@Validated({ Default.class, Create.class })
 	public ResponseEntity<CategoryResponse> create(@Valid CategoryRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
 	}
 
 	@Override
-	@Operation(summary = "Update an existing category", description = "Change the name or properties of a specific category.")
 	public ResponseEntity<CategoryResponse> update(Long id, @Valid CategoryRequest request) {
 		return ResponseEntity.ok(service.update(id, request));
 	}
 
 	@Override
-	@Operation(summary = "Delete a category", description = "Remove a category permanently from the system.")
 	public ResponseEntity<Void> delete(Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@Override
-	@Operation(summary = "Get a category", description = "Retrieve details about a specific category.")
 	public ResponseEntity<CategoryResponse> read(Long id) {
 		return ResponseEntity.ok(service.read(id));
 	}

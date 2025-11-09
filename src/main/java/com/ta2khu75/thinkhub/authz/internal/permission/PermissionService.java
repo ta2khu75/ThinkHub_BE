@@ -1,17 +1,18 @@
 package com.ta2khu75.thinkhub.authz.internal.permission;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionRequest;
+import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.PermissionResponse;
-import com.ta2khu75.thinkhub.shared.service.CrudService;
 
-public interface PermissionService extends CrudService<PermissionRequest, PermissionResponse, Long> {
-	Set<PermissionResponse> saveAll(Set<PermissionRequest> requests);
-	Set<PermissionResponse> readAllBySummary(Set<String> summaries);
-	PermissionResponse readBySummary(String summary);
-	PermissionResponse readByPatternAndMethod(String pattern, RequestMethod method);
-//	Optional<PermissionResponse> findBySummary(String summary);
+public interface PermissionService {
+	List<PermissionSummary> saveAll(Collection<PermissionSummary> permissions);
+
+	Set<PermissionSummary> readAllSummaryByCodes(Collection<String> codes);
+
+	PermissionResponse readByCode(String code);
+
+	PermissionResponse read(Long id);
 }

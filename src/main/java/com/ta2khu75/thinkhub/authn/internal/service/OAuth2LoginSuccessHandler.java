@@ -12,9 +12,9 @@ import com.ta2khu75.thinkhub.authn.api.dto.TokenResponse;
 import com.ta2khu75.thinkhub.authn.internal.config.TokenType;
 import com.ta2khu75.thinkhub.authn.internal.model.CustomOAuth2User;
 import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
-import com.ta2khu75.thinkhub.user.api.dto.UserDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
+import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,12 +47,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 	}
 
 	private AuthResponse makeAuthResponse(UserPrincipal auth) {
-		UserDto user = auth.user();
-		RoleDto role = auth.role();
+		UserSummary user = auth.user();
+		RoleSummary role = auth.role();
 		TokenResponse refreshToken = jwtService.createJwt(auth, TokenType.REFRESH);
 		TokenResponse accessToken = jwtService.createJwt(auth, TokenType.ACCESS);
-		UserResponse userResponse = new UserResponse(user.id(), user.firstName(), user.lastName(), user.username(),
-				user.birthday(), user.summary(), null, null, null);
+		UserResponse userResponse = new UserResponse(user.id(), user.firstName(), user.lastName(), user.username());
 		return new AuthResponse(userResponse, role.name(), accessToken, refreshToken);
 	}
 

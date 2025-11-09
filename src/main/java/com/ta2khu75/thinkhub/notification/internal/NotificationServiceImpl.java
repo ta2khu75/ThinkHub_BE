@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.comment.api.CommentApi;
 import com.ta2khu75.thinkhub.notification.api.NotificationApi;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationIdDto;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationRequest;
@@ -16,9 +15,7 @@ import com.ta2khu75.thinkhub.notification.internal.entity.Notification;
 import com.ta2khu75.thinkhub.notification.internal.entity.NotificationId;
 import com.ta2khu75.thinkhub.notification.internal.mapper.NotificationMapper;
 import com.ta2khu75.thinkhub.notification.internal.repository.NotificationRepository;
-import com.ta2khu75.thinkhub.post.api.PostApi;
-import com.ta2khu75.thinkhub.quiz.api.QuizApi;
-import com.ta2khu75.thinkhub.report.api.ReportApi;
+import com.ta2khu75.thinkhub.notification.required.port.NotificationPostPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
@@ -26,24 +23,29 @@ import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.shared.util.IdConverterUtil;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class NotificationServiceImpl
 		extends BaseService<Notification, NotificationId, NotificationRepository, NotificationMapper>
 		implements NotificationApi {
-	private final PostApi postApi;
-	private final QuizApi quizApi;
-	private final CommentApi commentApi;
-	private final ReportApi reportApi;
-	private final ApplicationEventPublisher events;
+	NotificationPostPort postPort;
+	NotificationPostPort commentPort;
+	NotificationPostPort reportPort;
+	NotificationPostPort quizPort;
+	ApplicationEventPublisher events;
 
-	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper, PostApi postApi,
-			QuizApi quizApi, CommentApi commentApi, ReportApi reportApi, ApplicationEventPublisher events) {
+	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper,
+			NotificationPostPort postPort, NotificationPostPort commentPort, NotificationPostPort reportPort,
+			NotificationPostPort quizPort, ApplicationEventPublisher events) {
 		super(repository, mapper);
+		this.postPort = postPort;
+		this.commentPort = commentPort;
+		this.reportPort = reportPort;
+		this.quizPort = quizPort;
 		this.events = events;
-		this.postApi = postApi;
-		this.quizApi = quizApi;
-		this.reportApi = reportApi;
-		this.commentApi = commentApi;
 	}
 
 	@Override
@@ -91,13 +93,13 @@ public class NotificationServiceImpl
 		Long targetIdLong = Long.valueOf(targetIdString);
 		switch (notification.getId().getTargetType()) {
 		case POST:
-			return postApi.read(targetIdLong);
+			return postPort.read(targetIdLong);
 		case QUIZ:
-			return quizApi.read(targetIdLong);
+			return quizPort.read(targetIdLong);
 		case COMMENT:
-			return commentApi.read(targetIdLong);
+			return commentPort.read(targetIdLong);
 		case REPORT:
-			return reportApi.read(targetIdLong);
+			return reportPort.read(targetIdLong);
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + notification.getId().getTargetType());
 		}

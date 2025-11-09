@@ -20,7 +20,7 @@ import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "QuizResult", description = "Manage and review quiz submission results from users.")
+@Tag(name = "Quiz Result", description = "Manage and review quiz submission results from users.")
 @ApiController("${app.api-prefix}/quiz-results")
 public class QuizResultController extends BaseController<QuizResultApi> implements IdDecodable {
 	public QuizResultController(QuizResultApi service) {
@@ -31,7 +31,7 @@ public class QuizResultController extends BaseController<QuizResultApi> implemen
 	@Operation(summary = "Submit quiz result", description = "Submit user answers for a specific quiz and receive the result including score, feedback, and review data.")
 	public ResponseEntity<QuizResultResponse> submit(@PathVariable String id,
 			@RequestBody QuizResultRequest quizResultRequest) {
-		return ResponseEntity.ok(service.submit(decodeId(id), quizResultRequest));
+		return ResponseEntity.ok(service.submit(id, quizResultRequest));
 	}
 
 	@GetMapping
@@ -44,7 +44,7 @@ public class QuizResultController extends BaseController<QuizResultApi> implemen
 	@GetMapping("{id}")
 	@Operation(summary = "Read quiz result detail", description = "Fetch detailed result information for a specific quiz submission, including answers and scoring breakdown.")
 	public ResponseEntity<QuizResultResponse> readDetail(@PathVariable String id) {
-		return ResponseEntity.ok(service.readDetail(decodeId(id)));
+		return ResponseEntity.ok(service.readDetail(id));
 	}
 
 	@Override

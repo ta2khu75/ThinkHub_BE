@@ -29,9 +29,9 @@ public class AuthProvider extends BaseEntityLong {
 	Long userId;
 	@Column(columnDefinition = "TEXT")
 	String accessToken;
-
 	@Column(columnDefinition = "TEXT")
 	String refreshToken;
+	String status;
 
 	@PrePersist
 	@PreUpdate

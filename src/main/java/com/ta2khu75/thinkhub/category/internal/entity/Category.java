@@ -34,14 +34,14 @@ public class Category extends BaseEntityLong {
 	String updatedBy;
 
 	@PreUpdate
-	public void normalizeName() {
+	public void preUpdate() {
 		if (name != null) {
 			name = name.trim().toLowerCase(); // chuẩn hóa
 		}
 	}
 
 	@PrePersist
-	public void makeSlug() {
+	public void prePersist() {
 		slug = SlugUtil.toSlug(name);
 		if (name != null) {
 			name = name.trim().toLowerCase(); // chuẩn hóa

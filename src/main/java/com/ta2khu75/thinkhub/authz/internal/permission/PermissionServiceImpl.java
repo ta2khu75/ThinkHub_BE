@@ -1,17 +1,19 @@
 package com.ta2khu75.thinkhub.authz.internal.permission;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionRequest;
+import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.PermissionResponse;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
-
-import jakarta.validation.Valid;
 
 @Service
 public class PermissionServiceImpl extends BaseService<Permission, Long, PermissionRepository, PermissionMapper>
@@ -22,51 +24,40 @@ public class PermissionServiceImpl extends BaseService<Permission, Long, Permiss
 	}
 
 	@Override
-	public PermissionResponse create(@Valid PermissionRequest request) {
-		Permission permission = mapper.toEntity(request);
-		permission = repository.save(permission);
-		return mapper.convert(permission);
-	}
-
-	@Override
-	public PermissionResponse update(Long id, @Valid PermissionRequest request) {
-		Permission permission = this.readEntity(id);
-		mapper.update(request, permission);
-		permission = repository.save(permission);
-		return mapper.convert(permission);
-	}
-
-	@Override
 	public PermissionResponse read(Long id) {
 		Permission permission = this.readEntity(id);
 		return mapper.convert(permission);
 	}
 
 	@Override
-	public void delete(Long id) {
-		repository.deleteById(id);
+	public Set<PermissionSummary> readAllSummaryByCodes(Collection<String> codes) {
+		if (validateCollection(codes).isEmpty()) {
+			return Collections.emptySet();
+		}
+		Set<String> uniqueCodes = new HashSet<>(codes);
+		List<Permission> entities = repository.findAllByCodeIn(uniqueCodes);
+		return entities.stream().map(mapper::toSummary).collect(Collectors.toSet());
+	}
+
+	private <T> Collection<T> validateCollection(Collection<T> items) {
+		if (items == null || items.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return items.stream().filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
 	}
 
 	@Override
-	public Set<PermissionResponse> readAllBySummary(Set<String> summaries) {
-		return repository.findAllBySummaryIn(summaries).stream().map(mapper::convert).collect(Collectors.toSet());
+	public PermissionResponse readByCode(String code) {
+		return mapper.convert(repository.findByCode(code).orElseThrow(() -> new NotFoundException(
+				"Could not find " + Permission.class.getSimpleName() + " with code: " + code)));
 	}
 
 	@Override
-	public PermissionResponse readBySummary(String summary) {
-		return mapper.convert(repository.findBySummary(summary)
-				.orElseThrow(() -> new NotFoundException("Could not find Permission with summary: " + summary)));
+	public List<PermissionSummary> saveAll(Collection<PermissionSummary> permissions) {
+		if (validateCollection(permissions).isEmpty()) {
+			return Collections.emptyList();
+		}
+		return repository.saveAll(permissions.stream().map(mapper::toEntity).collect(Collectors.toSet())).stream()
+				.map(mapper::toSummary).toList();
 	}
-
-	@Override
-	public PermissionResponse readByPatternAndMethod(String pattern, RequestMethod method) {
-		return repository.findByPatternAndMethod(pattern, method).map(mapper::convert).orElseThrow(()->new NotFoundException("Could not find Permission with pattern: " + pattern + " and method: " + method));
-	}
-
-	@Override
-	public Set<PermissionResponse> saveAll(Set<PermissionRequest> requests) {
-		return repository.saveAll(requests.stream().map(mapper::toEntity).collect(Collectors.toSet())).stream()
-				.map(mapper::convert).collect(Collectors.toSet());
-	}
-
 }

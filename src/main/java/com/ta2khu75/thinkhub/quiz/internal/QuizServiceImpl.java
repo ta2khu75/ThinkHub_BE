@@ -31,8 +31,8 @@ import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
-import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
@@ -41,7 +41,7 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper> implements QuizApi {
+class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper> implements QuizApi, IdDecodable {
 
 	private final ApplicationEventPublisher events;
 	private final QuizTagPort tagPort;
@@ -65,14 +65,15 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper
 		quiz.setPostIds(this.getPostIds(request));
 		quiz.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
 		QuizResponse response = this.save(quiz);
-		events.publishEvent(new QuizCreatedEvent(quiz.getAuthorId(), quiz.getId()));
+		events.publishEvent(new QuizCreatedEvent(response.getAuthor().id(), quiz.getId()));
 		return response;
 	}
 
 	@Override
-	public QuizResponse update(Long id, @Valid QuizRequest request) {
+	public QuizResponse update(String id, @Valid QuizRequest request) {
+		Long quizId = decodeId(id);
 		this.validateExistence(request);
-		Quiz quiz = readEntity(id);
+		Quiz quiz = readEntity(quizId);
 		mapper.update(request, quiz);
 		quiz.setTagIds(this.getTagIds(request));
 		quiz.setPostIds(this.getPostIds(request));
@@ -81,9 +82,15 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper
 
 	@Override
 	@Transactional(readOnly = true)
+	public QuizResponse read(String id) {
+		Long quizId = decodeId(id);
+		return read(quizId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public QuizResponse read(Long id) {
 		Quiz quiz = readEntity(id);
-		quiz.setQuestions(null);
 		QuizResponse response = mapper.convert(quiz);
 		response.setAuthor(userPort.readAuthor(quiz.getAuthorId()));
 		response.setTags(tagPort.readAllByIds(quiz.getTagIds()));
@@ -91,8 +98,9 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper
 	}
 
 	@Override
-	public void delete(Long id) {
-		Quiz quiz = this.readEntity(id);
+	public void delete(String id) {
+		Long quizId = decodeId(id);
+		Quiz quiz = this.readEntity(quizId);
 		quiz.setDeleted(true);
 		this.save(quiz);
 	}
@@ -154,15 +162,15 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper
 	@Override
 	@Transactional
 	@Cacheable(cacheNames = "dynamicCache", key = "quizDetail#id")
-	public QuizDetailResponse readDetail(Long id) {
-		return mapper.toDetailResponse(this.readEntity(id));
+	public QuizDetailResponse readDetail(String id) {
+		Long quizId = decodeId(id);
+		return mapper.toDetailResponse(this.readEntity(quizId));
 	}
 
 	@Override
-	public void checkExists(Long id) {
-		if (!repository.existsById(id)) {
-			throw new NotFoundException("Could not find quiz with id: " + id);
-		}
+	@Transactional
+	public QuizDetailResponse readDetail(Long id) {
+		return mapper.toDetailResponse(this.readEntity(id));
 	}
 
 	@Override
@@ -194,6 +202,18 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper
 	private QuizResponse save(Quiz quiz) {
 		quiz = repository.save(quiz);
 		return mapper.convert(quiz);
+	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.USER;
+	}
+
+	@Override
+	public void ensureExists(String id) {
+		Long quizId = decodeId(id);
+		this.assertExists(quizId);
+
 	}
 
 }

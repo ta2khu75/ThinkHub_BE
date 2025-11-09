@@ -19,7 +19,7 @@ import com.ta2khu75.thinkhub.shared.service.BaseService;
 import jakarta.validation.Valid;
 
 @Service
-public class CategoryServiceImpl extends BaseService<Category, Long, CategoryRepository, CategoryMapper>
+class CategoryServiceImpl extends BaseService<Category, Long, CategoryRepository, CategoryMapper>
 		implements CategoryApi {
 
 	private final CategoryMediaPort mediaPort;
@@ -80,5 +80,10 @@ public class CategoryServiceImpl extends BaseService<Category, Long, CategoryRep
 		response.setImageUrl(media.url());
 		response.setDefaultImageUrl(defaultMedia.url());
 		return response;
+	}
+
+	@Override
+	public void ensureExists(Long id) {
+		this.assertExists(id);
 	}
 }

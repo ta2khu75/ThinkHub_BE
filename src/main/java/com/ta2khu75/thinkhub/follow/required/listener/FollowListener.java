@@ -32,7 +32,7 @@ class FollowListener {
 		onCreateNotification(event.userId(), event.targetId(), NotificationTargetType.POST);
 	}
 
-	private void onCreateNotification(Long userId, Long targetId, NotificationTargetType targetType) {
+	private void onCreateNotification(String userId, Long targetId, NotificationTargetType targetType) {
 		Search search = new Search();
 		search.setPage(0);
 		search.setSize(1000);

@@ -25,7 +25,9 @@ public class Permission {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 	@Column(unique = true, nullable = false)
-	String summary;
+	String code;
+	@Column(unique = true, nullable = false)
+	String name;
 	String description;
 	@Column(nullable = false)
 	String pattern;

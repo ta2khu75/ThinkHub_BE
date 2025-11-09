@@ -8,10 +8,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
-import com.ta2khu75.thinkhub.user.api.dto.UserDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
+import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
-public record UserPrincipal(UserDto user, RoleDto role, AuthProvider provider) implements UserDetails, Serializable {
+public record UserPrincipal(UserSummary user, RoleSummary role, AuthProvider provider)
+		implements UserDetails, Serializable {
 
 	private static final long serialVersionUID = 7209939028389672571L;
 

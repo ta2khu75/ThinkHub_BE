@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
-import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.tag.api.TagApi;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
@@ -37,13 +36,6 @@ class TagServiceImpl extends BaseService<Tag, Long, TagRepository, TagMapper> im
 	}
 
 	@Override
-	public void checkExists(Long id) {
-		if (!repository.existsById(id)) {
-			throw new NotFoundException("Could not find tag with id: " + id);
-		}
-	}
-
-	@Override
 	public EntityType getEntityType() {
 		return EntityType.TAG;
 	}
@@ -67,5 +59,10 @@ class TagServiceImpl extends BaseService<Tag, Long, TagRepository, TagMapper> im
 	@Override
 	public TagDto readByName(String name) {
 		return repository.findByName(name).map(mapper::convert).orElse(null);
+	}
+
+	@Override
+	public void ensureExists(Long id) {
+		this.assertExists(id);
 	}
 }

@@ -1,13 +1,16 @@
 package com.ta2khu75.thinkhub.authz.internal.group;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
-import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupRequest;
+import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.PermissionGroupResponse;
-import com.ta2khu75.thinkhub.shared.service.CrudService;
 
-public interface PermissionGroupService extends CrudService<PermissionGroupRequest, PermissionGroupResponse, Integer> {
+public interface PermissionGroupService {
 	List<PermissionGroupResponse> readAll();
-	Optional<PermissionGroupResponse> findByName(String name);
+
+	Set<PermissionGroupSummary> readAllSummaryByCodes(Collection<String> codes);
+
+	List<PermissionGroupSummary> saveAll(Collection<PermissionGroupSummary> requests);
 }

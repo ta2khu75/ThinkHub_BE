@@ -7,12 +7,13 @@ import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 
 public interface FollowApi {
-	void follow(Long followingId);
+	void follow(String followingId);
 
-	void unFollow(Long followingId);
+	void unFollow(String followingId);
 
-	FollowStatusResponse isFollowing(Long followingId);
+	FollowStatusResponse isFollowing(String followingId);
 
-	PageResponse<AuthorResponse> readAuthorPage(Long followingId, FollowDirection direction, Search search);
-	PageResponse<FollowResponse> readPage(Long followingId, FollowDirection direction, Search search);	
+	PageResponse<AuthorResponse> readAuthorPage(String followingId, FollowDirection direction, Search search);
+
+	PageResponse<FollowResponse> readPage(String followingId, FollowDirection direction, Search search);
 }

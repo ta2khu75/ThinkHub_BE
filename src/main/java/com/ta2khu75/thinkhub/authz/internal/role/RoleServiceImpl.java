@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ta2khu75.thinkhub.authz.api.dto.RoleDto;
+import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.authz.internal.permission.Permission;
@@ -17,7 +17,7 @@ import com.ta2khu75.thinkhub.shared.service.BaseService;
 import jakarta.validation.Valid;
 
 @Service
-public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, RoleMapper> implements RoleService {
+class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, RoleMapper> implements RoleService {
 
 	protected RoleServiceImpl(RoleRepository repository, RoleMapper mapper) {
 		super(repository, mapper);
@@ -77,17 +77,17 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	}
 
 	@Override
-	public RoleDto readDtoByName(String name) {
+	public RoleSummary readSummaryByName(String name) {
 		Role role = repository.findByName(name)
 				.orElseThrow(() -> new NotFoundException("Could not find Role with name: " + name));
-		return mapper.toDto(role);
+		return mapper.toSummary(role);
 	}
 
 	@Override
 	@Transactional
-	public RoleDto readDto(Long id) {
+	public RoleSummary readSummary(Long id) {
 		Role role = this.readEntity(id);
-		return mapper.toDto(role);
+		return mapper.toSummary(role);
 	}
 
 	@Override
@@ -96,15 +96,13 @@ public class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, Rol
 	}
 
 	@Override
-	public void checkExists(Long id) {
-		if (!repository.existsById(id)) {
-			throw new NotFoundException("Could not find role with id: " + id);
-		}
+	public EntityType getEntityType() {
+		return EntityType.ROLE;
 	}
 
 	@Override
-	public EntityType getEntityType() {
-		return EntityType.ROLE;
+	public void ensureExists(Long id) {
+		this.assertExists(id);
 	}
 
 }

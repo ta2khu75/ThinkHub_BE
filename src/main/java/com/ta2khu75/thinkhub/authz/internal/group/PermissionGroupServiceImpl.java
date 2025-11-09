@@ -1,61 +1,24 @@
 package com.ta2khu75.thinkhub.authz.internal.group;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupRequest;
+import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.PermissionGroupResponse;
-import com.ta2khu75.thinkhub.authz.internal.permission.Permission;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
-
-import jakarta.validation.Valid;
 
 @Service
 public class PermissionGroupServiceImpl
 		extends BaseService<PermissionGroup, Integer, PermissionGroupRepository, PermissionGroupMapper>
 		implements PermissionGroupService {
+
 	protected PermissionGroupServiceImpl(PermissionGroupRepository repository, PermissionGroupMapper mapper) {
 		super(repository, mapper);
-	}
-
-	@Override
-	public PermissionGroupResponse create(@Valid PermissionGroupRequest request) {
-		PermissionGroup permissionGroup = mapper.toEntity(request);
-		permissionGroup.setPermissions(request.permissionIds().stream().map(permissionId -> {
-			Permission permission = new Permission();
-			permission.setId(permissionId);
-			return permission;
-		}).toList());
-		permissionGroup = repository.save(permissionGroup);
-		return mapper.convert(permissionGroup);
-	}
-
-	@Override
-	public PermissionGroupResponse update(Integer id, @Valid PermissionGroupRequest request) {
-		PermissionGroup permissionGroup = this.readEntity(id);
-		mapper.update(request, permissionGroup);
-		permissionGroup.setPermissions(request.permissionIds().stream().map(permissionId -> {
-			Permission permission = new Permission();
-			permission.setId(permissionId);
-			return permission;
-		}).collect(Collectors.toList()));
-		permissionGroup = repository.save(permissionGroup);
-		return mapper.convert(permissionGroup);
-	}
-
-	@Override
-	public PermissionGroupResponse read(Integer id) {
-		PermissionGroup permissionGroup = this.readEntity(id);
-		return mapper.convert(permissionGroup);
-	}
-
-	@Override
-	public void delete(Integer id) {
-		repository.deleteById(id);
 	}
 
 	@Override
@@ -65,7 +28,13 @@ public class PermissionGroupServiceImpl
 	}
 
 	@Override
-	public Optional<PermissionGroupResponse> findByName(String name) {
-		return repository.findByName(name).map(mapper::convert);
+	public List<PermissionGroupSummary> saveAll(Collection<PermissionGroupSummary> requests) {
+		return repository.saveAll(requests.stream().map(mapper::toEntity).collect(Collectors.toSet())).stream()
+				.map(mapper::toSummary).toList();
+	}
+
+	@Override
+	public Set<PermissionGroupSummary> readAllSummaryByCodes(Collection<String> codes) {
+		return repository.findAllByCodeIn(codes).stream().map(mapper::toSummary).collect(Collectors.toSet());
 	}
 }

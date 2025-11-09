@@ -30,8 +30,9 @@ public class PermissionGroup {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
 	@Column(unique = true, nullable = false)
+	String code;
+	@Column(unique = true, nullable = false)
 	String name;
-	@Column
 	String description;
 	@OneToMany @JoinColumn(name = "group_id")
 	List<Permission> permissions;
