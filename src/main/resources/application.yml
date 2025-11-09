@@ -1,8 +1,16 @@
 # Conversion to YAML from Properties formar report
 # Warnings:
 # - The yaml file had comments which are lost in the refactoring!
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+    enabled: true
+  api-docs:
+    path: ${app.api-prefix}/api-docs
+    enabled: true
 app:
   api-prefix: /api/v1
+  frontend-url: http://localhost:3000
 spring:
   application:
     name: thinkhub
@@ -78,6 +86,34 @@ spring:
     property-naming-strategy: SNAKE_CASE
     serialization:
       indent-output: true
+  security:
+   oauth2:
+     client:
+       registration:
+         github:
+            client-id: ${github.client-id}
+            client-secret: ${github.client-secret}
+            scope: user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+         google:
+            client-id: ${google.client-id}
+            client-secret: ${google.client-secret}
+            scope:
+              - openid
+              - email
+              - profile 
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+       provider:
+         github:
+           authorization-uri: https://github.com/login/oauth/authorize
+           token-uri: https://github.com/login/oauth/access_token
+           user-info-uri: https://api.github.com/user
+           user-name-attribute: id
+         google:
+           authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+           token-uri: https://oauth2.googleapis.com/token
+           user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+           user-name-attribute: sub
   modulith:
     detection-strategy: com.ta2khu75.thinkhub.config.CustomApplicationModuleDetectionStrategy
 firebase:

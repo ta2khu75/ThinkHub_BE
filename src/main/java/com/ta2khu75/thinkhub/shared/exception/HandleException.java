@@ -98,7 +98,7 @@ public class HandleException implements ResponseBodyAdvice<Object> {
 			@NonNull Class<? extends HttpMessageConverter<?>> converterType) {
 		String uri = request.getRequestURI();
 
-		return !uri.startsWith(apiPrefix + "/swagger") && !uri.startsWith(apiPrefix + "/api-docs")
+		return !uri.startsWith("/swagger") && !uri.startsWith(apiPrefix + "/api-docs")
 				&& !uri.startsWith("/swagger-ui");
 	}
 

@@ -1,7 +1,6 @@
 package com.ta2khu75.thinkhub.authz.internal.permission;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
@@ -13,9 +12,7 @@ public interface PermissionMapper extends Converter<Permission, PermissionRespon
 	@Override
 	PermissionResponse convert(Permission entity);
 
-	@Mapping(target = "permissionIds", ignore = true)
 	PermissionSummary toSummary(Permission entity);
 
-	@Mapping(target = "permissions", ignore = true)
 	Permission toEntity(PermissionSummary summary);
 }

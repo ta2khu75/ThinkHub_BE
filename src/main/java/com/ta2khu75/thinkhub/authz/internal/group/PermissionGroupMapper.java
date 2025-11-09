@@ -13,9 +13,10 @@ public interface PermissionGroupMapper extends Converter<PermissionGroup, Permis
 	@Override
 	PermissionGroupResponse convert(PermissionGroup entity);
 
-	@Mapping(sou)
+	@Mapping(target = "permissionIds", ignore = true)
 	PermissionGroupSummary toSummary(PermissionGroup permissionGroup);
 
+	@Mapping(target = "permissions", ignore = true)
 	PermissionGroup toEntity(PermissionGroupSummary permissionGroupSummary);
 
 }
