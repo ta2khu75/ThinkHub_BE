@@ -12,33 +12,36 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderLocal;
+import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderSummary;
+import com.ta2khu75.thinkhub.authProvider.internal.entity.ProviderType;
 import com.ta2khu75.thinkhub.authn.api.AuthnApi;
-import com.ta2khu75.thinkhub.authn.api.dto.AuthResponse;
+import com.ta2khu75.thinkhub.authn.api.dto.AuthSummary;
 import com.ta2khu75.thinkhub.authn.api.dto.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.LoginRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.RegisterRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.TokenResponse;
 import com.ta2khu75.thinkhub.authn.internal.config.TokenType;
-import com.ta2khu75.thinkhub.authn.internal.model.AuthProvider;
-import com.ta2khu75.thinkhub.authn.internal.model.ProviderType;
 import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
-import com.ta2khu75.thinkhub.authn.internal.repository.AuthProviderRepository;
 import com.ta2khu75.thinkhub.authn.internal.service.JwtService;
-import com.ta2khu75.thinkhub.authn.internal.util.PasswordGenerator;
+import com.ta2khu75.thinkhub.authn.internal.util.PasswordUtil;
+import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthProviderPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
 import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
+import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.exception.MismatchException;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
+import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserRequest;
-import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
+import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserStatusSummary;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
@@ -47,16 +50,17 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 class AuthnServiceImpl implements AuthnApi, IdDecodable {
-	private final AuthProviderRepository repository;
+
+	private final AuthenticationManager authenticationManager;
+	private final AuthnAuthProviderPort authProviderPort;
 	private final AuthnUserPort userPort;
 	private final AuthnAuthzPort authzPort;
-	private final AuthenticationManager authenticationManager;
 	private final JwtService jwtService;
 	private final RedisService redisService;
 	private final PasswordEncoder passwordEncoder;
 
 	@Override
-	public AuthResponse login(LoginRequest request) {
+	public AuthSummary login(LoginRequest request) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(request.email().toLowerCase(), request.password()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -69,17 +73,12 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 		if (!request.password().equals(request.confirmPassword()))
 			throw new MismatchException("password and confirm password not matches");
 		RoleResponse role = authzPort.readByName(RoleDefault.USER.name());
-		UserStatusSummary status = new UserStatusSummary(null, false, true, role.id());
+		UserStatusRequest status = new UserStatusRequest(false, true, role.id());
 		UserRequest user = request.user();
-		UserSummary userSummary = new UserSummary(null, user.firstName(), user.lastName(), request.email(), null,
+		UserCreateRequest userCreate = new UserCreateRequest(request.email(), user.firstName(), user.lastName(), null,
 				status);
-		UserSummary userResponse = userPort.create(userSummary);
-		AuthProvider authProvider = new AuthProvider();
-		authProvider.setEmail(request.email());
-		authProvider.setPassword(passwordEncoder.encode(request.password()));
-		authProvider.setUserId(decodeId(userResponse.id()));
-		authProvider.setProvider(ProviderType.LOCAL);
-		repository.save(authProvider);
+		String password = passwordEncoder.encode(request.password());
+		this.createAuth(userCreate, password);
 	}
 
 	@Override
@@ -87,17 +86,17 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 	public void changePassword(ChangePasswordRequest request) {
 		if (!request.newPassword().equals(request.confirmPassword()))
 			throw new MismatchException("New password and confirm password not matches");
-		AuthProvider authProvider = repository
-				.findByUserIdAndProvider(SecurityUtil.getCurrentUserIdDecode(), ProviderType.LOCAL)
-				.orElseThrow(() -> new UnauthorizedException("User not found"));
-		if (!passwordEncoder.matches(request.password(), authProvider.getPassword()))
+		if (request.newPassword().equals(request.password()))
+			throw new InvalidDataException("Current password and new password are same");
+		AuthProviderSummary authProvider = authProviderPort.readByEmailAndProvider(SecurityUtil.getCurrentUserId(),
+				ProviderType.LOCAL);
+		if (!passwordEncoder.matches(request.password(), authProvider.password()))
 			throw new MismatchException("Password not matches");
-		authProvider.setPassword(passwordEncoder.encode(request.newPassword()));
-		repository.save(authProvider);
+		authProviderPort.updatePassword(authProvider.id(), request.password());
 	}
 
 	@Override
-	public AuthResponse refreshToken(String token) {
+	public AuthSummary refreshToken(String token) {
 		Jwt jwt = jwtService.validateToken(token, TokenType.REFRESH);
 		String id = jwt.getId().toString();
 		String userId = jwt.getSubject();
@@ -121,13 +120,10 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 
 	}
 
-	private AuthResponse makeAuthResponse(UserPrincipal auth) {
-		UserSummary user = auth.user();
-		RoleSummary role = auth.role();
+	private AuthSummary makeAuthResponse(UserPrincipal auth) {
 		TokenResponse refreshToken = jwtService.createJwt(auth, TokenType.REFRESH);
 		TokenResponse accessToken = jwtService.createJwt(auth, TokenType.ACCESS);
-		UserResponse userResponse = new UserResponse(user.id(), user.firstName(), user.lastName(), user.username());
-		return new AuthResponse(userResponse, role.name(), accessToken, refreshToken);
+		return new AuthSummary(accessToken, refreshToken);
 	}
 
 	@Override
@@ -136,23 +132,21 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 	}
 
 	@Override
-	public void create(UserSummary user) {
-		AuthProvider authProvider = new AuthProvider();
-		authProvider.setEmail(user.email());
-		authProvider.setPassword(passwordEncoder.encode(PasswordGenerator.generate(12)));
-		authProvider.setUserId(decodeId(user.id()));
-		authProvider.setProvider(ProviderType.LOCAL);
-		repository.save(authProvider);
+	public void create(UserCreateRequest request, String password) {
+		String passwordEncode = passwordEncoder.encode(password);
+		createAuth(request, passwordEncode);
 	}
 
 	@Override
-	public void create(UserSummary user, String password) {
-		AuthProvider authProvider = new AuthProvider();
-		authProvider.setEmail(user.email());
-		authProvider.setPassword(passwordEncoder.encode(password));
-		authProvider.setUserId(decodeId(user.id()));
-		authProvider.setProvider(ProviderType.LOCAL);
-		repository.save(authProvider);
+	public void createGeneratorPassword(UserCreateRequest request) {
+		String password = passwordEncoder.encode(PasswordUtil.generate(8));
+		createAuth(request, password);
+	}
+
+	private void createAuth(UserCreateRequest request, String password) {
+		UserSummary user = userPort.create(request);
+		AuthProviderLocal authProvider = new AuthProviderLocal(user.email(), password, user.id());
+		authProviderPort.create(authProvider);
 	}
 
 }

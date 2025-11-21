@@ -17,7 +17,7 @@ import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 @Service
-public class MediaServiceImpl extends BaseService<Media, Long, MediaRepository, MediaMapper> implements MediaApi {
+class MediaServiceImpl extends BaseService<Media, Long, MediaRepository, MediaMapper> implements MediaApi {
 	private final StorageStrategy storageStrategy;
 
 	public MediaServiceImpl(MediaRepository repository, MediaMapper mapper, StorageStrategy storageStrategy) {

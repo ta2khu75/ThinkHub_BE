@@ -16,9 +16,7 @@ import com.ta2khu75.thinkhub.user.api.dto.UserStatusResponse;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 public interface UserApi extends SearchService<UserSearch, UserResponse>, ExistsService<Long> {
-	UserSummary create(UserSummary user);
-
-	UserResponse create(UserCreateRequest request);
+	UserSummary create(UserCreateRequest request);
 
 	UserResponse update(String userId, UserRequest request);
 

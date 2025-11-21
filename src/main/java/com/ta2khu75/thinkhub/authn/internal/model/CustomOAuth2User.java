@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 public class CustomOAuth2User implements OidcUser {
-
 	private final OAuth2User oauth2User;
 	private final OidcUser oidcUser; // null nếu provider không phải OIDC
 	private final UserPrincipal principal;

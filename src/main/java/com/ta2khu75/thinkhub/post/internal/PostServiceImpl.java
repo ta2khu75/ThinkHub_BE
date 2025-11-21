@@ -38,7 +38,7 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-public class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper>
+class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper>
 		implements PostApi, IdDecodable {
 	private final ApplicationEventPublisher events;
 	private final PostUserPort userPort;

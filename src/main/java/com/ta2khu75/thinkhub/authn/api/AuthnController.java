@@ -11,19 +11,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ta2khu75.thinkhub.authn.api.dto.AuthResponse;
+import com.ta2khu75.thinkhub.authn.api.dto.AuthSummary;
 import com.ta2khu75.thinkhub.authn.api.dto.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.LoginRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.RegisterRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.TokenResponse;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
+import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 
-@Tag(name = "Authn", description = "Handle user login, registration, logout and token refresh.") @ApiController("${app.api-prefix}/authn")
+@Tag(name = "Authn", description = "Handle user login, registration, logout and token refresh.")
+@ApiController("${app.api-prefix}/authn")
 public class AuthnController extends BaseController<AuthnApi> {
 	private static final String REFRESH_TOKEN = "refresh_token";
 	private static final String ACCESS_TOKEN = "access_token";
@@ -32,8 +35,16 @@ public class AuthnController extends BaseController<AuthnApi> {
 		super(service);
 	}
 
+	@PostMapping("/create-user")
+	@Operation(summary = "Register a new user", description = "Create a new user account with email and password. A confirmation email may be sent.")
+	public ResponseEntity<Void> register(@Valid @RequestBody UserCreateRequest request) throws MessagingException {
+		service.createGeneratorPassword(request);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
 	@PostMapping("/register")
-	@Operation(summary = "Register a new user" , description = "Create a new user account with email and password. A confirmation email may be sent.") public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
+	@Operation(summary = "Register a new user", description = "Create a new user account with email and password. A confirmation email may be sent.")
+	public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) throws MessagingException {
 		service.register(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -49,7 +60,7 @@ public class AuthnController extends BaseController<AuthnApi> {
 	@PostMapping("/login")
 	@Operation(summary = "Login", description = "Authenticate the user and return an access token and refresh token.")
 	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-		AuthResponse response = service.login(request);
+		AuthSummary response = service.login(request);
 		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
 		ResponseCookie cookieAccess = createCookie(ACCESS_TOKEN, response.accessToken());
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
@@ -59,7 +70,7 @@ public class AuthnController extends BaseController<AuthnApi> {
 	@PostMapping("/refresh-token")
 	@Operation(summary = "Refresh access token", description = "Use the refresh token from cookie to get a new access token.")
 	public ResponseEntity<AuthResponse> refreshToken(@CookieValue(REFRESH_TOKEN) String refreshToken) {
-		AuthResponse response = service.refreshToken(refreshToken);
+		AuthSummary response = service.refreshToken(refreshToken);
 		ResponseCookie cookieRefresh = createCookie(REFRESH_TOKEN, response.refreshToken());
 		ResponseCookie cookieAccess = createCookie(ACCESS_TOKEN, response.accessToken());
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookieRefresh.toString(), cookieAccess.toString())
@@ -73,8 +84,8 @@ public class AuthnController extends BaseController<AuthnApi> {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
-	private AuthResponse makeAuthResponse(AuthResponse auth) {
-		return new AuthResponse(auth.user(), auth.role(), null, null);
+	private AuthResponse makeAuthResponse(AuthSummary auth) {
+		return new AuthResponse(auth.accessToken().getToken(), auth.refreshToken().getToken());
 	}
 
 	private ResponseCookie createCookie(String name, TokenResponse toke) {

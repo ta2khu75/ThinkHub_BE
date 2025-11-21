@@ -5,10 +5,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.authn.internal.model.AuthProvider;
-import com.ta2khu75.thinkhub.authn.internal.model.ProviderType;
+import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderSummary;
+import com.ta2khu75.thinkhub.authProvider.internal.entity.ProviderType;
 import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
-import com.ta2khu75.thinkhub.authn.internal.repository.AuthProviderRepository;
+import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthProviderPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
 import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
@@ -24,13 +24,13 @@ import lombok.experimental.FieldDefaults;
 public class UserDetailsServiceImpl implements UserDetailsService {
 	AuthnUserPort userPort;
 	AuthnAuthzPort authzPort;
-	AuthProviderRepository repository;
+	AuthnAuthProviderPort authProviderPort;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		try {
-			AuthProvider authProvider = repository.findByEmailAndProvider(username, ProviderType.LOCAL).orElseThrow();
-			UserSummary user = userPort.readSummary(authProvider.getUserId());
+			AuthProviderSummary authProvider = authProviderPort.readByEmailAndProvider(username, ProviderType.LOCAL);
+			UserSummary user = userPort.readSummary(authProvider.userId());
 			RoleSummary role = authzPort.readSummary(user.status().roleId());
 			return new UserPrincipal(user, role, authProvider);
 		} catch (Exception e) {

@@ -41,22 +41,10 @@ import com.ta2khu75.thinkhub.user.internal.mapper.UserMapper;
 import com.ta2khu75.thinkhub.user.internal.repository.UserRepository;
 import com.ta2khu75.thinkhub.user.internal.repository.UserStatusRepository;
 import com.ta2khu75.thinkhub.user.projection.internal.projection.Author;
-import com.ta2khu75.thinkhub.user.required.port.UserAuthnPort;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper> implements UserApi, IdDecodable {
-
-//	public UserServiceImpl(UserRepository repository, UserMapper mapper, UserAuthnPort authnPort,
-//			RedisService redisService, UserStatusRepository statusRepository, ApplicationEventPublisher events) {
-//		super(repository, mapper);
-////		this.authnPort = authnPort;
-//		this.redisService = redisService;
-//		this.statusRepository = statusRepository;
-//		this.events = events;
-//	}
-
-	RedisService redisService;
 
 	public UserServiceImpl(UserRepository repository, UserMapper mapper, RedisService redisService,
 			UserStatusRepository statusRepository, ApplicationEventPublisher events) {
@@ -66,16 +54,17 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 		this.events = events;
 	}
 
+	RedisService redisService;
 	UserStatusRepository statusRepository;
 	ApplicationEventPublisher events;
 
 //	@Override
-//	public UserSummary createSummary(UserCreate request) {
-//		if (repository.existsByEmail(request.email().toLowerCase()))
+//	public UserSummary create(UserSummary summary) {
+//		if (repository.existsByEmail(summary.email().toLowerCase()))
 //			throw new AlreadyExistsException("Email already exists");
-//		User user = mapper.toEntity(request);
-//		user.setUsername(request.firstName() + " " + request.lastName());
-//		UserStatus status = mapper.toEntity(request.status());
+//		User user = mapper.toEntity(summary);
+//		user.setUsername(summary.firstName() + " " + summary.lastName());
+//		UserStatus status = mapper.toEntity(summary.status());
 //		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
 //		user.setStatus(status);
 //		try {
@@ -88,12 +77,13 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 //	}
 
 	@Override
-	public UserSummary create(UserSummary summary) {
-		if (repository.existsByEmail(summary.email().toLowerCase()))
+	public UserSummary create(UserCreateRequest request) {
+		if (repository.existsByEmail(request.email().toLowerCase()))
 			throw new AlreadyExistsException("Email already exists");
-		User user = mapper.toEntity(summary);
-		user.setUsername(summary.firstName() + " " + summary.lastName());
-		UserStatus status = mapper.toEntity(summary.status());
+		User user = mapper.toEntity(request);
+		if (user.getUsername() == null)
+			user.setUsername(request.firstName() + " " + request.lastName());
+		UserStatus status = mapper.toEntity(request.status());
 		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
 		user.setStatus(status);
 		try {
@@ -232,37 +222,6 @@ class UserServiceImpl extends BaseService<User, Long, UserRepository, UserMapper
 	public void ensureExists(Long id) {
 		this.assertExists(id);
 	}
-
-	@Override
-	public UserResponse create(UserCreateRequest request) {
-		if (repository.existsByEmail(request.email().toLowerCase()))
-			throw new AlreadyExistsException("Email already exists");
-		User user = mapper.toEntity(request);
-		if (user.getUsername() == null)
-			user.setUsername(request.firstName() + " " + request.lastName());
-		UserStatus status = mapper.toEntity(request.status());
-		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
-		user.setStatus(status);
-		try {
-			user = repository.save(user);
-		} catch (DataIntegrityViolationException e) {
-			e.printStackTrace();
-			throw new AlreadyExistsException(e.getMessage());
-		}
-		UserSummary summary = mapper.toSummary(user);
-//		authnPort.create(summary);
-		return mapper.convert(user);
-	}
-//	@Override
-//	public UserResponse create(UserCreateRequest request) {
-//		User user = mapper.toEntity(request);
-//		UserStatus status = mapper.toEntity(request.status());
-//		user.setStatus(status);
-//		events.publishEvent(new CheckExistsEvent<>(EntityType.ROLE, status.getRoleId()));
-//		user = repository.save(user);
-//		UserSummary response = mapper.toSummary(user);
-//		return mapper.convert(user);
-//	}
 
 	@Override
 	public long count() {

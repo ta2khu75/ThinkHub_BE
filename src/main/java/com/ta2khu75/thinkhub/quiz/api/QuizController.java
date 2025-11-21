@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Tag(name = "Quiz", description = "Create, manage, take, and interact with quizzes including commenting and reporting.")
 @ApiController("${app.api-prefix}/quizzes")
-public class QuizController extends BaseController<QuizApi>
+class QuizController extends BaseController<QuizApi>
 		implements CrudController<QuizRequest, QuizResponse, String>, IdDecodable {
 
 	protected QuizController(QuizApi service) {

@@ -25,8 +25,8 @@ import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.ApiScanner;
 import com.ta2khu75.thinkhub.user.api.UserApi;
-import com.ta2khu75.thinkhub.user.api.dto.UserStatusSummary;
-import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
+import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
+import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,16 +39,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataInitializer implements ApplicationRunner {
-	AuthzApi authzApi;
 	AuthnApi authnApi;
+	AuthzApi authzApi;
 	UserApi userApi;
 	ApiScanner apiScanner;
 	PublicEndpointRegistry publicEndpointRegistry;
 
 	private void createUserAdmin() {
-		UserStatusSummary status = new UserStatusSummary(null, true, true, this.initDefaultRoles());
-		UserSummary user = new UserSummary(null, "admin", "admin", "admin@g.com", "loading", status);
-		user = userApi.create(user);
+		UserStatusRequest status = new UserStatusRequest(true, true, this.initDefaultRoles());
+		UserCreateRequest user = new UserCreateRequest("loading@g.com", "loading", "loading", "loading", status);
 		authnApi.create(user, "123456");
 	}
 

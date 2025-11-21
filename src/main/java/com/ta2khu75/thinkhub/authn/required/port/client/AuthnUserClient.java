@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
 import com.ta2khu75.thinkhub.user.api.UserApi;
+import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
@@ -26,11 +27,6 @@ public class AuthnUserClient extends BaseClient<UserApi> implements AuthnUserPor
 	}
 
 	@Override
-	public UserSummary create(UserSummary request) {
-		return api.create(request);
-	}
-
-	@Override
 	public UserResponse readByEmail(String email) {
 		return api.readByEmail(email);
 	}
@@ -38,6 +34,11 @@ public class AuthnUserClient extends BaseClient<UserApi> implements AuthnUserPor
 	@Override
 	public UserSummary readSummaryByEmail(String email) {
 		return api.readSummaryByEmail(email);
+	}
+
+	@Override
+	public UserSummary create(UserCreateRequest request) {
+		return api.create(request);
 	}
 
 }

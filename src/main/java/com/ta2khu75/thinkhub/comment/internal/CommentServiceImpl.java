@@ -24,7 +24,7 @@ import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.UserApi;
 
 @Service
-public class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository, CommentMapper>
+class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository, CommentMapper>
 		implements CommentApi {
 	private final UserApi accountService;
 

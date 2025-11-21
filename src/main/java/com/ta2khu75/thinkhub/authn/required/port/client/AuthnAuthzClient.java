@@ -9,7 +9,7 @@ import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
 
 @Component
-public class AuthnAuthzClient extends BaseClient<AuthzApi> implements AuthnAuthzPort {
+class AuthnAuthzClient extends BaseClient<AuthzApi> implements AuthnAuthzPort {
 
 	protected AuthnAuthzClient(AuthzApi api) {
 		super(api);

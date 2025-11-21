@@ -28,7 +28,7 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NotificationServiceImpl
+class NotificationServiceImpl
 		extends BaseService<Notification, NotificationId, NotificationRepository, NotificationMapper>
 		implements NotificationApi {
 	NotificationPostPort postPort;

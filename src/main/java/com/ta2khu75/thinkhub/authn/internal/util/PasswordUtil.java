@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PasswordGenerator {
+public class PasswordUtil {
 	private static final SecureRandom random = new SecureRandom();
 
 	private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final String LOWER = "abcdefghijklmnopqrstuvwxyz";
 	private static final String DIGITS = "0123456789";
 	private static final String SPECIAL = "!@#$%^&*()-_=+";
+
+	private PasswordUtil() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static String generate(int length) {
 		if (length < 8)

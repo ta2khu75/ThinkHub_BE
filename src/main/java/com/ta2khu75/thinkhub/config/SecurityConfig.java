@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.authn.internal.config;
+package com.ta2khu75.thinkhub.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -25,6 +24,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 
+import com.ta2khu75.thinkhub.authn.internal.config.CookieTokenResolver;
+import com.ta2khu75.thinkhub.authn.internal.config.JwtProviderFactory;
+import com.ta2khu75.thinkhub.authn.internal.config.TokenType;
 import com.ta2khu75.thinkhub.authn.internal.service.OAuth2LoginSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
@@ -33,14 +35,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
-	private final AccessDeniedHandler accessDeniedHandler;
 	private final AuthorizationManager<RequestAuthorizationContext> authorizationManager;
+	private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService;
+	private final OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
 	private final AuthenticationEntryPoint authenticationEntryPoint;
+	private final AccessDeniedHandler accessDeniedHandler;
 	private final JwtProviderFactory jwtProviderFactory;
 	private final UserDetailsService userDetailsService;
-	private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService;
 	private final OidcUserService oidcUserService;
-	private final OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
+	private final PasswordEncoder passwordEncoder;
 	@Value("${springdoc.swagger-ui.path}")
 	private String swaggerUiPath;
 	@Value("${springdoc.api-docs.path}")
@@ -73,7 +76,7 @@ public class SecurityConfig {
 	AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
 		AuthenticationManagerBuilder authenticationManagerBuilder = http
 				.getSharedObject(AuthenticationManagerBuilder.class);
-		authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+		authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
 		return authenticationManagerBuilder.build();
 	}
 
@@ -87,8 +90,4 @@ public class SecurityConfig {
 		return jwtAuthenticationConverter;
 	}
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
 }

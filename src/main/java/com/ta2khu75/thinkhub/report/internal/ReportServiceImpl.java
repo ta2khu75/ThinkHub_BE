@@ -27,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ReportServiceImpl extends BaseService<Report, Long, ReportRepository, ReportMapper> implements ReportApi {
+class ReportServiceImpl extends BaseService<Report, Long, ReportRepository, ReportMapper> implements ReportApi {
 	private final UserApi accountService;
 	private final ApplicationEventPublisher events;
 

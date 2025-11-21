@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.authn.internal.config;
+package com.ta2khu75.thinkhub.authz.internal.config;
 
 import java.util.function.Supplier;
 
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
 import com.google.api.gax.rpc.UnauthenticatedException;
-import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
+import com.ta2khu75.thinkhub.authz.internal.role.RoleService;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
@@ -26,11 +26,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class AuthorizationManagerImpl implements AuthorizationManager<RequestAuthorizationContext> {
-	AuthnAuthzPort authzPort;
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+class EndpointAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 	RedisService redisService;
+	RoleService roleService;
 
 	private boolean isAdmin(String roleName) {
 		return RoleDefault.ADMIN.name().equals(roleName);
@@ -78,7 +78,7 @@ public class AuthorizationManagerImpl implements AuthorizationManager<RequestAut
 		if (isAdmin(roleName)) {
 			return new AuthorizationDecision(true);
 		}
-		RoleSummary role = authzPort.readSummaryByName(roleName);
+		RoleSummary role = roleService.readSummaryByName(roleName);
 		boolean isAllowed = isAllowedEndpoint(role, requestUrl, httpMethod);
 		if (isAllowed) {
 			return new AuthorizationDecision(true);

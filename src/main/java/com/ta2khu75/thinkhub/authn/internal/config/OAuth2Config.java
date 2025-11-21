@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.authn.internal.service;
+package com.ta2khu75.thinkhub.authn.internal.config;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,18 +15,20 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import com.ta2khu75.thinkhub.authProvider.internal.entity.ProviderType;
 import com.ta2khu75.thinkhub.authn.internal.model.CustomOAuth2User;
-import com.ta2khu75.thinkhub.authn.internal.model.ProviderType;
 import com.ta2khu75.thinkhub.authn.internal.model.ProviderUser;
 import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
+import com.ta2khu75.thinkhub.authn.internal.service.GitHubEmailFetcher;
+import com.ta2khu75.thinkhub.authn.internal.service.OAuth2Service;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
-public class OAuth2ServicesConfig {
+public class OAuth2Config {
 	private final OAuth2Service oauth2Service;
-	private final static String ACCESS_TOKEN = "access_token";
+	private final String ACCESS_TOKEN = "access_token";
 
 	@Bean
 	OidcUserService oidcUserService() {
@@ -51,7 +53,7 @@ public class OAuth2ServicesConfig {
 			OAuth2User oauth2User = delegate.loadUser(userRequest);
 			String registrationId = userRequest.getClientRegistration().getRegistrationId();
 			Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
-			attributes.put("access_token", userRequest.getAccessToken().getTokenValue());
+			attributes.put(ACCESS_TOKEN, userRequest.getAccessToken().getTokenValue());
 			ProviderUser providerUser = getProviderUser(registrationId, attributes);
 			UserPrincipal principal = oauth2Service.authenticationWithProviderUser(providerUser);
 			return new CustomOAuth2User(oauth2User, principal);

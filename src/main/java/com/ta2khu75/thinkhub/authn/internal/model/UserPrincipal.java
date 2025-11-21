@@ -1,6 +1,5 @@
 package com.ta2khu75.thinkhub.authn.internal.model;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,14 +7,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
-public record UserPrincipal(UserSummary user, RoleSummary role, AuthProvider provider)
-		implements UserDetails, Serializable {
-
-	private static final long serialVersionUID = 7209939028389672571L;
-
+public record UserPrincipal(UserSummary user, RoleSummary role, AuthProviderSummary provider) implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
@@ -23,7 +19,7 @@ public record UserPrincipal(UserSummary user, RoleSummary role, AuthProvider pro
 
 	@Override
 	public String getPassword() {
-		return provider.getPassword();
+		return provider.password();
 	}
 
 	@Override

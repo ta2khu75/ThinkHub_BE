@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.authn.internal.model;
+package com.ta2khu75.thinkhub.authProvider.internal.entity;
 
 import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
 
@@ -20,18 +20,13 @@ import lombok.experimental.FieldDefaults;
 public class AuthProvider extends BaseEntityLong {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	ProviderType provider;
-	String providerUserId;
+	ProviderType type;
+	String providerId;
 	@Column(nullable = false)
 	String email;
 	String password;
 	@Column(nullable = false)
 	Long userId;
-	@Column(columnDefinition = "TEXT")
-	String accessToken;
-	@Column(columnDefinition = "TEXT")
-	String refreshToken;
-	String status;
 
 	@PrePersist
 	@PreUpdate
