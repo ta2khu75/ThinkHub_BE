@@ -11,30 +11,24 @@ import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.dto.UserRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
 import com.ta2khu75.thinkhub.user.api.dto.UserSearch;
 import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserStatusResponse;
+import com.ta2khu75.thinkhub.user.internal.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@ApiController("${app.api-prefix}/users")
 @Tag(name = "User")
-public class UserController extends BaseController<UserApi> {
+@ApiController("${app.api-prefix}/users")
+class UserController extends BaseController<UserService> {
 
-	protected UserController(UserApi service) {
+	protected UserController(UserService service) {
 		super(service);
 	}
-
-//	@PostMapping
-//	@Operation(summary = "Create a new account", description = "Create a new user account with profile and status information.")
-//	public ResponseEntity<UserResponse> create(@Valid @RequestBody request) {
-//		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
-//	}
 
 	@DeleteMapping("{id}")
 	@Operation(summary = "Delete an account", description = "Delete an existing user account by its ID.")
@@ -46,11 +40,6 @@ public class UserController extends BaseController<UserApi> {
 	@GetMapping("{id}")
 	ResponseEntity<UserResponse> read(@PathVariable String id) {
 		return ResponseEntity.ok(service.read(id));
-	}
-
-	@GetMapping("me")
-	ResponseEntity<UserResponse> readMe() {
-		return ResponseEntity.ok(service.read(SecurityUtil.getCurrentUserId()));
 	}
 
 	@GetMapping

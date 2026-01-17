@@ -25,6 +25,7 @@ import com.ta2khu75.thinkhub.authn.internal.config.TokenType;
 import com.ta2khu75.thinkhub.authn.internal.model.UserPrincipal;
 import com.ta2khu75.thinkhub.authn.internal.service.JwtService;
 import com.ta2khu75.thinkhub.authn.internal.util.PasswordUtil;
+import com.ta2khu75.thinkhub.authn.internal.validator.AuthnValidator;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthProviderPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
@@ -32,8 +33,6 @@ import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
-import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
-import com.ta2khu75.thinkhub.shared.exception.MismatchException;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
@@ -42,7 +41,6 @@ import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
-import com.ta2khu75.thinkhub.user.api.dto.UserStatusSummary;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 import lombok.RequiredArgsConstructor;
@@ -53,6 +51,7 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 
 	private final AuthenticationManager authenticationManager;
 	private final AuthnAuthProviderPort authProviderPort;
+	private final AuthnValidator validator;
 	private final AuthnUserPort userPort;
 	private final AuthnAuthzPort authzPort;
 	private final JwtService jwtService;
@@ -70,8 +69,7 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 
 	@Override
 	public void register(RegisterRequest request) {
-		if (!request.password().equals(request.confirmPassword()))
-			throw new MismatchException("password and confirm password not matches");
+		validator.validateRegister(request);
 		RoleResponse role = authzPort.readByName(RoleDefault.USER.name());
 		UserStatusRequest status = new UserStatusRequest(false, true, role.id());
 		UserRequest user = request.user();
@@ -84,14 +82,9 @@ class AuthnServiceImpl implements AuthnApi, IdDecodable {
 	@Override
 	@Transactional
 	public void changePassword(ChangePasswordRequest request) {
-		if (!request.newPassword().equals(request.confirmPassword()))
-			throw new MismatchException("New password and confirm password not matches");
-		if (request.newPassword().equals(request.password()))
-			throw new InvalidDataException("Current password and new password are same");
 		AuthProviderSummary authProvider = authProviderPort.readByEmailAndProvider(SecurityUtil.getCurrentUserId(),
 				ProviderType.LOCAL);
-		if (!passwordEncoder.matches(request.password(), authProvider.password()))
-			throw new MismatchException("Password not matches");
+		validator.validateChangePassword(request, authProvider, passwordEncoder);
 		authProviderPort.updatePassword(authProvider.id(), request.password());
 	}
 

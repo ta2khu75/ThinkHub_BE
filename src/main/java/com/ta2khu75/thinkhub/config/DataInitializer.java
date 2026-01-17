@@ -172,7 +172,9 @@ public class DataInitializer implements ApplicationRunner {
 		List<RoleResponse> roles = Arrays.stream(RoleDefault.values())
 				.map(role -> authzApi.createRole(new RoleRequest(role.name(), null, new HashSet<>()))).toList();
 		return roles.stream().filter(role -> role.name().equals(RoleDefault.ADMIN.name())).findFirst()
-				.orElseThrow(() -> new NotFoundException("Not found role name ADMIN")).id();
+				.orElseThrow(
+						() -> new NotFoundException("DataInitializer:NOT_FOUND_ROLE_NAME", "Not found role name ADMIN"))
+				.id();
 	}
 
 	private Set<Long> getPermissionPublicIds(Map<String, List<PermissionSummary>> permissionMap) {

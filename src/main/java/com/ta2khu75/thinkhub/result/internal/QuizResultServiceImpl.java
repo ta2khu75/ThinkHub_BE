@@ -35,17 +35,20 @@ import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
 @Service
-class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepository, QuizResultMapper>
+class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepository>
 		implements QuizResultApi, IdDecodable {
 	private final QuizApi quizApi;
 	private final QuizResultCache cache;
 
 	public QuizResultServiceImpl(QuizResultRepository repository, QuizResultMapper mapper, QuizApi quizApi,
 			QuizResultCache cache) {
-		super(repository, mapper);
+		super(repository);
 		this.quizApi = quizApi;
 		this.cache = cache;
+		this.mapper = mapper;
 	}
+
+	private final QuizResultMapper mapper;
 
 	@Override
 	public PageResponse<QuizResultResponse> search(QuizResultSearch search) {

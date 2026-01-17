@@ -41,21 +41,23 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository, QuizMapper> implements QuizApi, IdDecodable {
-
-	private final ApplicationEventPublisher events;
-	private final QuizTagPort tagPort;
-	private final QuizUserPort userPort;
-	private final QuizMediaPort mediaPort;
+class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements QuizApi, IdDecodable {
 
 	public QuizServiceImpl(QuizRepository repository, QuizMapper mapper, ApplicationEventPublisher events,
 			QuizTagPort tagPort, QuizUserPort userPort, QuizMediaPort mediaPort) {
-		super(repository, mapper);
+		super(repository);
 		this.events = events;
 		this.tagPort = tagPort;
 		this.userPort = userPort;
 		this.mediaPort = mediaPort;
+		this.mapper = mapper;
 	}
+
+	private final QuizMapper mapper;
+	private final ApplicationEventPublisher events;
+	private final QuizTagPort tagPort;
+	private final QuizUserPort userPort;
+	private final QuizMediaPort mediaPort;
 
 	@Override
 	public QuizResponse create(@Valid QuizRequest request) {

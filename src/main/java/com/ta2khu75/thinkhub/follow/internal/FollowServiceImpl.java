@@ -16,13 +16,13 @@ import com.ta2khu75.thinkhub.follow.api.dto.FollowStatusResponse;
 import com.ta2khu75.thinkhub.follow.internal.entity.Follow;
 import com.ta2khu75.thinkhub.follow.internal.entity.FollowId;
 import com.ta2khu75.thinkhub.follow.internal.repository.FollowRepository;
+import com.ta2khu75.thinkhub.follow.internal.validator.FollowValidator;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
-import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 import com.ta2khu75.thinkhub.user.api.UserApi;
@@ -33,23 +33,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 class FollowServiceImpl implements FollowApi, IdDecodable {
 	private final FollowRepository repository;
+	private final FollowValidator validator;
 	private final UserApi accountApi;
 	private final ApplicationEventPublisher events;
 
 	@Override
 	@Transactional
 	public void follow(String userId) {
-		events.publishEvent(new CheckExistsEvent<>(EntityType.USER, userId));
-		Long followerId = SecurityUtil.getCurrentUserIdDecode();
 		Long followingId = decodeId(userId);
+		Long followerId = SecurityUtil.getCurrentUserIdDecode();
+		events.publishEvent(new CheckExistsEvent<>(EntityType.USER, userId));
 		FollowId id = new FollowId(followingId, followerId);
-		if (followerId.equals(followingId)) {
-			throw new InvalidDataException("Cannot follow yourself");
-		}
-		if (!repository.existsById(id)) {
-			Follow follow = new Follow(id, null);
-			repository.save(follow);
-		}
+		boolean alreadyFollowed = repository.existsById(new FollowId(followingId, followerId));
+		validator.validateFollow(followerId, followingId, alreadyFollowed);
+		Follow follow = new Follow(id, null);
+		repository.save(follow);
 	}
 
 	@Override
@@ -83,27 +81,15 @@ class FollowServiceImpl implements FollowApi, IdDecodable {
 	public PageResponse<FollowResponse> readPage(String userIdString, FollowDirection direction, Search search) {
 		Long userId = decodeId(userIdString);
 		Pageable pageable = search.toPageable();
-		Page<Follow> page;
-		PageResponse<FollowResponse> pageResponse;
-		if (direction == FollowDirection.FOLLOWING) {
-			page = repository.findByIdFollowingId(userId, pageable);
-			List<FollowResponse> followerResponse = page.getContent().stream()
-					.map(follow -> new FollowResponse(follow.getId().getFollowerId())).toList();
-			pageResponse = new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(),
-					followerResponse);
-		} else {
-			page = repository.findByIdFollowerId(userId, pageable);
-			List<FollowResponse> followingResponse = page.getContent().stream()
-					.map(follow -> new FollowResponse(follow.getId().getFollowingId())).toList();
-			pageResponse = new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(),
-					followingResponse);
-		}
-		return pageResponse;
+		Page<Follow> page = direction.query(repository, userId, pageable);
+		List<FollowResponse> data = page.getContent().stream().map(f -> new FollowResponse(direction.extractUserId(f)))
+				.toList();
+
+		return new PageResponse<>(page.getNumber(), page.getTotalElements(), page.getTotalPages(), data);
 	}
 
 	@Override
 	public IdConfig getIdConfig() {
 		return IdConfig.USER;
 	}
-
 }

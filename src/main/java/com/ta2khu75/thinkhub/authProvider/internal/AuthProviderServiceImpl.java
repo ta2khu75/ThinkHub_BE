@@ -10,6 +10,7 @@ import com.ta2khu75.thinkhub.authProvider.internal.entity.AuthProvider;
 import com.ta2khu75.thinkhub.authProvider.internal.entity.ProviderType;
 import com.ta2khu75.thinkhub.authProvider.internal.mapper.AuthProviderMapper;
 import com.ta2khu75.thinkhub.authProvider.internal.repository.AuthProviderRepository;
+import com.ta2khu75.thinkhub.authProvider.internal.validator.AuthProviderErrorCode;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
@@ -19,11 +20,15 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class AuthProviderServiceImpl extends BaseService<AuthProvider, Long, AuthProviderRepository, AuthProviderMapper>
+class AuthProviderServiceImpl extends BaseService<AuthProvider, Long, AuthProviderRepository>
 		implements AuthProviderApi, IdDecodable {
+
 	protected AuthProviderServiceImpl(AuthProviderRepository repository, AuthProviderMapper mapper) {
-		super(repository, mapper);
+		super(repository);
+		this.mapper = mapper;
 	}
+
+	private final AuthProviderMapper mapper;
 
 	@Override
 	public IdConfig getIdConfig() {
@@ -49,8 +54,9 @@ class AuthProviderServiceImpl extends BaseService<AuthProvider, Long, AuthProvid
 	@Override
 	public AuthProviderSummary readByEmailAndProvider(String email, ProviderType provider) {
 		AuthProvider authProvider = repository.findByEmailAndProvider(email, provider)
-				.orElseThrow(() -> new NotFoundException("Could not find " + AuthProvider.class.getSimpleName()
-						+ " with email: " + email + " and provider: " + provider.name()));
+				.orElseThrow(() -> new NotFoundException(AuthProviderErrorCode.NOT_FOUND,
+						"Could not find " + AuthProvider.class.getSimpleName() + " with email: " + email
+								+ " and provider: " + provider.name()));
 		return mapper.convert(authProvider);
 
 	}
@@ -67,8 +73,9 @@ class AuthProviderServiceImpl extends BaseService<AuthProvider, Long, AuthProvid
 	public AuthProviderSummary readByUserIdAndProvider(String userId, ProviderType provider) {
 		Long userIdLong = decodeId(userId);
 		AuthProvider authProvider = repository.findByUserIdAndProvider(userIdLong, provider)
-				.orElseThrow(() -> new NotFoundException("Could not find " + AuthProvider.class.getSimpleName()
-						+ " with userId: " + userIdLong + " and provider: " + provider.name()));
+				.orElseThrow(() -> new NotFoundException(AuthProviderErrorCode.NOT_FOUND,
+						"Could not find " + AuthProvider.class.getSimpleName() + " with userId: " + userIdLong
+								+ " and provider: " + provider.name()));
 		return mapper.convert(authProvider);
 	}
 

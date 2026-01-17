@@ -13,13 +13,15 @@ import com.ta2khu75.thinkhub.authz.api.dto.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 @Service
-public class PermissionGroupServiceImpl
-		extends BaseService<PermissionGroup, Integer, PermissionGroupRepository, PermissionGroupMapper>
+public class PermissionGroupServiceImpl extends BaseService<PermissionGroup, Integer, PermissionGroupRepository>
 		implements PermissionGroupService {
 
-	protected PermissionGroupServiceImpl(PermissionGroupRepository repository, PermissionGroupMapper mapper) {
-		super(repository, mapper);
+	public PermissionGroupServiceImpl(PermissionGroupRepository repository, PermissionGroupMapper mapper) {
+		super(repository);
+		this.mapper = mapper;
 	}
+
+	private final PermissionGroupMapper mapper;
 
 	@Override
 	@Transactional

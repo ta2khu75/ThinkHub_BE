@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.ta2khu75.thinkhub.category.api.dto.CategoryRequest;
 import com.ta2khu75.thinkhub.category.api.dto.CategoryResponse;
+import com.ta2khu75.thinkhub.category.internal.service.CategoryService;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
@@ -21,10 +22,10 @@ import jakarta.validation.groups.Default;
 
 @Tag(name = "Category", description = "Manage content categories for organizing and classifying items within the system.")
 @ApiController("${app.api-prefix}/categories")
-public class CategoryController extends BaseController<CategoryApi>
+public class CategoryController extends BaseController<CategoryService>
 		implements CrudController<CategoryRequest, CategoryResponse, Long> {
 
-	protected CategoryController(CategoryApi service) {
+	protected CategoryController(CategoryService service) {
 		super(service);
 	}
 

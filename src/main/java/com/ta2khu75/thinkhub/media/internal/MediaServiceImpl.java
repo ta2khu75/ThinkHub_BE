@@ -17,13 +17,16 @@ import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 @Service
-class MediaServiceImpl extends BaseService<Media, Long, MediaRepository, MediaMapper> implements MediaApi {
+class MediaServiceImpl extends BaseService<Media, Long, MediaRepository> implements MediaApi {
 	private final StorageStrategy storageStrategy;
 
 	public MediaServiceImpl(MediaRepository repository, MediaMapper mapper, StorageStrategy storageStrategy) {
-		super(repository, mapper);
+		super(repository);
+		this.mapper = mapper;
 		this.storageStrategy = storageStrategy;
 	}
+
+	private final MediaMapper mapper;
 
 	@Override
 	public MediaResponse create(MediaRequest request) throws IOException {

@@ -12,31 +12,35 @@ import com.ta2khu75.thinkhub.report.internal.entity.Report;
 import com.ta2khu75.thinkhub.report.internal.entity.ReportStatus;
 import com.ta2khu75.thinkhub.report.internal.mapper.ReportMapper;
 import com.ta2khu75.thinkhub.report.internal.repository.ReportRepository;
+import com.ta2khu75.thinkhub.report.internal.validator.ReportValidator;
+import com.ta2khu75.thinkhub.report.required.port.ReportUserPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
-import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import static com.ta2khu75.thinkhub.shared.util.IdConverterUtil.decode;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
-import com.ta2khu75.thinkhub.user.api.UserApi;
-
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class ReportServiceImpl extends BaseService<Report, Long, ReportRepository, ReportMapper> implements ReportApi {
-	private final UserApi accountService;
-	private final ApplicationEventPublisher events;
+class ReportServiceImpl extends BaseService<Report, Long, ReportRepository> implements ReportApi {
 
-	public ReportServiceImpl(ReportRepository repository, ReportMapper mapper, UserApi accountService,
-			ApplicationEventPublisher events) {
-		super(repository, mapper);
-		this.accountService = accountService;
+	public ReportServiceImpl(ReportRepository repository, ReportMapper mapper, ReportUserPort userPort,
+			ReportValidator validator, ApplicationEventPublisher events) {
+		super(repository);
 		this.events = events;
+		this.mapper = mapper;
+		this.userPort= userPort;
+		this.validator = validator;
 	}
+
+	private final ReportUserPort userPort;
+	private final ReportMapper mapper;
+	private final ReportValidator validator;
+	private final ApplicationEventPublisher events;
 
 	@Override
 	public ReportResponse create(ReportRequest request) {
@@ -52,13 +56,11 @@ class ReportServiceImpl extends BaseService<Report, Long, ReportRepository, Repo
 	@Override
 	public ReportResponse update(Long id, @Valid ReportRequest request) {
 		Report report = this.readEntity(id);
+		validator.validateUpdate(report);
 		report.setType(request.type());
-		if (report.getStatus().equals(ReportStatus.PENDING)) {
-			report.setType(request.type());
-			repository.save(report);
-			return toResponse(report);
-		}
-		throw new InvalidDataException("You can't update report with status " + report.getStatus());
+		report.setType(request.type());
+		repository.save(report);
+		return toResponse(report);
 	}
 
 	@Override
@@ -95,7 +97,7 @@ class ReportServiceImpl extends BaseService<Report, Long, ReportRepository, Repo
 	}
 
 	private ReportResponse toResponse(Report report) {
-		AuthorResponse author = accountService.readAuthor(report.getAuthorId());
+		AuthorResponse author = userPort.readAuthor(report.getAuthorId());
 		ReportResponse response = mapper.convert(report);
 		response.setAuthor(author);
 		return response;

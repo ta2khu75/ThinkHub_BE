@@ -14,15 +14,19 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import com.ta2khu75.thinkhub.tag.internal.entity.Tag;
 import com.ta2khu75.thinkhub.tag.internal.mapper.TagMapper;
 import com.ta2khu75.thinkhub.tag.internal.repository.TagRepository;
+import com.ta2khu75.thinkhub.tag.internal.service.TagService;
 
 import jakarta.validation.Valid;
 
 @Service
-class TagServiceImpl extends BaseService<Tag, Long, TagRepository, TagMapper> implements TagApi {
+class TagServiceImpl extends BaseService<Tag, Long, TagRepository> implements TagService, TagApi {
 
 	protected TagServiceImpl(TagRepository repository, TagMapper mapper) {
-		super(repository, mapper);
+		super(repository);
+		this.mapper = mapper;
 	}
+
+	private TagMapper mapper;
 
 	@Override
 	public TagDto create(@Valid TagDto request) {

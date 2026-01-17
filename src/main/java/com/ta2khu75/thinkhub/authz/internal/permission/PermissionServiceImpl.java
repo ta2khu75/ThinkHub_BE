@@ -16,12 +16,15 @@ import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 @Service
-public class PermissionServiceImpl extends BaseService<Permission, Long, PermissionRepository, PermissionMapper>
+public class PermissionServiceImpl extends BaseService<Permission, Long, PermissionRepository>
 		implements PermissionService {
 
 	protected PermissionServiceImpl(PermissionRepository repository, PermissionMapper mapper) {
-		super(repository, mapper);
+		super(repository);
+		this.mapper = mapper;
 	}
+
+	private final PermissionMapper mapper;
 
 	@Override
 	public PermissionResponse read(Long id) {
@@ -48,8 +51,9 @@ public class PermissionServiceImpl extends BaseService<Permission, Long, Permiss
 
 	@Override
 	public PermissionResponse readByCode(String code) {
-		return mapper.convert(repository.findByCode(code).orElseThrow(() -> new NotFoundException(
-				"Could not find " + Permission.class.getSimpleName() + " with code: " + code)));
+		return mapper.convert(repository.findByCode(code)
+				.orElseThrow(() -> new NotFoundException(PermissionErrorCode.NOT_FOUND,
+						"Could not find " + Permission.class.getSimpleName() + " with code: " + code)));
 	}
 
 	@Override

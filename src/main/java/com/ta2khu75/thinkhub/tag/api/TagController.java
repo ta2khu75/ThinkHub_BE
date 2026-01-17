@@ -11,14 +11,15 @@ import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
+import com.ta2khu75.thinkhub.tag.internal.service.TagService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @ApiController("${app.api-prefix}/tags")
 @Tag(name = "Tag", description = "APIs for managing tags")
-public class TagController extends BaseController<TagApi> {
-	protected TagController(TagApi service) {
+public class TagController extends BaseController<TagService> {
+	protected TagController(TagService service) {
 		super(service);
 	}
 
@@ -28,6 +29,7 @@ public class TagController extends BaseController<TagApi> {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
+
 	@GetMapping
 	public ResponseEntity<PageResponse<TagDto>> search(@SnakeCaseModelAttribute Search search) {
 		return ResponseEntity.ok(service.search(search));

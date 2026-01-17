@@ -15,29 +15,35 @@ import com.ta2khu75.thinkhub.comment.internal.entity.Comment;
 import com.ta2khu75.thinkhub.comment.internal.entity.CommentTargetType;
 import com.ta2khu75.thinkhub.comment.internal.mapper.CommentMapper;
 import com.ta2khu75.thinkhub.comment.internal.repository.CommentRepository;
+import com.ta2khu75.thinkhub.comment.internal.service.CommentService;
+import com.ta2khu75.thinkhub.comment.internal.validator.CommentValidator;
+import com.ta2khu75.thinkhub.comment.required.port.CommentUserPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
-import com.ta2khu75.thinkhub.shared.exception.InvalidDataException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
-import com.ta2khu75.thinkhub.user.api.UserApi;
 
 @Service
-class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository, CommentMapper>
-		implements CommentApi {
-	private final UserApi accountService;
+class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository> implements CommentService, CommentApi {
 
-	public CommentServiceImpl(CommentRepository repository, CommentMapper mapper, UserApi accountService) {
-		super(repository, mapper);
-		this.accountService = accountService;
+	public CommentServiceImpl(CommentRepository repository, CommentValidator validator, CommentUserPort userPort,
+			CommentMapper mapper) {
+		super(repository);
+		this.validator = validator;
+		this.userPort = userPort;
+		this.mapper = mapper;
 	}
+
+	private final CommentValidator validator;
+	private final CommentUserPort userPort;
+	private final CommentMapper mapper;
 
 	@Override
 	public PageResponse<CommentResponse> readPageBy(Long targetId, CommentTargetType targetType, Search search) {
 		Page<Comment> page = repository.findByTargetIdAndTargetType(targetId, targetType, search.toPageable());
 		Set<Long> authorIds = page.getContent().stream().map(Comment::getAuthorId).collect(Collectors.toSet());
-		Map<Long, AuthorResponse> authorMap = accountService.readMapAuthorsByUserIds(authorIds);
+		Map<Long, AuthorResponse> authorMap = userPort.readMapAuthorsByUserIds(authorIds);
 		List<CommentResponse> comments = page.getContent().stream().map(comment -> {
 			CommentResponse response = mapper.convert(comment);
 			response.setAuthor(authorMap.get(comment.getAuthorId()));
@@ -48,7 +54,7 @@ class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository, C
 
 	@Override
 	public CommentResponse create(Long targetId, CommentTargetType targetType, CommentRequest request) {
-		AuthorResponse author = accountService.readAuthor(SecurityUtil.getCurrentUserId());
+		AuthorResponse author = userPort.readAuthor(SecurityUtil.getCurrentUserId());
 		Comment comment = mapper.toEntity(request);
 		comment.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
 		comment.setTargetId(targetId);
@@ -61,14 +67,13 @@ class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository, C
 	@Override
 	public CommentResponse update(Long id, CommentRequest request) {
 		Comment comment = this.readEntity(id);
-		if (comment.getAuthorId().equals(SecurityUtil.getCurrentUserIdDecode())) {
-			comment.setContent(request.getContent());
-			AuthorResponse author = accountService.readAuthor(SecurityUtil.getCurrentUserId());
-			CommentResponse response = mapper.convert(repository.save(comment));
-			response.setAuthor(author);
-			return response;
-		}
-		throw new InvalidDataException("You are not allowed to update this comment");
+		Long currentUserId = SecurityUtil.getCurrentUserIdDecode();
+		validator.validateUpdate(comment, currentUserId);
+		comment.setContent(request.getContent());
+		AuthorResponse author = userPort.readAuthor(SecurityUtil.getCurrentUserId());
+		CommentResponse response = mapper.convert(repository.save(comment));
+		response.setAuthor(author);
+		return response;
 	}
 
 	@Override
@@ -79,7 +84,7 @@ class CommentServiceImpl extends BaseService<Comment, Long, CommentRepository, C
 	@Override
 	public CommentResponse read(Long id) {
 		Comment comment = this.readEntity(id);
-		AuthorResponse author = accountService.readAuthor(comment.getAuthorId());
+		AuthorResponse author = userPort.readAuthor(comment.getAuthorId());
 		CommentResponse response = mapper.convert(comment);
 		response.setAuthor(author);
 		return response;

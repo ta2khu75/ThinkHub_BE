@@ -28,25 +28,27 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-class NotificationServiceImpl
-		extends BaseService<Notification, NotificationId, NotificationRepository, NotificationMapper>
+class NotificationServiceImpl extends BaseService<Notification, NotificationId, NotificationRepository>
 		implements NotificationApi {
-	NotificationPostPort postPort;
-	NotificationPostPort commentPort;
-	NotificationPostPort reportPort;
-	NotificationPostPort quizPort;
-	ApplicationEventPublisher events;
 
 	public NotificationServiceImpl(NotificationRepository repository, NotificationMapper mapper,
 			NotificationPostPort postPort, NotificationPostPort commentPort, NotificationPostPort reportPort,
 			NotificationPostPort quizPort, ApplicationEventPublisher events) {
-		super(repository, mapper);
+		super(repository);
 		this.postPort = postPort;
 		this.commentPort = commentPort;
 		this.reportPort = reportPort;
 		this.quizPort = quizPort;
 		this.events = events;
+		this.mapper = mapper;
 	}
+
+	NotificationMapper mapper;
+	NotificationPostPort postPort;
+	NotificationPostPort commentPort;
+	NotificationPostPort reportPort;
+	NotificationPostPort quizPort;
+	ApplicationEventPublisher events;
 
 	@Override
 	public NotificationResponse create(NotificationRequest request) {

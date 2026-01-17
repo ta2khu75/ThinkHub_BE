@@ -38,20 +38,21 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-class PostServiceImpl extends BaseService<Post, Long, PostRepository, PostMapper>
-		implements PostApi, IdDecodable {
+class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements PostApi, IdDecodable {
 	private final ApplicationEventPublisher events;
 	private final PostUserPort userPort;
 	private final PostTagPort tagPort;
 	private final PostMediaPort mediaPort;
+	private final PostMapper mapper;
 
 	public PostServiceImpl(PostRepository repository, PostMapper mapper, ApplicationEventPublisher events,
 			PostUserPort userPort, PostTagPort tagPort, PostMediaPort mediaPort) {
-		super(repository, mapper);
+		super(repository);
 		this.events = events;
 		this.userPort = userPort;
 		this.tagPort = tagPort;
 		this.mediaPort = mediaPort;
+		this.mapper = mapper;
 	}
 
 	@Override

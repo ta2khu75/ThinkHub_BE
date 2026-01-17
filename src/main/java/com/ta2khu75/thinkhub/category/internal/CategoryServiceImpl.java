@@ -10,6 +10,7 @@ import com.ta2khu75.thinkhub.category.api.dto.CategoryResponse;
 import com.ta2khu75.thinkhub.category.internal.entity.Category;
 import com.ta2khu75.thinkhub.category.internal.mapper.CategoryMapper;
 import com.ta2khu75.thinkhub.category.internal.repository.CategoryRepository;
+import com.ta2khu75.thinkhub.category.internal.service.CategoryService;
 import com.ta2khu75.thinkhub.category.required.port.CategoryMediaPort;
 import com.ta2khu75.thinkhub.media.api.dto.MediaResponse;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
@@ -19,18 +20,20 @@ import com.ta2khu75.thinkhub.shared.service.BaseService;
 import jakarta.validation.Valid;
 
 @Service
-class CategoryServiceImpl extends BaseService<Category, Long, CategoryRepository, CategoryMapper>
-		implements CategoryApi {
-
-	private final CategoryMediaPort mediaPort;
-	private final ApplicationEventPublisher events;
+class CategoryServiceImpl extends BaseService<Category, Long, CategoryRepository>
+		implements CategoryService, CategoryApi {
 
 	public CategoryServiceImpl(CategoryRepository repository, CategoryMapper mapper, CategoryMediaPort mediaPort,
 			ApplicationEventPublisher events) {
-		super(repository, mapper);
+		super(repository);
 		this.mediaPort = mediaPort;
 		this.events = events;
+		this.mapper = mapper;
 	}
+
+	private final CategoryMediaPort mediaPort;
+	private final ApplicationEventPublisher events;
+	private final CategoryMapper mapper;
 
 	@Override
 	public CategoryResponse create(@Valid CategoryRequest request) {

@@ -17,11 +17,14 @@ import com.ta2khu75.thinkhub.shared.service.BaseService;
 import jakarta.validation.Valid;
 
 @Service
-class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, RoleMapper> implements RoleService {
+class RoleServiceImpl extends BaseService<Role, Long, RoleRepository> implements RoleService {
 
 	protected RoleServiceImpl(RoleRepository repository, RoleMapper mapper) {
-		super(repository, mapper);
+		super(repository);
+		this.mapper = mapper;
 	}
+
+	private final RoleMapper mapper;
 
 	@Override
 	public RoleResponse create(@Valid RoleRequest request) {
@@ -61,8 +64,8 @@ class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, RoleMapper
 
 	@Override
 	public RoleResponse readByName(String roleName) {
-		Role role = repository.findByName(roleName)
-				.orElseThrow(() -> new NotFoundException("Could not find Role with name: " + roleName));
+		Role role = repository.findByName(roleName).orElseThrow(
+				() -> new NotFoundException(RoleErrorCode.NOT_FOUND, "Could not find Role with name: " + roleName));
 		return mapper.convert(role);
 	}
 
@@ -78,8 +81,8 @@ class RoleServiceImpl extends BaseService<Role, Long, RoleRepository, RoleMapper
 
 	@Override
 	public RoleSummary readSummaryByName(String name) {
-		Role role = repository.findByName(name)
-				.orElseThrow(() -> new NotFoundException("Could not find Role with name: " + name));
+		Role role = repository.findByName(name).orElseThrow(
+				() -> new NotFoundException(RoleErrorCode.NOT_FOUND, "Could not find Role with name: " + name));
 		return mapper.toSummary(role);
 	}
 

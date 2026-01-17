@@ -6,7 +6,6 @@ import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
 import com.ta2khu75.thinkhub.user.api.UserApi;
 import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
-import com.ta2khu75.thinkhub.user.api.dto.UserResponse;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 @Component
@@ -17,18 +16,8 @@ public class AuthnUserClient extends BaseClient<UserApi> implements AuthnUserPor
 	}
 
 	@Override
-	public UserSummary readSummary(Long id) {
-		return api.readSummary(id);
-	}
-
-	@Override
 	public UserSummary readSummary(String id) {
 		return api.readSummary(id);
-	}
-
-	@Override
-	public UserResponse readByEmail(String email) {
-		return api.readByEmail(email);
 	}
 
 	@Override

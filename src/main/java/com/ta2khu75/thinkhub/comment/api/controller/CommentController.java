@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.ta2khu75.thinkhub.comment.api.CommentApi;
 import com.ta2khu75.thinkhub.comment.api.dto.CommentRequest;
 import com.ta2khu75.thinkhub.comment.api.dto.CommentResponse;
+import com.ta2khu75.thinkhub.comment.internal.service.CommentService;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 
@@ -17,9 +17,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Comment", description = "Manage user comments and allow reporting of inappropriate content.")
 @ApiController("${app.api-prefix}/comments")
-public class CommentController extends BaseController<CommentApi> {
+public class CommentController extends BaseController<CommentService> {
 
-	protected CommentController(CommentApi service) {
+	protected CommentController(CommentService service) {
 		super(service);
 	}
 
