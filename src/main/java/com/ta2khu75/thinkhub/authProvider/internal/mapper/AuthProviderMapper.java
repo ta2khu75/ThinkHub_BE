@@ -17,15 +17,17 @@ public interface AuthProviderMapper extends Converter<AuthProvider, AuthProvider
 	@Mapping(target = "providerId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
+	@Mapping(target = "userId", ignore = true)
 	AuthProvider toEntity(AuthProviderLocal local);
 
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "password", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
+	@Mapping(target = "userId", ignore = true)
 	AuthProvider toEntity(AuthProviderOAuth2 oAuth2);
 
 	@Override
-	@Mapping(target = "userId", source = "source")
+	@Mapping(target = "userId", ignore = true)
 	AuthProviderSummary convert(AuthProvider source);
 }

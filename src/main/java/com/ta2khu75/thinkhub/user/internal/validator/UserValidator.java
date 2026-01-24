@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.user.internal.validator;
 
 import org.springframework.stereotype.Component;
 
-import com.ta2khu75.thinkhub.shared.exception.AbstractBizValidator;
+import com.ta2khu75.thinkhub.shared.exception.BaseValidator;
 import com.ta2khu75.thinkhub.shared.exception.ForbiddenException;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class UserValidator extends AbstractBizValidator {
+public class UserValidator extends BaseValidator {
 
 	public void validateCreate(UserCreateRequest request, boolean emailExists) {
 		ensure(!emailExists, UserErrorCode.EMAIL_EXISTS, "Email already exists");

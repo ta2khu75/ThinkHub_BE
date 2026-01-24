@@ -17,7 +17,7 @@ public class PermissionSummary {
 	@NotBlank
 	String code;
 	@NotBlank
-	String name;
+	String summary;
 	String description;
 	@NotBlank
 	String pattern;

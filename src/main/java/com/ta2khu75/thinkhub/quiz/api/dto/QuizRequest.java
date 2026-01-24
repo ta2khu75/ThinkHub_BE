@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.api.enums.ResultVisibility;
-import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -15,9 +14,9 @@ import jakarta.validation.constraints.NotNull;
 public record QuizRequest(@NotBlank(message = "Title must not be blank") String title,
 		@NotNull(message = "Time must not be null") Integer duration,
 		@NotBlank(message = "Description must not be blank") String description,
-		@NotNull(message = "Exam level must not be null") QuizLevel level, boolean shuffleQuestion, boolean completed,
+		@NotNull(message = "Exam level must not be null") QuizLevel level,
 		@NotNull(message = "Quiz category must not be null") Long categoryId, Long mediaId,
 		@NotEmpty(message = "Tag must not be empty") @Valid Set<String> tags, List<String> postIds,
-		@NotEmpty(message = "Question must not be empty") @Valid List<QuestionDto> questions,
-		AccessModifier accessModifier, ResultVisibility resultVisibility) {
+		@NotEmpty(message = "Question must not be empty") @Valid List<QuestionDto> questions, boolean shuffleQuestion,
+		ResultVisibility resultVisibility) {
 }

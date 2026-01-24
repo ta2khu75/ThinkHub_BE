@@ -28,7 +28,6 @@ public interface PostMapper
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "viewCount", ignore = true)
-	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "quizIds", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
@@ -39,7 +38,6 @@ public interface PostMapper
 	@Override
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "slug", ignore = true)
-	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "viewCount", ignore = true)
 	@Mapping(target = "authorId", ignore = true)

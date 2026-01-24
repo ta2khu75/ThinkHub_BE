@@ -2,10 +2,10 @@ package com.ta2khu75.thinkhub.follow.internal.validator;
 
 import org.springframework.stereotype.Component;
 
-import com.ta2khu75.thinkhub.shared.exception.AbstractBizValidator;
+import com.ta2khu75.thinkhub.shared.exception.BaseValidator;
 
 @Component
-public class FollowValidator extends AbstractBizValidator {
+public class FollowValidator extends BaseValidator {
 	public void validateFollow(Long followerId, Long followingId, boolean alreadyFollowed) {
 
 		// Business rule: không được follow chính mình

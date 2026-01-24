@@ -52,11 +52,11 @@ class AuthProviderServiceImpl extends BaseService<AuthProvider, Long, AuthProvid
 	}
 
 	@Override
-	public AuthProviderSummary readByEmailAndProvider(String email, ProviderType provider) {
-		AuthProvider authProvider = repository.findByEmailAndProvider(email, provider)
+	public AuthProviderSummary readByEmailAndProvider(String email, ProviderType type) {
+		AuthProvider authProvider = repository.findByEmailAndType(email, type)
 				.orElseThrow(() -> new NotFoundException(AuthProviderErrorCode.NOT_FOUND,
 						"Could not find " + AuthProvider.class.getSimpleName() + " with email: " + email
-								+ " and provider: " + provider.name()));
+								+ " and type: " + type.name()));
 		return mapper.convert(authProvider);
 
 	}
@@ -70,12 +70,12 @@ class AuthProviderServiceImpl extends BaseService<AuthProvider, Long, AuthProvid
 	}
 
 	@Override
-	public AuthProviderSummary readByUserIdAndProvider(String userId, ProviderType provider) {
+	public AuthProviderSummary readByUserIdAndProvider(String userId, ProviderType type) {
 		Long userIdLong = decodeId(userId);
-		AuthProvider authProvider = repository.findByUserIdAndProvider(userIdLong, provider)
+		AuthProvider authProvider = repository.findByUserIdAndType(userIdLong, type)
 				.orElseThrow(() -> new NotFoundException(AuthProviderErrorCode.NOT_FOUND,
 						"Could not find " + AuthProvider.class.getSimpleName() + " with userId: " + userIdLong
-								+ " and provider: " + provider.name()));
+								+ " and type: " + type.name()));
 		return mapper.convert(authProvider);
 	}
 

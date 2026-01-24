@@ -6,26 +6,26 @@ import org.springframework.http.ResponseEntity;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizRequest;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizResponse;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizSearch;
+import com.ta2khu75.thinkhub.quiz.internal.service.QuizService;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
-import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @Tag(name = "Quiz", description = "Create, manage, take, and interact with quizzes including commenting and reporting.")
 @ApiController("${app.api-prefix}/quizzes")
-class QuizController extends BaseController<QuizApi>
-		implements CrudController<QuizRequest, QuizResponse, String>, IdDecodable {
+class QuizController extends BaseController<QuizService> implements CrudController<QuizRequest, QuizResponse, String> {
 
-	protected QuizController(QuizApi service) {
+	protected QuizController(QuizService service) {
 		super(service);
 	}
 
@@ -59,6 +59,27 @@ class QuizController extends BaseController<QuizApi>
 		return ResponseEntity.ok(service.readDetail(id));
 	}
 
+	@PostMapping("{id}/disable")
+	@Operation(summary = "Disable a quiz", description = "Temporarily remove a quiz from the system.")
+	public ResponseEntity<Void> disable(String id) {
+		service.disable(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("{id}/publish")
+	@Operation(summary = "Publish a quiz", description = "Publish a quiz to share with others.")
+	public ResponseEntity<Void> publish(String id) {
+		service.publish(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("{id}/hide")
+	@Operation(summary = "Hide a quiz", description = "Hide a quiz from public view.")
+	public ResponseEntity<Void> hide(String id) {
+		service.hide(id);
+		return ResponseEntity.noContent().build();
+	}
+	
 	@Override
 	@Operation(summary = "Delete a quiz", description = "Permanently remove a quiz from the system.")
 	public ResponseEntity<Void> delete(String id) {
@@ -66,10 +87,6 @@ class QuizController extends BaseController<QuizApi>
 		return ResponseEntity.noContent().build();
 	}
 
-	@Override
-	public IdConfig getIdConfig() {
-		return IdConfig.QUIZ;
-	}
 }
 //	@GetMapping("mine/{keyword}")
 //	public ResponseEntity<List<QuizResponse>> mySearch(@PathVariable String keyword) {

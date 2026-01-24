@@ -8,7 +8,7 @@ import com.ta2khu75.thinkhub.authProvider.internal.entity.AuthProvider;
 import com.ta2khu75.thinkhub.authProvider.internal.entity.ProviderType;
 
 public interface AuthProviderRepository extends JpaRepository<AuthProvider, Long> {
-	Optional<AuthProvider> findByUserIdAndProvider(Long userId, ProviderType provider);
+	Optional<AuthProvider> findByUserIdAndType(Long userId, ProviderType type);
 
-	Optional<AuthProvider> findByEmailAndProvider(String email, ProviderType provider);
+	Optional<AuthProvider> findByEmailAndType(String email, ProviderType type);
 }

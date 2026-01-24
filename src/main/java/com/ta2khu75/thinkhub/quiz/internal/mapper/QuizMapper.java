@@ -35,9 +35,9 @@ public interface QuizMapper
 
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "slug", ignore = true)
+	@Mapping(target = "status", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "postIds", ignore = true)
-	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
@@ -45,8 +45,8 @@ public interface QuizMapper
 
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "slug", ignore = true)
+	@Mapping(target = "status", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
-	@Mapping(target = "deleted", ignore = true)
 	@Mapping(target = "authorId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)

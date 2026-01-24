@@ -17,17 +17,20 @@ import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.api.dto.PostSearch;
 import com.ta2khu75.thinkhub.post.api.event.PostCreatedEvent;
 import com.ta2khu75.thinkhub.post.internal.entity.Post;
+import com.ta2khu75.thinkhub.post.internal.entity.PostStatus;
 import com.ta2khu75.thinkhub.post.internal.mapper.PostMapper;
 import com.ta2khu75.thinkhub.post.internal.repository.PostRepository;
+import com.ta2khu75.thinkhub.post.internal.service.PostService;
+import com.ta2khu75.thinkhub.post.internal.validator.PostErrorCode;
 import com.ta2khu75.thinkhub.post.required.client.PostMediaPort;
 import com.ta2khu75.thinkhub.post.required.client.PostTagPort;
 import com.ta2khu75.thinkhub.post.required.client.PostUserPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
-import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
+import com.ta2khu75.thinkhub.shared.exception.BusinessException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
@@ -38,7 +41,7 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements PostApi, IdDecodable {
+class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements PostService, PostApi, IdDecodable {
 	private final ApplicationEventPublisher events;
 	private final PostUserPort userPort;
 	private final PostTagPort tagPort;
@@ -58,6 +61,9 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 	@Override
 	public PostResponse create(@Valid PostRequest request) {
 		this.validateExistence(request);
+		if (PostStatus.OWNER_DELETED.equals(request.status()) || PostStatus.ADMIN_DISABLED.equals(request.status())) {
+			throw new BusinessException(PostErrorCode.STATUS_INVALID, "Invalid status");
+		}
 		Post post = mapper.toEntity(request);
 		post.setTagIds(this.getTagIds(request));
 		post.setQuizIds(this.getQuizIds(request));
@@ -72,6 +78,9 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 		validateExistence(request);
 		Long postId = decodeId(id);
 		Post post = this.readEntity(postId);
+		if (post.getStatus().equals(PostStatus.OWNER_DELETED) || post.getStatus().equals(PostStatus.ADMIN_DISABLED)) {
+			throw new BusinessException(PostErrorCode.STATUS_INVALID, "Invalid status");
+		}
 		mapper.update(request, post);
 		post.setTagIds(this.getTagIds(request));
 		post.setQuizIds(this.getQuizIds(request));
@@ -93,7 +102,7 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 	public void delete(String id) {
 		Long postId = decodeId(id);
 		Post post = readEntity(postId);
-		post.setDeleted(true);
+		post.setStatus(PostStatus.OWNER_DELETED);
 		repository.save(post);
 	}
 
@@ -138,7 +147,7 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 
 		// Nếu không phải là chính chủ, chỉ cho xem bài viết PUBLIC
 		if (!SecurityUtil.isAuthorDecode(authorId)) {
-			search.setAccessModifier(AccessModifier.PUBLIC);
+			search.setStatus(PostStatus.ACTIVE);
 		}
 
 		Page<Post> page = repository.search(search);
@@ -206,6 +215,15 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 	public void ensureExists(String id) {
 		Long postId = decodeId(id);
 		this.assertExists(postId);
+	}
+
+	@Override
+	public void disable(String id) {
+		Long postId = decodeId(id);
+		Post post = readEntity(postId);
+		post.setStatus(PostStatus.ADMIN_DISABLED);
+		repository.save(post);
+
 	}
 
 }

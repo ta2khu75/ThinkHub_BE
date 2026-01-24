@@ -20,14 +20,16 @@ import com.ta2khu75.thinkhub.quiz.api.dto.QuizResponse;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizSearch;
 import com.ta2khu75.thinkhub.quiz.api.event.QuizCreatedEvent;
 import com.ta2khu75.thinkhub.quiz.internal.entity.Quiz;
+import com.ta2khu75.thinkhub.quiz.internal.entity.QuizStatus;
 import com.ta2khu75.thinkhub.quiz.internal.mapper.QuizMapper;
 import com.ta2khu75.thinkhub.quiz.internal.repository.QuizRepository;
+import com.ta2khu75.thinkhub.quiz.internal.service.QuizService;
+import com.ta2khu75.thinkhub.quiz.internal.validator.QuizValidator;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizMediaPort;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizTagPort;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizUserPort;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
 import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
-import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
@@ -41,23 +43,25 @@ import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 import jakarta.validation.Valid;
 
 @Service
-class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements QuizApi, IdDecodable {
+class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements QuizApi, QuizService, IdDecodable {
 
 	public QuizServiceImpl(QuizRepository repository, QuizMapper mapper, ApplicationEventPublisher events,
-			QuizTagPort tagPort, QuizUserPort userPort, QuizMediaPort mediaPort) {
+			QuizTagPort tagPort, QuizUserPort userPort, QuizMediaPort mediaPort, QuizValidator validator) {
 		super(repository);
 		this.events = events;
 		this.tagPort = tagPort;
 		this.userPort = userPort;
 		this.mediaPort = mediaPort;
+		this.validator = validator;
 		this.mapper = mapper;
 	}
 
 	private final QuizMapper mapper;
-	private final ApplicationEventPublisher events;
 	private final QuizTagPort tagPort;
 	private final QuizUserPort userPort;
 	private final QuizMediaPort mediaPort;
+	private final QuizValidator validator;
+	private final ApplicationEventPublisher events;
 
 	@Override
 	public QuizResponse create(@Valid QuizRequest request) {
@@ -76,6 +80,7 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 		Long quizId = decodeId(id);
 		this.validateExistence(request);
 		Quiz quiz = readEntity(quizId);
+		validator.validateUpdate(quiz);
 		mapper.update(request, quiz);
 		quiz.setTagIds(this.getTagIds(request));
 		quiz.setPostIds(this.getPostIds(request));
@@ -100,14 +105,6 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 	}
 
 	@Override
-	public void delete(String id) {
-		Long quizId = decodeId(id);
-		Quiz quiz = this.readEntity(quizId);
-		quiz.setDeleted(true);
-		this.save(quiz);
-	}
-
-	@Override
 	@Transactional
 	public PageResponse<QuizResponse> search(QuizSearch search) {
 		if (search.getAuthorId() != null) {
@@ -117,7 +114,7 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 
 		// Nếu không phải là chính chủ, chỉ cho xem bài viết PUBLIC
 		if (!SecurityUtil.isAuthorDecode(authorId)) {
-			search.setAccessModifier(AccessModifier.PUBLIC);
+			search.setStatus(QuizStatus.ACTIVE);
 		}
 
 		Page<Quiz> page = repository.search(search);
@@ -208,14 +205,41 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 
 	@Override
 	public IdConfig getIdConfig() {
-		return IdConfig.USER;
+		return IdConfig.QUIZ;
 	}
 
 	@Override
 	public void ensureExists(String id) {
 		Long quizId = decodeId(id);
 		this.assertExists(quizId);
+	}
+
+	@Transactional
+	private Quiz updateStatus(String id, QuizStatus status) {
+		Long quizId = decodeId(id);
+		Quiz quiz = readEntity(quizId);
+		quiz.setStatus(status);
+		return repository.save(quiz);
+	}
+
+	@Override
+	public void disable(String id) {
+		this.updateStatus(id, QuizStatus.ADMIN_DISABLED);
+	}
+
+	@Override
+	public void publish(String id) {
+		this.updateStatus(id, QuizStatus.ACTIVE);
 
 	}
 
+	@Override
+	public void hide(String id) {
+		this.updateStatus(id, QuizStatus.INACTIVE);
+	}
+
+	@Override
+	public void delete(String id) {
+		this.updateStatus(id, QuizStatus.OWNER_DELETED);
+	}
 }

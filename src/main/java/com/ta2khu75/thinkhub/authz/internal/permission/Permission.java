@@ -27,7 +27,7 @@ public class Permission {
 	@Column(unique = true, nullable = false)
 	String code;
 	@Column(unique = true, nullable = false)
-	String name;
+	String summary;
 	String description;
 	@Column(nullable = false)
 	String pattern;

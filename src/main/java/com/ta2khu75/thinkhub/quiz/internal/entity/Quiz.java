@@ -15,7 +15,6 @@ import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.api.enums.ResultVisibility;
 import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
 import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
-import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 
@@ -28,9 +27,9 @@ import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	public Quiz() {
 		super();
-		accessModifier = AccessModifier.PRIVATE;
 		resultVisibility = ResultVisibility.FULL;
 		shuffleQuestion = true;
+		status = QuizStatus.DRAFT;
 	}
 
 	@Column(nullable = false, length = 255)
@@ -43,14 +42,12 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	String slug;
 	Long mediaId;
 	boolean shuffleQuestion = true;
-	boolean deleted;
-	boolean completed;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	QuizLevel level;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	AccessModifier accessModifier;
+	QuizStatus status;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	ResultVisibility resultVisibility;
@@ -77,5 +74,4 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	public void prePersist() {
 		slug = SlugUtil.toSlug(title);
 	}
-
 }

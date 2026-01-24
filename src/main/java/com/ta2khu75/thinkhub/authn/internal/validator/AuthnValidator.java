@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderSummary;
 import com.ta2khu75.thinkhub.authn.api.dto.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.RegisterRequest;
-import com.ta2khu75.thinkhub.shared.exception.AbstractBizValidator;
+import com.ta2khu75.thinkhub.shared.exception.BaseValidator;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class AuthnValidator extends AbstractBizValidator {
+public class AuthnValidator extends BaseValidator {
 	/* ================= REGISTER ================= */
 
 	public void validateRegister(RegisterRequest request) {

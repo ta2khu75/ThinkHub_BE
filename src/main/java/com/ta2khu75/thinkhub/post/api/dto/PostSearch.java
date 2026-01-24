@@ -3,8 +3,8 @@ package com.ta2khu75.thinkhub.post.api.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ta2khu75.thinkhub.post.internal.entity.PostStatus;
 import com.ta2khu75.thinkhub.shared.api.dto.Search;
-import com.ta2khu75.thinkhub.shared.enums.AccessModifier;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +18,7 @@ public class PostSearch extends Search {
 	private Integer maxViews;
 	private String authorId;
 	private Long authorIdQuery;
-	private AccessModifier accessModifier;
+	private PostStatus status;
 	private LocalDate createdFrom;
 	private LocalDate createdTo;
 }

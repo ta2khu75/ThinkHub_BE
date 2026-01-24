@@ -34,10 +34,9 @@ public class QuizRepositoryImpl implements QuizRepositoryCustom {
 				applyIfNotNull(search.getCategoryIds(), () -> quiz.categoryId.in(search.getCategoryIds())),
 				applyIfNotNull(search.getTagIds(), () -> quiz.tagIds.any().in(search.getCategoryIds())),
 				applyIfNotNull(search.getLevels(), () -> quiz.level.in(search.getLevels())),
-				applyIfNotNull(search.getCompleted(), () -> quiz.completed.eq(search.getCompleted())),
 				applyIfNotNull(search.getMinDuration(), () -> quiz.duration.goe(search.getMinDuration())),
 				applyIfNotNull(search.getMaxDuration(), () -> quiz.duration.loe(search.getMaxDuration())),
-				applyIfNotNull(search.getAccessModifier(), () -> quiz.accessModifier.eq(search.getAccessModifier())),
+				applyIfNotNull(search.getStatus(), () -> quiz.status.eq(search.getStatus())),
 				applyIfNotNull(search.getAuthorIdQuery(), () -> quiz.authorId.eq(search.getAuthorIdQuery())) };
 		JPAQuery<Quiz> query = queryFactory.selectFrom(quiz).leftJoin(quiz.tagIds).fetchJoin().where(conditions)
 				.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0])).offset(pageable.getOffset())

@@ -58,7 +58,7 @@ class QuizResultServiceImpl extends BaseService<QuizResult, Long, QuizResultRepo
 	@Override
 	public QuizResultResponse take(String quizId) {
 		Long quizIdDecode = decodeId(quizId, IdConfig.QUIZ);
-		QuizDetailResponse quiz = quizApi.readDetail(quizId);
+		QuizDetailResponse quiz = quizApi.readDetail(quizIdDecode);
 		quiz.getQuestions().forEach(question -> question.answers().forEach(answer -> answer.setCorrect(false)));
 		QuizResult quizResult = new QuizResult();
 		quizResult.setQuizId(quizIdDecode);

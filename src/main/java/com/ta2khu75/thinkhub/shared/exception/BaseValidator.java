@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.ta2khu75.thinkhub.shared.enums.ErrorCode;
 
-public abstract class AbstractBizValidator {
+public abstract class BaseValidator {
 
 	// ---------------- Basic null/empty checks ----------------
 

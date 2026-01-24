@@ -4,16 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import com.ta2khu75.thinkhub.post.api.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.api.dto.PostSearch;
+import com.ta2khu75.thinkhub.post.internal.service.PostService;
 import com.ta2khu75.thinkhub.shared.anotation.ApiController;
 import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
 import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
 import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
-import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,9 +21,8 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Post", description = "Create, manage, and interact with posts including commenting and reporting.")
 @ApiController("${app.api-prefix}/posts")
-public class PostController extends BaseController<PostApi>
-		implements CrudController<PostRequest, PostResponse, String>, IdDecodable {
-	protected PostController(PostApi service) {
+class PostController extends BaseController<PostService> implements CrudController<PostRequest, PostResponse, String> {
+	protected PostController(PostService service) {
 		super(service);
 	}
 
@@ -64,9 +63,11 @@ public class PostController extends BaseController<PostApi>
 		return ResponseEntity.ok(service.readDetail(id));
 	}
 
-	@Override
-	public IdConfig getIdConfig() {
-		return IdConfig.POST;
+	@PutMapping("{id}/disable")
+	@Operation(summary = "Disable a post", description = "Temporarily remove a post from the system.")
+	public ResponseEntity<Void> disable(@PathVariable String id) {
+		service.disable(id);
+		return ResponseEntity.noContent().build();
 	}
 }
 //	private final ObjectMapper objectMapper;
