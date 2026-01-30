@@ -38,7 +38,7 @@ public interface QuizMapper
 	@Mapping(target = "status", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
 	@Mapping(target = "postIds", ignore = true)
-	@Mapping(target = "authorId", ignore = true)
+	@Mapping(target = "ownerId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
 	Quiz toEntity(QuizRequest request);
@@ -47,7 +47,7 @@ public interface QuizMapper
 	@Mapping(target = "slug", ignore = true)
 	@Mapping(target = "status", ignore = true)
 	@Mapping(target = "tagIds", ignore = true)
-	@Mapping(target = "authorId", ignore = true)
+	@Mapping(target = "ownerId", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
 	void update(QuizRequest request, @MappingTarget Quiz quiz);

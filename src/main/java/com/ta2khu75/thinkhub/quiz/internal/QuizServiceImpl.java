@@ -69,7 +69,7 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 		Quiz quiz = mapper.toEntity(request);
 		quiz.setTagIds(getTagIds(request));
 		quiz.setPostIds(this.getPostIds(request));
-		quiz.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
+		quiz.setOwnerId(SecurityUtil.getCurrentUserIdDecode());
 		QuizResponse response = this.save(quiz);
 		events.publishEvent(new QuizCreatedEvent(response.getAuthor().id(), quiz.getId()));
 		return response;
@@ -80,7 +80,6 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 		Long quizId = decodeId(id);
 		this.validateExistence(request);
 		Quiz quiz = readEntity(quizId);
-		validator.validateUpdate(quiz);
 		mapper.update(request, quiz);
 		quiz.setTagIds(this.getTagIds(request));
 		quiz.setPostIds(this.getPostIds(request));
@@ -99,7 +98,7 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 	public QuizResponse read(Long id) {
 		Quiz quiz = readEntity(id);
 		QuizResponse response = mapper.convert(quiz);
-		response.setAuthor(userPort.readAuthor(quiz.getAuthorId()));
+		response.setAuthor(userPort.readAuthor(quiz.getOwnerId()));
 		response.setTags(tagPort.readAllByIds(quiz.getTagIds()));
 		return response;
 	}
@@ -107,10 +106,10 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 	@Override
 	@Transactional
 	public PageResponse<QuizResponse> search(QuizSearch search) {
-		if (search.getAuthorId() != null) {
-			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.USER));
+		if (search.getOwnerId() != null) {
+			search.setOwnerIdQuery(decode(search.getOwnerId(), IdConfig.USER));
 		}
-		Long authorId = search.getAuthorIdQuery();
+		Long authorId = search.getOwnerIdQuery();
 
 		// Nếu không phải là chính chủ, chỉ cho xem bài viết PUBLIC
 		if (!SecurityUtil.isAuthorDecode(authorId)) {
@@ -133,7 +132,7 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 			authorMap = Map.of(authorId, author);
 		} else {
 			// Lấy toàn bộ authorId trong trang
-			Set<Long> authorIds = page.getContent().stream().map(Quiz::getAuthorId).collect(Collectors.toSet());
+			Set<Long> authorIds = page.getContent().stream().map(Quiz::getOwnerId).collect(Collectors.toSet());
 
 			authorMap = userPort.readMapAuthorsByUserIds(authorIds);
 		}
@@ -147,8 +146,9 @@ class QuizServiceImpl extends BaseService<Quiz, Long, QuizRepository> implements
 
 	private QuizResponse toResponse(Quiz quiz, Map<Long, AuthorResponse> authorMap, Map<Long, TagDto> tagMap) {
 		QuizResponse response = mapper.convert(quiz);
-		response.setAuthor(authorMap.get(quiz.getAuthorId()));
-		Set<TagDto> tags = quiz.getTagIds().stream().map(tagMap::get).filter(Objects::nonNull)
+		response.setAuthor(authorMap.get(quiz.getOwnerId()));
+		Set<TagDto> tags = quiz.getTagIds().stream().map(tagMap::get)
+				.filter(Objects::nonNull)
 				.collect(Collectors.toSet());
 		response.setTags(tags);
 		if (quiz.getMediaId() != null) {

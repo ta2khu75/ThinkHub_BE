@@ -16,8 +16,8 @@ public class PostSearch extends Search {
 	private List<Long> categoryIds;
 	private Integer minViews;
 	private Integer maxViews;
-	private String authorId;
-	private Long authorIdQuery;
+	private String ownerId;
+	private Long ownerIdQuery;
 	private PostStatus status;
 	private LocalDate createdFrom;
 	private LocalDate createdTo;

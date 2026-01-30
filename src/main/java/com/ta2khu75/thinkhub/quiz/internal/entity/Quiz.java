@@ -18,8 +18,8 @@ import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
 import com.ta2khu75.thinkhub.shared.enums.IdConfig;
 import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 
-@Entity
 @Data
+@Entity
 @AllArgsConstructor
 @ToString(exclude = { "questions" })
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -27,14 +27,12 @@ import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	public Quiz() {
 		super();
-		resultVisibility = ResultVisibility.FULL;
 		shuffleQuestion = true;
-		status = QuizStatus.DRAFT;
+		resultVisibility = ResultVisibility.FULL;
 	}
 
 	@Column(nullable = false, length = 255)
 	String title;
-	@Column(nullable = false)
 	Integer duration;
 	@Column(nullable = false, length = 255)
 	String description;
@@ -53,14 +51,14 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	ResultVisibility resultVisibility;
 
 	@Column(nullable = false, updatable = false)
-	Long authorId;
+	Long ownerId;
+	@Column(nullable = false)
+	Long categoryId;
 	@ElementCollection
 	Set<Long> postIds;
 	@ElementCollection
 	@Column(nullable = false)
 	Set<Long> tagIds;
-	@Column(nullable = false)
-	Long categoryId;
 	@JoinColumn(name = "quiz_id")
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Question> questions;

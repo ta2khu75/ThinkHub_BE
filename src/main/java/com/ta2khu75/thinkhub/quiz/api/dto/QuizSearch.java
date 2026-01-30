@@ -17,8 +17,8 @@ public class QuizSearch extends Search {
 	private List<Long> tagIds;
 	private Integer minDuration;
 	private Integer maxDuration;
-	private String authorId;
-	private Long authorIdQuery;
+	private String ownerId;
+	private Long ownerIdQuery;
 	private QuizStatus status;
 	private LocalDate createdFrom;
 	private LocalDate createdTo;

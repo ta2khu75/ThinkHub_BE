@@ -19,7 +19,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 
 @Tag(name = "Quiz", description = "Create, manage, take, and interact with quizzes including commenting and reporting.")
 @ApiController("${app.api-prefix}/quizzes")
@@ -79,7 +78,7 @@ class QuizController extends BaseController<QuizService> implements CrudControll
 		service.hide(id);
 		return ResponseEntity.noContent().build();
 	}
-	
+
 	@Override
 	@Operation(summary = "Delete a quiz", description = "Permanently remove a quiz from the system.")
 	public ResponseEntity<Void> delete(String id) {

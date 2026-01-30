@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.authn.internal.config;
+package com.ta2khu75.thinkhub.config;
 
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 

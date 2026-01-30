@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.api.enums.ResultVisibility;
+import com.ta2khu75.thinkhub.quizDraft.api.dto.QuestionDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

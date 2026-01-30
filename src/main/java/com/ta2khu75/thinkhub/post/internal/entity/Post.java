@@ -48,7 +48,7 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	@Column(nullable = false)
 	Long categoryId;
 	@Column(nullable = false, updatable = false)
-	Long authorId;
+	Long ownerId;
 
 	@Override
 	public IdConfig getIdConfig() {

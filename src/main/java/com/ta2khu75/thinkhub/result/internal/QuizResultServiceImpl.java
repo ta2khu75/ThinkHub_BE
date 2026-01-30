@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.quiz.api.QuizApi;
-import com.ta2khu75.thinkhub.quiz.api.dto.AnswerDto;
-import com.ta2khu75.thinkhub.quiz.api.dto.QuestionDto;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizDetailResponse;
+import com.ta2khu75.thinkhub.quizDraft.api.dto.AnswerDto;
+import com.ta2khu75.thinkhub.quizDraft.api.dto.QuestionDto;
 import com.ta2khu75.thinkhub.result.api.QuizResultApi;
 import com.ta2khu75.thinkhub.result.api.dto.QuizResultRequest;
 import com.ta2khu75.thinkhub.result.api.dto.QuizResultResponse;

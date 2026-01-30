@@ -1,4 +1,4 @@
-package com.ta2khu75.thinkhub.quiz.api.dto;
+package com.ta2khu75.thinkhub.quizDraft.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

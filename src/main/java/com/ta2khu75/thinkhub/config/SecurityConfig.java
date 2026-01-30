@@ -24,7 +24,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 
-import com.ta2khu75.thinkhub.authn.internal.config.CookieTokenResolver;
 import com.ta2khu75.thinkhub.authn.internal.config.JwtProviderFactory;
 import com.ta2khu75.thinkhub.authn.internal.config.TokenType;
 import com.ta2khu75.thinkhub.authn.internal.service.OAuth2LoginSuccessHandler;

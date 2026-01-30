@@ -67,7 +67,7 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 		Post post = mapper.toEntity(request);
 		post.setTagIds(this.getTagIds(request));
 		post.setQuizIds(this.getQuizIds(request));
-		post.setAuthorId(SecurityUtil.getCurrentUserIdDecode());
+		post.setOwnerId(SecurityUtil.getCurrentUserIdDecode());
 		PostResponse response = this.save(post);
 		events.publishEvent(new PostCreatedEvent(response.getAuthor().id(), post.getId()));
 		return response;
@@ -140,10 +140,10 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 
 	@Override
 	public PageResponse<PostResponse> search(PostSearch search) {
-		if (search.getAuthorId() != null) {
-			search.setAuthorIdQuery(decode(search.getAuthorId(), IdConfig.USER));
+		if (search.getOwnerId() != null) {
+			search.setOwnerIdQuery(decode(search.getOwnerId(), IdConfig.USER));
 		}
-		Long authorId = search.getAuthorIdQuery();
+		Long authorId = search.getOwnerIdQuery();
 
 		// Nếu không phải là chính chủ, chỉ cho xem bài viết PUBLIC
 		if (!SecurityUtil.isAuthorDecode(authorId)) {
@@ -166,7 +166,7 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 			authorMap = Map.of(authorId, author);
 		} else {
 			// Lấy toàn bộ authorId trong trang
-			Set<Long> authorIds = page.getContent().stream().map(Post::getAuthorId).collect(Collectors.toSet());
+			Set<Long> authorIds = page.getContent().stream().map(Post::getOwnerId).collect(Collectors.toSet());
 
 			authorMap = userPort.readMapAuthorsByUserIds(authorIds);
 		}
@@ -180,7 +180,7 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 
 	private PostResponse toResponse(Post post, Map<Long, AuthorResponse> authorMap, Map<Long, TagDto> tagMap) {
 		PostResponse response = mapper.convert(post);
-		response.setAuthor(authorMap.get(post.getAuthorId()));
+		response.setAuthor(authorMap.get(post.getOwnerId()));
 
 		Set<TagDto> tags = post.getTagIds().stream().map(tagMap::get).filter(Objects::nonNull)
 				.collect(Collectors.toSet());
@@ -199,7 +199,7 @@ class PostServiceImpl extends BaseService<Post, Long, PostRepository> implements
 		Long postId = decodeId(id);
 		Post post = readEntity(postId);
 		PostResponse response = mapper.convert(readEntity(postId));
-		AuthorResponse author = userPort.readAuthor(post.getAuthorId());
+		AuthorResponse author = userPort.readAuthor(post.getOwnerId());
 		Set<TagDto> tags = tagPort.readAllByIds(post.getTagIds());
 		response.setAuthor(author);
 		response.setTags(tags);
