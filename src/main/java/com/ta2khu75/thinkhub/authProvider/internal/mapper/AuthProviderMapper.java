@@ -8,7 +8,7 @@ import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderLocal;
 import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderOAuth2;
 import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderSummary;
 import com.ta2khu75.thinkhub.authProvider.internal.entity.AuthProvider;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 
 @Mapper(config = MapperSpringConfig.class)
 public interface AuthProviderMapper extends Converter<AuthProvider, AuthProviderSummary> {

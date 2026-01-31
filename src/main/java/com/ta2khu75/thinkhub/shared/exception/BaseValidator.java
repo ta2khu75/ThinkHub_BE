@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.shared.exception;
 import java.util.Collection;
 import java.util.Objects;
 
-import com.ta2khu75.thinkhub.shared.enums.ErrorCode;
+import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
 public abstract class BaseValidator {
 

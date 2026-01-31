@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.notification.internal.entity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.ta2khu75.thinkhub.notification.api.NotificationStatus;
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityCustom;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityCustom;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

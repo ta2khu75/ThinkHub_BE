@@ -5,7 +5,8 @@ import java.util.List;
 
 import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.internal.entity.QuizStatus;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

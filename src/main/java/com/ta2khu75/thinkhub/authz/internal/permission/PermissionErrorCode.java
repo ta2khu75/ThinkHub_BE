@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.authz.internal.permission;
 
-import com.ta2khu75.thinkhub.shared.enums.ErrorCode;
+import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
 public enum PermissionErrorCode implements ErrorCode {
 	NOT_FOUND;

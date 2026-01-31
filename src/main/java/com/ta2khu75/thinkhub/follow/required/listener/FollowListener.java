@@ -11,8 +11,8 @@ import com.ta2khu75.thinkhub.follow.api.event.FollowTargetCreatedEvent;
 import com.ta2khu75.thinkhub.notification.api.NotificationTargetType;
 import com.ta2khu75.thinkhub.post.api.event.PostCreatedEvent;
 import com.ta2khu75.thinkhub.quiz.api.event.QuizCreatedEvent;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 import lombok.RequiredArgsConstructor;
 

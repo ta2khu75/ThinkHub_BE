@@ -1,6 +1,7 @@
 package com.ta2khu75.thinkhub.comment.internal.entity;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;

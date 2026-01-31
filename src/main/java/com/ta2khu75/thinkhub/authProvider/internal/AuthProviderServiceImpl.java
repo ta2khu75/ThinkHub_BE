@@ -11,7 +11,7 @@ import com.ta2khu75.thinkhub.authProvider.internal.entity.ProviderType;
 import com.ta2khu75.thinkhub.authProvider.internal.mapper.AuthProviderMapper;
 import com.ta2khu75.thinkhub.authProvider.internal.repository.AuthProviderRepository;
 import com.ta2khu75.thinkhub.authProvider.internal.validator.AuthProviderErrorCode;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;

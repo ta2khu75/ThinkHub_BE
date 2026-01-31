@@ -18,9 +18,9 @@ import com.ta2khu75.thinkhub.comment.internal.repository.CommentRepository;
 import com.ta2khu75.thinkhub.comment.internal.service.CommentService;
 import com.ta2khu75.thinkhub.comment.internal.validator.CommentValidator;
 import com.ta2khu75.thinkhub.comment.required.port.CommentUserPort;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 

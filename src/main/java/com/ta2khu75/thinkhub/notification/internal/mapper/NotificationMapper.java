@@ -8,7 +8,7 @@ import org.springframework.core.convert.converter.Converter;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationRequest;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationResponse;
 import com.ta2khu75.thinkhub.notification.internal.entity.Notification;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 
 @Mapper(config = MapperSpringConfig.class)

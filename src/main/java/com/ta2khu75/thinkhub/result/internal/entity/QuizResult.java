@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.result.internal.entity;
 import java.time.Instant;
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

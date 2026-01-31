@@ -8,7 +8,7 @@ import org.springframework.core.convert.converter.Converter;
 import com.ta2khu75.thinkhub.comment.api.dto.CommentRequest;
 import com.ta2khu75.thinkhub.comment.api.dto.CommentResponse;
 import com.ta2khu75.thinkhub.comment.internal.entity.Comment;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 
 @Mapper(config = MapperSpringConfig.class)
 public interface CommentMapper extends Converter<Comment, CommentResponse> {

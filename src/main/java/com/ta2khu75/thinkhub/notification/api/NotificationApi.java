@@ -4,8 +4,8 @@ import com.ta2khu75.thinkhub.notification.api.dto.NotificationIdDto;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationRequest;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationResponse;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationStatusRequest;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 public interface NotificationApi {
 	NotificationResponse create(NotificationRequest request);

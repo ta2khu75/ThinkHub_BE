@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.sqids.Sqids;
 
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
 
 public class IdConverterUtil {
 

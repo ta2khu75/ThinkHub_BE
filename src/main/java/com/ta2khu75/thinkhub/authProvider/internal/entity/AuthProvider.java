@@ -1,6 +1,7 @@
 package com.ta2khu75.thinkhub.authProvider.internal.entity;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

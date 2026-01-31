@@ -4,9 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.springframework.core.convert.converter.Converter;
 
+import com.ta2khu75.thinkhub.quiz.draft.api.dto.AnswerDto;
 import com.ta2khu75.thinkhub.quiz.internal.entity.Answer;
-import com.ta2khu75.thinkhub.quizDraft.api.dto.AnswerDto;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 
 
 @Mapper(config = MapperSpringConfig.class)

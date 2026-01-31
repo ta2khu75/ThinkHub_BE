@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ta2khu75.thinkhub.notification.required.port.NotificationUserPort;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 import com.ta2khu75.thinkhub.user.api.UserApi;
 
 @Component

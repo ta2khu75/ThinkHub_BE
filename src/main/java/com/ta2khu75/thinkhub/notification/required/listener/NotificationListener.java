@@ -14,7 +14,7 @@ import com.ta2khu75.thinkhub.notification.api.dto.NotificationRequest;
 import com.ta2khu75.thinkhub.notification.required.port.NotificationAuthzPort;
 import com.ta2khu75.thinkhub.notification.required.port.NotificationUserPort;
 import com.ta2khu75.thinkhub.report.api.event.ReportCreatedEvent;
-import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
+import com.ta2khu75.thinkhub.shared.domain.enums.RoleDefault;
 
 import lombok.RequiredArgsConstructor;
 

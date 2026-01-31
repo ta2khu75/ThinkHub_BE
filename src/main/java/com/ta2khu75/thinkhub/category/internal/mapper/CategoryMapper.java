@@ -8,7 +8,7 @@ import org.springframework.core.convert.converter.Converter;
 import com.ta2khu75.thinkhub.category.api.dto.CategoryRequest;
 import com.ta2khu75.thinkhub.category.api.dto.CategoryResponse;
 import com.ta2khu75.thinkhub.category.internal.entity.Category;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 
 @Mapper(config = MapperSpringConfig.class)
 public interface CategoryMapper extends Converter<Category, CategoryResponse> {

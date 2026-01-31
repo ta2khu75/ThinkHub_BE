@@ -16,8 +16,8 @@ import com.ta2khu75.thinkhub.authn.api.dto.ChangePasswordRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.LoginRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.RegisterRequest;
 import com.ta2khu75.thinkhub.authn.api.dto.TokenResponse;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
 import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 
 import io.swagger.v3.oas.annotations.Operation;

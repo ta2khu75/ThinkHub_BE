@@ -7,11 +7,11 @@ import com.ta2khu75.thinkhub.quiz.api.dto.QuizRequest;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizResponse;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizSearch;
 import com.ta2khu75.thinkhub.quiz.internal.service.QuizService;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
-import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.anotation.SnakeCaseModelAttribute;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.CrudController;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

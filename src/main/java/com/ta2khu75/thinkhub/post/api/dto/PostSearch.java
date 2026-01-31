@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.ta2khu75.thinkhub.post.internal.entity.PostStatus;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

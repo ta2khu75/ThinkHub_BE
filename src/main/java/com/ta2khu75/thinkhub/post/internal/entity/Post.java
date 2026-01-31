@@ -4,9 +4,9 @@ import java.util.Set;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
-import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.HasIdSubject;
+import com.ta2khu75.thinkhub.shared.domain.enums.IdSubject;
 import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 
 import jakarta.persistence.Column;
@@ -28,7 +28,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
-public class Post extends BaseEntityLong implements IdConfigProvider {
+public class Post extends BaseEntityLong implements HasIdSubject {
 	@Column(nullable = false, length = 255)
 	String title;
 	@Column(nullable = false, columnDefinition = "TEXT")
@@ -51,8 +51,8 @@ public class Post extends BaseEntityLong implements IdConfigProvider {
 	Long ownerId;
 
 	@Override
-	public IdConfig getIdConfig() {
-		return IdConfig.POST;
+	public IdSubject getIdSubject() {
+		return IdSubject.POST;
 	}
 
 	@PrePersist

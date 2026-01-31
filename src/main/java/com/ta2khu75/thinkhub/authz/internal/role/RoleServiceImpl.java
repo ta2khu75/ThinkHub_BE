@@ -12,7 +12,7 @@ import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
 import com.ta2khu75.thinkhub.authz.internal.permission.Permission;
-import com.ta2khu75.thinkhub.shared.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.domain.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 

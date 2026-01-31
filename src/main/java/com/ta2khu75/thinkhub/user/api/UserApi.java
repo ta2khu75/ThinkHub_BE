@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;

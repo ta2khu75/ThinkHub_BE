@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
-import com.ta2khu75.thinkhub.shared.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
+import com.ta2khu75.thinkhub.shared.domain.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.tag.api.TagApi;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;

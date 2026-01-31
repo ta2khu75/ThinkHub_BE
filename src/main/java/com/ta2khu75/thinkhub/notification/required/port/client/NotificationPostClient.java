@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.ta2khu75.thinkhub.notification.required.port.NotificationPostPort;
 import com.ta2khu75.thinkhub.post.api.PostApi;
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 @Component
 class NotificationPostClient extends BaseClient<PostApi> implements NotificationPostPort {
 

@@ -5,7 +5,7 @@ import java.time.Instant;
 import com.ta2khu75.thinkhub.report.internal.entity.ReportStatus;
 import com.ta2khu75.thinkhub.report.internal.enums.ReportTargetType;
 import com.ta2khu75.thinkhub.report.internal.enums.ReportType;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

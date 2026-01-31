@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import com.ta2khu75.thinkhub.media.api.dto.MediaRequest;
 import com.ta2khu75.thinkhub.media.api.dto.MediaResponse;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 

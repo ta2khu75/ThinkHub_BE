@@ -8,7 +8,7 @@ import org.springframework.core.convert.converter.Converter;
 import com.ta2khu75.thinkhub.post.api.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.internal.entity.Post;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;

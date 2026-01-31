@@ -11,11 +11,11 @@ import com.ta2khu75.thinkhub.report.api.dto.ReportRequest;
 import com.ta2khu75.thinkhub.report.api.dto.ReportResponse;
 import com.ta2khu75.thinkhub.report.api.dto.ReportSearch;
 import com.ta2khu75.thinkhub.report.internal.entity.ReportStatus;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
-import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.anotation.SnakeCaseModelAttribute;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.CrudController;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

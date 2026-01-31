@@ -10,10 +10,10 @@ import com.ta2khu75.thinkhub.post.api.dto.PostRequest;
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
 import com.ta2khu75.thinkhub.post.api.dto.PostSearch;
 import com.ta2khu75.thinkhub.post.internal.service.PostService;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
-import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.CrudController;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

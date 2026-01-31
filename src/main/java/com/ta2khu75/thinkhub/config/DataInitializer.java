@@ -21,7 +21,7 @@ import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
-import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
+import com.ta2khu75.thinkhub.shared.domain.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.ApiScanner;
 import com.ta2khu75.thinkhub.user.api.UserApi;

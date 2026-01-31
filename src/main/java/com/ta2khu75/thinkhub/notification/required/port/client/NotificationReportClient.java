@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.ta2khu75.thinkhub.notification.required.port.NotificationReportPort;
 import com.ta2khu75.thinkhub.report.api.ReportApi;
 import com.ta2khu75.thinkhub.report.api.dto.ReportResponse;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 
 @Component
 class NotificationReportClient extends BaseClient<ReportApi> implements NotificationReportPort {

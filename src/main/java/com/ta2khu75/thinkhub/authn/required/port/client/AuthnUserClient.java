@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.authn.required.port.client;
 import org.springframework.stereotype.Component;
 
 import com.ta2khu75.thinkhub.authn.required.port.AuthnUserPort;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 import com.ta2khu75.thinkhub.user.api.UserApi;
 import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
 import com.ta2khu75.thinkhub.user.api.dto.UserSummary;

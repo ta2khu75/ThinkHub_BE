@@ -6,8 +6,8 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.ta2khu75.thinkhub.comment.required.port.CommentUserPort;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
 import com.ta2khu75.thinkhub.user.api.UserApi;
 @Component
 public class CommentUserClient extends BaseClient<UserApi> implements CommentUserPort {

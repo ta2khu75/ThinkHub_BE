@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.authn.internal.validator;
 
-import com.ta2khu75.thinkhub.shared.enums.ErrorCode;
+import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
 public enum AuthnErrorCode implements ErrorCode {
 

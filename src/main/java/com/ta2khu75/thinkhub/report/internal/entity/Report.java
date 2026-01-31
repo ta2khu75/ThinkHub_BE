@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.report.internal.entity;
 
 import com.ta2khu75.thinkhub.report.internal.enums.ReportTargetType;
 import com.ta2khu75.thinkhub.report.internal.enums.ReportType;
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

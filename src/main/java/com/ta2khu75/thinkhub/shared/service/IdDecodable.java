@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.shared.service;
 
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
 import com.ta2khu75.thinkhub.shared.util.IdConverterUtil;
 
 public interface IdDecodable {

@@ -7,9 +7,9 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
-import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.HasIdSubject;
+import com.ta2khu75.thinkhub.shared.domain.enums.IdSubject;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -32,7 +32,7 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
-public class User extends BaseEntityLong implements IdConfigProvider {
+public class User extends BaseEntityLong implements HasIdSubject {
 	@Column(nullable = false, unique = true)
 	String email;
 	@Column(nullable = false)
@@ -52,8 +52,8 @@ public class User extends BaseEntityLong implements IdConfigProvider {
 	String createdBy;
 
 	@Override
-	public IdConfig getIdConfig() {
-		return IdConfig.USER;
+	public IdSubject getIdSubject() {
+		return IdSubject.USER;
 	}
 
 	@PreUpdate

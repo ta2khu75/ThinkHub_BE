@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.quiz.api.dto;
 import java.util.List;
 
 import com.ta2khu75.thinkhub.post.api.dto.PostResponse;
-import com.ta2khu75.thinkhub.quizDraft.api.dto.QuestionDto;
+import com.ta2khu75.thinkhub.quiz.draft.api.dto.QuestionDto;
 
 import lombok.AccessLevel;
 import lombok.Data;

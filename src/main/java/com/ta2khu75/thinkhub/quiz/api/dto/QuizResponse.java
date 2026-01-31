@@ -5,8 +5,8 @@ import java.util.Set;
 import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.api.enums.ResultVisibility;
 import com.ta2khu75.thinkhub.quiz.internal.entity.QuizStatus;
-import com.ta2khu75.thinkhub.shared.api.dto.BaseClassResponse;
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.BaseClassResponse;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 
 import lombok.AccessLevel;

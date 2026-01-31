@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.ta2khu75.thinkhub.shared.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.domain.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 
 @Component

@@ -1,14 +1,14 @@
 package com.ta2khu75.thinkhub.user.projection.internal.projection;
 
-import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
-import com.ta2khu75.thinkhub.shared.entity.IdEntity;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.domain.entity.HasIdSubject;
+import com.ta2khu75.thinkhub.shared.domain.entity.IdEntity;
+import com.ta2khu75.thinkhub.shared.domain.enums.IdSubject;
 
-public record Author(Long id, String displayName) implements IdConfigProvider, IdEntity<Long> {
+public record Author(Long id, String displayName) implements HasIdSubject, IdEntity<Long> {
 
 	@Override
-	public IdConfig getIdConfig() {
-		return IdConfig.USER;
+	public IdSubject getIdSubject() {
+		return IdSubject.USER;
 	}
 
 	@Override

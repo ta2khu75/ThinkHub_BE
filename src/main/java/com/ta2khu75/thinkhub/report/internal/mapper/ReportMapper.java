@@ -8,7 +8,7 @@ import org.springframework.core.convert.converter.Converter;
 import com.ta2khu75.thinkhub.report.api.dto.ReportRequest;
 import com.ta2khu75.thinkhub.report.api.dto.ReportResponse;
 import com.ta2khu75.thinkhub.report.internal.entity.Report;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 
 @Mapper(config = MapperSpringConfig.class)

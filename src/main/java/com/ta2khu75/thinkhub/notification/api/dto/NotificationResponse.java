@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.notification.api.dto;
 
 
 import com.ta2khu75.thinkhub.notification.api.NotificationStatus;
-import com.ta2khu75.thinkhub.shared.api.dto.BaseClassResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.BaseClassResponse;
 
 import lombok.AccessLevel;
 import lombok.Data;

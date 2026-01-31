@@ -13,11 +13,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
-import com.ta2khu75.thinkhub.shared.enums.EntityType;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
-import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
+import com.ta2khu75.thinkhub.shared.domain.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.domain.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.exception.ConflictException;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.BaseService;

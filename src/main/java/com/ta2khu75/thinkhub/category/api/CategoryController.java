@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.ta2khu75.thinkhub.category.api.dto.CategoryRequest;
 import com.ta2khu75.thinkhub.category.api.dto.CategoryResponse;
 import com.ta2khu75.thinkhub.category.internal.service.CategoryService;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
-import com.ta2khu75.thinkhub.shared.api.controller.CrudController;
-import com.ta2khu75.thinkhub.shared.group.Create;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.api.controller.CrudController;
+import com.ta2khu75.thinkhub.shared.validation.group.Create;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

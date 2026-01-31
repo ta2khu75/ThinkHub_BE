@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.user.internal.validator;
 
-import com.ta2khu75.thinkhub.shared.enums.ErrorCode;
+import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 import com.ta2khu75.thinkhub.user.internal.entity.User;
 
 public enum UserErrorCode implements ErrorCode {

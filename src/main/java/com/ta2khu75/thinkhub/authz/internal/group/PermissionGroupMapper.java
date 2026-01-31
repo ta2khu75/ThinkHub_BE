@@ -6,7 +6,7 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.PermissionGroupResponse;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 
 @Mapper(config = MapperSpringConfig.class)
 public interface PermissionGroupMapper extends Converter<PermissionGroup, PermissionGroupResponse> {

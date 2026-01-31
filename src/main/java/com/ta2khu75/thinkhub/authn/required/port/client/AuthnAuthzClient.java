@@ -6,7 +6,7 @@ import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthzPort;
 import com.ta2khu75.thinkhub.authz.api.AuthzApi;
 import com.ta2khu75.thinkhub.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 
 @Component
 class AuthnAuthzClient extends BaseClient<AuthzApi> implements AuthnAuthzPort {

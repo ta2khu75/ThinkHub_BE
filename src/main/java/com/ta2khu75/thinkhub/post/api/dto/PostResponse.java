@@ -3,8 +3,8 @@ package com.ta2khu75.thinkhub.post.api.dto;
 import java.util.Set;
 
 import com.ta2khu75.thinkhub.post.internal.entity.PostStatus;
-import com.ta2khu75.thinkhub.shared.api.dto.BaseClassResponse;
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.BaseClassResponse;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 
 import lombok.AccessLevel;

@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.category.internal.entity;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
 import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 
 import jakarta.persistence.Column;

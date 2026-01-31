@@ -10,7 +10,7 @@ import com.ta2khu75.thinkhub.result.api.dto.UserAnswerRequest;
 import com.ta2khu75.thinkhub.result.api.dto.UserAnswerResponse;
 import com.ta2khu75.thinkhub.result.internal.entity.QuizResult;
 import com.ta2khu75.thinkhub.result.internal.entity.UserAnswer;
-import com.ta2khu75.thinkhub.shared.anotation.MapperSpringConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 
 @Mapper(config = MapperSpringConfig.class)

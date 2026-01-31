@@ -8,7 +8,7 @@ import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderOAuth2;
 import com.ta2khu75.thinkhub.authProvider.api.dto.AuthProviderSummary;
 import com.ta2khu75.thinkhub.authProvider.internal.entity.ProviderType;
 import com.ta2khu75.thinkhub.authn.required.port.AuthnAuthProviderPort;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 
 @Component
 class AuthnAuthProviderClient extends BaseClient<AuthProviderApi> implements AuthnAuthProviderPort {

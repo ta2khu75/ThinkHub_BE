@@ -13,7 +13,7 @@ import com.ta2khu75.thinkhub.media.internal.entity.MediaType;
 import com.ta2khu75.thinkhub.media.internal.mapper.MediaMapper;
 import com.ta2khu75.thinkhub.media.internal.repository.MediaRepository;
 import com.ta2khu75.thinkhub.media.internal.service.StorageStrategy;
-import com.ta2khu75.thinkhub.shared.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.domain.enums.EntityType;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 @Service

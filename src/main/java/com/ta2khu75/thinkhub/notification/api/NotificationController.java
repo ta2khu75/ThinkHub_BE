@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationIdDto;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationResponse;
 import com.ta2khu75.thinkhub.notification.api.dto.NotificationStatusRequest;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.anotation.SnakeCaseModelAttribute;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

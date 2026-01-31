@@ -13,9 +13,9 @@ import java.util.Set;
 
 import com.ta2khu75.thinkhub.quiz.api.enums.QuizLevel;
 import com.ta2khu75.thinkhub.quiz.api.enums.ResultVisibility;
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
-import com.ta2khu75.thinkhub.shared.entity.IdConfigProvider;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.HasIdSubject;
+import com.ta2khu75.thinkhub.shared.domain.enums.IdSubject;
 import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 
 @Data
@@ -24,7 +24,7 @@ import com.ta2khu75.thinkhub.shared.util.SlugUtil;
 @ToString(exclude = { "questions" })
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true, exclude = { "questions" })
-public class Quiz extends BaseEntityLong implements IdConfigProvider {
+public class Quiz extends BaseEntityLong implements HasIdSubject {
 	public Quiz() {
 		super();
 		shuffleQuestion = true;
@@ -64,8 +64,8 @@ public class Quiz extends BaseEntityLong implements IdConfigProvider {
 	List<Question> questions;
 
 	@Override
-	public IdConfig getIdConfig() {
-		return IdConfig.QUIZ;
+	public IdSubject getIdSubject() {
+		return IdSubject.QUIZ;
 	}
 
 	@PrePersist

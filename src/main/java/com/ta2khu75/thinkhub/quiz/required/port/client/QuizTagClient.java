@@ -5,7 +5,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import com.ta2khu75.thinkhub.quiz.required.port.QuizTagPort;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 import com.ta2khu75.thinkhub.tag.api.TagApi;
 import com.ta2khu75.thinkhub.tag.api.dto.TagDto;
 

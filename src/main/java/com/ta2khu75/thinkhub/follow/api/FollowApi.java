@@ -2,9 +2,9 @@ package com.ta2khu75.thinkhub.follow.api;
 
 import com.ta2khu75.thinkhub.follow.api.dto.FollowResponse;
 import com.ta2khu75.thinkhub.follow.api.dto.FollowStatusResponse;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.api.dto.Search;
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 public interface FollowApi {
 	void follow(String followingId);

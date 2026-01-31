@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.report.internal.validator;
 
-import com.ta2khu75.thinkhub.shared.enums.ErrorCode;
+import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
 public enum ReportErrorCode implements ErrorCode {
 	NOT_FOUND, UPDATE_NOT_ALLOWED, NOT_AUTHOR;

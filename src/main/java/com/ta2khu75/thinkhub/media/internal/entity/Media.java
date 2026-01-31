@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.media.internal.entity;
 
 import org.springframework.data.annotation.CreatedBy;
 
-import com.ta2khu75.thinkhub.shared.entity.BaseEntityLong;
+import com.ta2khu75.thinkhub.shared.domain.entity.BaseEntityLong;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

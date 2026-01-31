@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.ta2khu75.thinkhub.notification.required.port.NotificationQuizPort;
 import com.ta2khu75.thinkhub.quiz.api.QuizApi;
 import com.ta2khu75.thinkhub.quiz.api.dto.QuizResponse;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseClient;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 
 @Component
 class NotificationQuizClient extends BaseClient<QuizApi> implements NotificationQuizPort {

@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.post.required.client;
 import java.util.Collection;
 import java.util.Map;
 
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
 
 public interface PostUserPort {
 	AuthorResponse readAuthor(Long id);

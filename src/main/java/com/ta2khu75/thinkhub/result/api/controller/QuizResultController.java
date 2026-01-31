@@ -10,11 +10,11 @@ import com.ta2khu75.thinkhub.result.api.QuizResultApi;
 import com.ta2khu75.thinkhub.result.api.dto.QuizResultRequest;
 import com.ta2khu75.thinkhub.result.api.dto.QuizResultResponse;
 import com.ta2khu75.thinkhub.result.api.dto.QuizResultSearch;
-import com.ta2khu75.thinkhub.shared.anotation.ApiController;
-import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
-import com.ta2khu75.thinkhub.shared.api.controller.BaseController;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
+import com.ta2khu75.thinkhub.shared.common.anotation.ApiController;
+import com.ta2khu75.thinkhub.shared.common.anotation.SnakeCaseModelAttribute;
+import com.ta2khu75.thinkhub.shared.common.api.controller.BaseController;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import io.swagger.v3.oas.annotations.Operation;

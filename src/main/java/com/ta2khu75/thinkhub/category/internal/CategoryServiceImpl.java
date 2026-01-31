@@ -13,8 +13,8 @@ import com.ta2khu75.thinkhub.category.internal.repository.CategoryRepository;
 import com.ta2khu75.thinkhub.category.internal.service.CategoryService;
 import com.ta2khu75.thinkhub.category.required.port.CategoryMediaPort;
 import com.ta2khu75.thinkhub.media.api.dto.MediaResponse;
-import com.ta2khu75.thinkhub.shared.enums.EntityType;
-import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
+import com.ta2khu75.thinkhub.shared.domain.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.domain.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 
 import jakarta.validation.Valid;

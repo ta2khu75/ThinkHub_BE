@@ -28,11 +28,11 @@ import com.ta2khu75.thinkhub.quiz.internal.validator.QuizValidator;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizMediaPort;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizTagPort;
 import com.ta2khu75.thinkhub.quiz.required.port.QuizUserPort;
-import com.ta2khu75.thinkhub.shared.api.dto.PageResponse;
-import com.ta2khu75.thinkhub.shared.entity.AuthorResponse;
-import com.ta2khu75.thinkhub.shared.enums.EntityType;
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
-import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
+import com.ta2khu75.thinkhub.shared.domain.enums.EntityType;
+import com.ta2khu75.thinkhub.shared.domain.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.service.BaseService;
 import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
