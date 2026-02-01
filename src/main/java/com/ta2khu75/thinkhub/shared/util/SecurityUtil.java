@@ -5,8 +5,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import com.ta2khu75.thinkhub.shared.enums.IdConfig;
-import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
+import com.ta2khu75.thinkhub.shared.domain.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
 
 public final class SecurityUtil {

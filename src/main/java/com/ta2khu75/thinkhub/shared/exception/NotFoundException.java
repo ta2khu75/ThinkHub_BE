@@ -1,9 +1,14 @@
 package com.ta2khu75.thinkhub.shared.exception;
 
-public class NotFoundException extends BaseException{
-    private static final long serialVersionUID = 1L;
+import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
-	public NotFoundException(String message) {
-        super(message, 404);
-    }
+public class NotFoundException extends BaseException {
+	private static final long serialVersionUID = 1L;
+
+	public NotFoundException(ErrorCode code, String message) {
+		super(code, message, 404);
+	}
+	public NotFoundException(String code, String message) {
+		super(code, message, 404);
+	}
 }

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.ta2khu75.thinkhub.shared.api.dto.ApiResponse;
+import com.ta2khu75.thinkhub.shared.common.api.dto.ApiResponse;
 
 @RestControllerAdvice
 @RequiredArgsConstructor

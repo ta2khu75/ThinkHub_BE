@@ -1,0 +1,12 @@
+package com.ta2khu75.thinkhub.modules.notification.internal.repository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.ta2khu75.thinkhub.modules.notification.internal.entity.Notification;
+import com.ta2khu75.thinkhub.modules.notification.internal.entity.NotificationId;
+
+public interface NotificationRepository extends JpaRepository<Notification, NotificationId> {
+	Page<Notification> findByIdUserId(Long userId, Pageable pageable);
+}

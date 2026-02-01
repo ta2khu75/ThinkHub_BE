@@ -11,7 +11,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import com.ta2khu75.thinkhub.shared.anotation.SnakeCaseModelAttribute;
+import com.ta2khu75.thinkhub.shared.common.anotation.SnakeCaseModelAttribute;
 
 
 public class SnakeCaseModelAttributeResolver implements HandlerMethodArgumentResolver {

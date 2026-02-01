@@ -135,6 +135,10 @@ public class RedisService {
 	}
 
 	public class RedisKeyBuilder {
+		public static String quizDraft(String quizId) {
+			return String.format("quiz:draft", quizId);
+		}
+
 		public static String refreshToken(String id) {
 			return "auth:refresh:" + id;
 		}

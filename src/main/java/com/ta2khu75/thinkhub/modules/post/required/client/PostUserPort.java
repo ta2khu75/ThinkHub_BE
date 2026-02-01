@@ -1,0 +1,12 @@
+package com.ta2khu75.thinkhub.modules.post.required.client;
+
+import java.util.Collection;
+import java.util.Map;
+
+import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+
+public interface PostUserPort {
+	AuthorResponse readAuthor(Long id);
+
+	Map<Long, AuthorResponse> readMapAuthorsByUserIds(Collection<Long> ids);
+}

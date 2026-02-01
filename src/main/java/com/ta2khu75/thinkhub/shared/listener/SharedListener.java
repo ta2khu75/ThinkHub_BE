@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.shared.listener;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.ta2khu75.thinkhub.shared.event.CheckExistsEvent;
+import com.ta2khu75.thinkhub.shared.domain.event.CheckExistsEvent;
 import com.ta2khu75.thinkhub.shared.service.ExistsService;
 import com.ta2khu75.thinkhub.shared.service.clazz.ExistsServiceRegistry;
 

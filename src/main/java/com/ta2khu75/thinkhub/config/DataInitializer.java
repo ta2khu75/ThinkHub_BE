@@ -15,18 +15,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ta2khu75.thinkhub.authn.api.AuthnApi;
-import com.ta2khu75.thinkhub.authz.api.AuthzApi;
-import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
-import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
-import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
-import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
-import com.ta2khu75.thinkhub.shared.enums.RoleDefault;
+import com.ta2khu75.thinkhub.modules.authn.api.AuthnApi;
+import com.ta2khu75.thinkhub.modules.authz.api.AuthzApi;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.PermissionSummary;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.request.PermissionGroupSummary;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.response.RoleResponse;
+import com.ta2khu75.thinkhub.modules.user.api.UserApi;
+import com.ta2khu75.thinkhub.modules.user.api.dto.UserCreateRequest;
+import com.ta2khu75.thinkhub.modules.user.api.dto.UserStatusRequest;
+import com.ta2khu75.thinkhub.shared.domain.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.ApiScanner;
-import com.ta2khu75.thinkhub.user.api.UserApi;
-import com.ta2khu75.thinkhub.user.api.dto.UserStatusSummary;
-import com.ta2khu75.thinkhub.user.api.dto.UserSummary;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,16 +39,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataInitializer implements ApplicationRunner {
-	AuthzApi authzApi;
 	AuthnApi authnApi;
+	AuthzApi authzApi;
 	UserApi userApi;
 	ApiScanner apiScanner;
 	PublicEndpointRegistry publicEndpointRegistry;
 
 	private void createUserAdmin() {
-		UserStatusSummary status = new UserStatusSummary(null, true, true, this.initDefaultRoles());
-		UserSummary user = new UserSummary(null, "admin", "admin", "admin@g.com", "loading", status);
-		user = userApi.create(user);
+		UserStatusRequest status = new UserStatusRequest(true, true, this.initDefaultRoles());
+		UserCreateRequest user = new UserCreateRequest("loading@g.com", "loading", "loading", "loading", status);
 		authnApi.create(user, "123456");
 	}
 
@@ -173,7 +172,9 @@ public class DataInitializer implements ApplicationRunner {
 		List<RoleResponse> roles = Arrays.stream(RoleDefault.values())
 				.map(role -> authzApi.createRole(new RoleRequest(role.name(), null, new HashSet<>()))).toList();
 		return roles.stream().filter(role -> role.name().equals(RoleDefault.ADMIN.name())).findFirst()
-				.orElseThrow(() -> new NotFoundException("Not found role name ADMIN")).id();
+				.orElseThrow(
+						() -> new NotFoundException("DataInitializer:NOT_FOUND_ROLE_NAME", "Not found role name ADMIN"))
+				.id();
 	}
 
 	private Set<Long> getPermissionPublicIds(Map<String, List<PermissionSummary>> permissionMap) {

@@ -1,10 +1,25 @@
 package com.ta2khu75.thinkhub.shared.exception;
 
-public class ForbiddenException extends BaseException{
-	
+import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
+
+public class ForbiddenException extends BaseException {
+
 	private static final long serialVersionUID = 1L;
 
 	public ForbiddenException(String message) {
-		super(message,403);
+		super(ForbiddenErrorCode.NO_PERMISSION, message, 403);
+	}
+
+	public ForbiddenException(ErrorCode code, String message) {
+		super(code, message, 403);
+	}
+
+	enum ForbiddenErrorCode implements ErrorCode {
+		NO_PERMISSION;
+
+		@Override
+		public String getCode() {
+			return ForbiddenErrorCode.class.getSimpleName() + ":" + name();
+		}
 	}
 }
