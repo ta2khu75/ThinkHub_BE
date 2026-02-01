@@ -13,9 +13,9 @@ import org.springframework.web.servlet.mvc.condition.PathPatternsRequestConditio
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
-import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
 import com.ta2khu75.thinkhub.config.PublicEndpointRegistry;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.PermissionSummary;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.request.PermissionGroupSummary;
 import com.ta2khu75.thinkhub.shared.util.StringUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

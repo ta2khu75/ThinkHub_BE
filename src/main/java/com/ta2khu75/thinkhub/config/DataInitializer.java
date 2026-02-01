@@ -15,18 +15,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ta2khu75.thinkhub.authn.api.AuthnApi;
-import com.ta2khu75.thinkhub.authz.api.AuthzApi;
-import com.ta2khu75.thinkhub.authz.api.dto.PermissionSummary;
-import com.ta2khu75.thinkhub.authz.api.dto.request.PermissionGroupSummary;
-import com.ta2khu75.thinkhub.authz.api.dto.request.RoleRequest;
-import com.ta2khu75.thinkhub.authz.api.dto.response.RoleResponse;
+import com.ta2khu75.thinkhub.modules.authn.api.AuthnApi;
+import com.ta2khu75.thinkhub.modules.authz.api.AuthzApi;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.PermissionSummary;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.request.PermissionGroupSummary;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.request.RoleRequest;
+import com.ta2khu75.thinkhub.modules.authz.api.dto.response.RoleResponse;
+import com.ta2khu75.thinkhub.modules.user.api.UserApi;
+import com.ta2khu75.thinkhub.modules.user.api.dto.UserCreateRequest;
+import com.ta2khu75.thinkhub.modules.user.api.dto.UserStatusRequest;
 import com.ta2khu75.thinkhub.shared.domain.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;
 import com.ta2khu75.thinkhub.shared.service.ApiScanner;
-import com.ta2khu75.thinkhub.user.api.UserApi;
-import com.ta2khu75.thinkhub.user.api.dto.UserCreateRequest;
-import com.ta2khu75.thinkhub.user.api.dto.UserStatusRequest;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
