@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.modules.post.api.dto;
 
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.modules.post.internal.entity.PostStatus;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.PostStatus;
 import com.ta2khu75.thinkhub.modules.tag.api.dto.TagDto;
 import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.common.api.dto.BaseClassResponse;

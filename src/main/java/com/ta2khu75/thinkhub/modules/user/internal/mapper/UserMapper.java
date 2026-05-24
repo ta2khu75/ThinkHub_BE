@@ -12,9 +12,9 @@ import com.ta2khu75.thinkhub.modules.user.api.dto.UserStatusRequest;
 import com.ta2khu75.thinkhub.modules.user.api.dto.UserStatusResponse;
 import com.ta2khu75.thinkhub.modules.user.api.dto.UserStatusSummary;
 import com.ta2khu75.thinkhub.modules.user.api.dto.UserSummary;
-import com.ta2khu75.thinkhub.modules.user.internal.entity.User;
-import com.ta2khu75.thinkhub.modules.user.internal.entity.UserStatus;
-import com.ta2khu75.thinkhub.modules.user.projection.internal.projection.Author;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.Author;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.User;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.UserStatus;
 import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
@@ -83,7 +83,6 @@ public interface UserMapper extends Converter<User, UserResponse>, PageMapper<Us
 
 	UserStatusSummary toSummary(UserStatus entity);
 
-	@Mapping(target = "id", source = "entity")
 	UserSummary toSummary(User entity);
 
 	@Mapping(target = "id", source = "entity")

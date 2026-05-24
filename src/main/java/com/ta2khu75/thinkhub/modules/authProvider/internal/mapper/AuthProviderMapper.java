@@ -7,7 +7,7 @@ import org.springframework.core.convert.converter.Converter;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderLocal;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderOAuth2;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderSummary;
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.AuthProvider;
+import com.ta2khu75.thinkhub.modules.authProvider.internal.domain.AuthProvider;
 import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 
 @Mapper(config = MapperSpringConfig.class)
@@ -28,6 +28,5 @@ public interface AuthProviderMapper extends Converter<AuthProvider, AuthProvider
 	AuthProvider toEntity(AuthProviderOAuth2 oAuth2);
 
 	@Override
-	@Mapping(target = "userId", ignore = true)
 	AuthProviderSummary convert(AuthProvider source);
 }

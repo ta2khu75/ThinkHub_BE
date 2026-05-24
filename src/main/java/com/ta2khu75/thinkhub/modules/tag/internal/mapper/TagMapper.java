@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.modules.tag.api.dto.TagDto;
-import com.ta2khu75.thinkhub.modules.tag.internal.entity.Tag;
+import com.ta2khu75.thinkhub.modules.tag.internal.domain.Tag;
 import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 

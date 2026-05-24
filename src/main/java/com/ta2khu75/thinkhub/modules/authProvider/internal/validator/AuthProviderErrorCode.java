@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.modules.authProvider.internal.validator;
 
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.AuthProvider;
+import com.ta2khu75.thinkhub.modules.authProvider.internal.domain.AuthProvider;
 import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
 public enum AuthProviderErrorCode implements ErrorCode {

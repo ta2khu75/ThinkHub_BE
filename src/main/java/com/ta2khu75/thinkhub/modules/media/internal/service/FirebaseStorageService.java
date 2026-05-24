@@ -2,6 +2,7 @@ package com.ta2khu75.thinkhub.modules.media.internal.service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ import com.google.cloud.storage.*;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
-import com.ta2khu75.thinkhub.modules.media.internal.entity.MediaOwnerType;
+import com.ta2khu75.thinkhub.modules.media.internal.domain.MediaOwnerType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +28,20 @@ public class FirebaseStorageService implements StorageStrategy {
 	private String storageBucket;
 
 	@Override
-	public String upload(MediaOwnerType ownerType, MultipartFile file) throws IOException {
-		String fileName = UUID.randomUUID().toString().concat(this.getExtension(file));
-		String filePath = String.format("BACKEND/%s/%s", ownerType.name(), fileName); // to generated
+	public String upload(MultipartFile file) throws IOException {
+		String filePath = this.getFilePath(file);
 		Bucket bucket = storage.get(storageBucket);
 		Blob blob = bucket.create(filePath, file.getInputStream(), file.getContentType());
 		blob.toBuilder().setAcl(Collections.singletonList(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER))).build()
 				.update();
 		return String.format("https://storage.googleapis.com/%s/%s", storageBucket, filePath);
+	}
+
+	private String getFilePath(MultipartFile file) {
+		String fileName = UUID.randomUUID().toString().concat(this.getExtension(file));
+		String prefix = fileName.substring(0, 2);
+		LocalDate localDate = LocalDate.now();
+		return String.format("%d/%d/%s/%s", localDate.getYear(), localDate.getMonthValue(), prefix, fileName);
 	}
 
 	public void delete(String url) {

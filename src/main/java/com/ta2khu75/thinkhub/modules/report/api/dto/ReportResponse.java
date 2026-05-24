@@ -1,7 +1,7 @@
 package com.ta2khu75.thinkhub.modules.report.api.dto;
 
-import com.ta2khu75.thinkhub.modules.report.internal.entity.ReportStatus;
-import com.ta2khu75.thinkhub.modules.report.internal.enums.ReportType;
+import com.ta2khu75.thinkhub.modules.report.api.model.ReportType;
+import com.ta2khu75.thinkhub.modules.report.internal.domain.ReportStatus;
 import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.common.api.dto.BaseClassResponse;
 

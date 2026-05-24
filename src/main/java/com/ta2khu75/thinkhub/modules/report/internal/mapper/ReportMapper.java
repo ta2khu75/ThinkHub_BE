@@ -7,7 +7,7 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.modules.report.api.dto.ReportRequest;
 import com.ta2khu75.thinkhub.modules.report.api.dto.ReportResponse;
-import com.ta2khu75.thinkhub.modules.report.internal.entity.Report;
+import com.ta2khu75.thinkhub.modules.report.internal.domain.Report;
 import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.PageMapper;
 

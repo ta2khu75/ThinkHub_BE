@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.modules.authn.required.port;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderLocal;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderOAuth2;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderSummary;
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.ProviderType;
+import com.ta2khu75.thinkhub.modules.authProvider.api.model.ProviderType;
 
 public interface AuthnAuthProviderPort {
 	AuthProviderSummary create(AuthProviderLocal local);
@@ -12,7 +12,7 @@ public interface AuthnAuthProviderPort {
 
 	AuthProviderSummary readByEmailAndProvider(String email, ProviderType provider);
 
-	AuthProviderSummary readByUserIdAndProvider(String userId, ProviderType provider);
+	AuthProviderSummary readByUserIdAndProvider(Long userId, ProviderType provider);
 
 	void updatePassword(Long id, String password);
 }

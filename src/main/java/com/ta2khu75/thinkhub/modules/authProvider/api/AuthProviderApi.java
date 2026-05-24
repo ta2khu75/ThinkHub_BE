@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.modules.authProvider.api;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderLocal;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderOAuth2;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderSummary;
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.ProviderType;
+import com.ta2khu75.thinkhub.modules.authProvider.api.model.ProviderType;
 
 public interface AuthProviderApi {
 
@@ -15,5 +15,5 @@ public interface AuthProviderApi {
 
 	AuthProviderSummary readByEmailAndProvider(String email, ProviderType provider);
 
-	AuthProviderSummary readByUserIdAndProvider(String userId, ProviderType provider);
+	AuthProviderSummary readByUserIdAndProvider(Long userId, ProviderType provider);
 }

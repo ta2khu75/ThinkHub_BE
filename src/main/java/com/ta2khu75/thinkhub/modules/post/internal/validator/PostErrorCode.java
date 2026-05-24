@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.modules.post.internal.validator;
 
-import com.ta2khu75.thinkhub.modules.post.internal.entity.Post;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.Post;
 import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
 public enum PostErrorCode implements ErrorCode {

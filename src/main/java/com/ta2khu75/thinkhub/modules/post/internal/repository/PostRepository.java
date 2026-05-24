@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.modules.post.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ta2khu75.thinkhub.modules.post.internal.entity.Post;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.Post;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 //	List<Post> findAllByAuthorIdAndTitleContainingIgnoreCase(Long authorId, String keyword);

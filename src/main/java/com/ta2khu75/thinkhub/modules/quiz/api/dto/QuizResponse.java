@@ -2,9 +2,9 @@ package com.ta2khu75.thinkhub.modules.quiz.api.dto;
 
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.modules.quiz.api.enums.QuizLevel;
-import com.ta2khu75.thinkhub.modules.quiz.api.enums.ResultVisibility;
-import com.ta2khu75.thinkhub.modules.quiz.internal.entity.QuizStatus;
+import com.ta2khu75.thinkhub.modules.quiz.api.model.QuizLevel;
+import com.ta2khu75.thinkhub.modules.quiz.api.model.ResultVisibility;
+import com.ta2khu75.thinkhub.modules.quiz.internal.domain.QuizStatus;
 import com.ta2khu75.thinkhub.modules.tag.api.dto.TagDto;
 import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
 import com.ta2khu75.thinkhub.shared.common.api.dto.BaseClassResponse;

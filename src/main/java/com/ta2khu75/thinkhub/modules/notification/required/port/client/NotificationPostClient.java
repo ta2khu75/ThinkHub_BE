@@ -6,6 +6,7 @@ import com.ta2khu75.thinkhub.modules.notification.required.port.NotificationPost
 import com.ta2khu75.thinkhub.modules.post.api.PostApi;
 import com.ta2khu75.thinkhub.modules.post.api.dto.PostResponse;
 import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
+
 @Component
 class NotificationPostClient extends BaseClient<PostApi> implements NotificationPostPort {
 

@@ -1,5 +1,7 @@
 package com.ta2khu75.thinkhub.modules.category.api.dto;
 
+import com.ta2khu75.thinkhub.modules.category.api.model.CategoryStatus;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -12,5 +14,6 @@ public class CategoryResponse {
 	String slug;
 	String description;
 	String imageUrl;
-	String defaultImageUrl;
+	String fallbackImageUrl;
+	CategoryStatus status;
 }

@@ -16,7 +16,7 @@ public class AuthnUserClient extends BaseClient<UserApi> implements AuthnUserPor
 	}
 
 	@Override
-	public UserSummary readSummary(String id) {
+	public UserSummary readSummary(Long id) {
 		return api.readSummary(id);
 	}
 

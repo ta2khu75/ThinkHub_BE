@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.ProviderType;
+import com.ta2khu75.thinkhub.modules.authProvider.api.model.ProviderType;
 import com.ta2khu75.thinkhub.modules.authn.internal.model.CustomOAuth2User;
 import com.ta2khu75.thinkhub.modules.authn.internal.model.ProviderUser;
 import com.ta2khu75.thinkhub.modules.authn.internal.model.UserPrincipal;

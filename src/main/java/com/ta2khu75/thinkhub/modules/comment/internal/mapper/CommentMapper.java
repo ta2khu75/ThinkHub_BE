@@ -7,7 +7,7 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.modules.comment.api.dto.CommentRequest;
 import com.ta2khu75.thinkhub.modules.comment.api.dto.CommentResponse;
-import com.ta2khu75.thinkhub.modules.comment.internal.entity.Comment;
+import com.ta2khu75.thinkhub.modules.comment.internal.domain.Comment;
 import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 
 @Mapper(config = MapperSpringConfig.class)

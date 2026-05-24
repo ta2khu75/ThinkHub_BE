@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 import java.time.Instant;
 import java.util.List;
 
-import com.ta2khu75.thinkhub.modules.quiz.api.enums.QuizLevel;
+import com.ta2khu75.thinkhub.modules.quiz.api.model.QuizLevel;
 
 @Data
 @AllArgsConstructor

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.ta2khu75.thinkhub.modules.user.api.dto.UserCreateRequest;
 import com.ta2khu75.thinkhub.modules.user.api.dto.UserStatusRequest;
-import com.ta2khu75.thinkhub.modules.user.internal.entity.UserStatus;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.UserStatus;
 import com.ta2khu75.thinkhub.shared.exception.BaseValidator;
 import com.ta2khu75.thinkhub.shared.exception.ForbiddenException;
 import com.ta2khu75.thinkhub.shared.exception.NotFoundException;

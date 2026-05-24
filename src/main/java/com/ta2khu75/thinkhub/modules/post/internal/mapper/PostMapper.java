@@ -7,7 +7,7 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.ta2khu75.thinkhub.modules.post.api.dto.PostRequest;
 import com.ta2khu75.thinkhub.modules.post.api.dto.PostResponse;
-import com.ta2khu75.thinkhub.modules.post.internal.entity.Post;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.Post;
 import com.ta2khu75.thinkhub.modules.tag.api.dto.TagDto;
 import com.ta2khu75.thinkhub.shared.common.anotation.MapperSpringConfig;
 import com.ta2khu75.thinkhub.shared.mapper.BaseMapper;

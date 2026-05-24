@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.ta2khu75.thinkhub.modules.user.internal.entity.User;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.User;
 
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 	boolean existsByEmail(String email);

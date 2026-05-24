@@ -15,9 +15,9 @@ import com.ta2khu75.thinkhub.modules.authz.api.dto.request.PermissionGroupSummar
 import com.ta2khu75.thinkhub.modules.authz.api.dto.request.RoleRequest;
 import com.ta2khu75.thinkhub.modules.authz.api.dto.response.PermissionGroupResponse;
 import com.ta2khu75.thinkhub.modules.authz.api.dto.response.RoleResponse;
-import com.ta2khu75.thinkhub.modules.authz.internal.group.PermissionGroupService;
-import com.ta2khu75.thinkhub.modules.authz.internal.permission.PermissionService;
-import com.ta2khu75.thinkhub.modules.authz.internal.role.RoleService;
+import com.ta2khu75.thinkhub.modules.authz.group.PermissionGroupApi;
+import com.ta2khu75.thinkhub.modules.authz.permission.PermissionApi;
+import com.ta2khu75.thinkhub.modules.authz.role.RoleApi;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +27,9 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class AuthzServiceImpl implements AuthzApi {
-	PermissionGroupService groupService;
-	PermissionService permissionService;
-	RoleService roleService;
+	PermissionGroupApi groupService;
+	PermissionApi permissionService;
+	RoleApi roleService;
 
 	@Override
 	public List<PermissionGroupResponse> readAllGroups() {

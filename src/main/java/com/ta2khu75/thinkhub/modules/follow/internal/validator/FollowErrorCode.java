@@ -1,6 +1,6 @@
 package com.ta2khu75.thinkhub.modules.follow.internal.validator;
 
-import com.ta2khu75.thinkhub.modules.follow.internal.entity.Follow;
+import com.ta2khu75.thinkhub.modules.follow.internal.domain.Follow;
 import com.ta2khu75.thinkhub.shared.domain.enums.ErrorCode;
 
 public enum FollowErrorCode implements ErrorCode {

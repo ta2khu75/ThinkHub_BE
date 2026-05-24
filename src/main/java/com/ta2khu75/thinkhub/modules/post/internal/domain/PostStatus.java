@@ -1,0 +1,8 @@
+package com.ta2khu75.thinkhub.modules.post.internal.domain;
+
+public enum PostStatus {
+	ACTIVE, // public & usable
+	INACTIVE, // owner hides
+	OWNER_DELETED, // owner soft delete
+	ADMIN_DISABLED // admin enforcement
+}

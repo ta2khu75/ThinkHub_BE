@@ -19,9 +19,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ta2khu75.thinkhub.modules.user.api.dto.UserSearch;
-import com.ta2khu75.thinkhub.modules.user.internal.entity.QUser;
-import com.ta2khu75.thinkhub.modules.user.internal.entity.User;
-import com.ta2khu75.thinkhub.modules.user.projection.internal.projection.Author;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.Author;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.QUser;
+import com.ta2khu75.thinkhub.modules.user.internal.domain.User;
 
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.getOrderSpecifiers;
 import static com.ta2khu75.thinkhub.shared.util.QueryDslUtil.applyIfNotNull;

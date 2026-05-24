@@ -9,9 +9,14 @@ import com.ta2khu75.thinkhub.shared.service.ExistsService;
 public interface MediaApi extends ExistsService<Long> {
 	MediaResponse create(MediaRequest request) throws IOException;
 
-	MediaResponse update(Long id, MediaRequest request) throws IOException;
-
 	MediaResponse read(Long id);
 
+	String readUrl(Long id);
+
 	void delete(Long id);
+
+	void attach(Long id);
+
+	void detach(Long id);
+
 }

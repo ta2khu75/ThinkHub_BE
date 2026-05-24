@@ -1,7 +1,7 @@
 package com.ta2khu75.thinkhub.modules.authProvider.api.dto;
 
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.ProviderType;
+import com.ta2khu75.thinkhub.modules.authProvider.api.model.ProviderType;
 
-public record AuthProviderOAuth2(ProviderType type, String providerId, String email, String userId) {
+public record AuthProviderOAuth2(ProviderType type, String providerId, String email, Long userId) {
 
 }

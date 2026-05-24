@@ -2,9 +2,9 @@ package com.ta2khu75.thinkhub.modules.report.api.dto;
 
 import java.time.Instant;
 
-import com.ta2khu75.thinkhub.modules.report.internal.entity.ReportStatus;
-import com.ta2khu75.thinkhub.modules.report.internal.enums.ReportTargetType;
-import com.ta2khu75.thinkhub.modules.report.internal.enums.ReportType;
+import com.ta2khu75.thinkhub.modules.report.api.model.ReportTargetType;
+import com.ta2khu75.thinkhub.modules.report.api.model.ReportType;
+import com.ta2khu75.thinkhub.modules.report.internal.domain.ReportStatus;
 import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 import lombok.Data;

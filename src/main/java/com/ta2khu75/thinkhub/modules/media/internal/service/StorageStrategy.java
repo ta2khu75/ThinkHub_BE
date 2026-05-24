@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ta2khu75.thinkhub.modules.media.internal.entity.MediaOwnerType;
+import com.ta2khu75.thinkhub.modules.media.internal.domain.MediaOwnerType;
 
 public interface StorageStrategy {
-	String upload(MediaOwnerType ownerType, MultipartFile file) throws IOException;
+	String upload(MultipartFile file) throws IOException;
 
 	void delete(String url);
 }

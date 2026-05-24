@@ -13,7 +13,7 @@ import org.springframework.util.AntPathMatcher;
 
 import com.google.api.gax.rpc.UnauthenticatedException;
 import com.ta2khu75.thinkhub.modules.authz.api.dto.RoleSummary;
-import com.ta2khu75.thinkhub.modules.authz.internal.role.RoleService;
+import com.ta2khu75.thinkhub.modules.authz.role.RoleApi;
 import com.ta2khu75.thinkhub.shared.domain.enums.RoleDefault;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService;
 import com.ta2khu75.thinkhub.shared.service.clazz.RedisService.RedisKeyBuilder;
@@ -30,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class EndpointAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 	RedisService redisService;
-	RoleService roleService;
+	RoleApi roleService;
 
 	private boolean isAdmin(String roleName) {
 		return RoleDefault.ADMIN.name().equals(roleName);

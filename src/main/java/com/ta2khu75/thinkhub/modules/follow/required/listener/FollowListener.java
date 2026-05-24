@@ -5,10 +5,10 @@ import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
 import com.ta2khu75.thinkhub.modules.follow.api.FollowApi;
-import com.ta2khu75.thinkhub.modules.follow.api.FollowDirection;
 import com.ta2khu75.thinkhub.modules.follow.api.dto.FollowResponse;
 import com.ta2khu75.thinkhub.modules.follow.api.event.FollowTargetCreatedEvent;
-import com.ta2khu75.thinkhub.modules.notification.api.NotificationTargetType;
+import com.ta2khu75.thinkhub.modules.follow.api.model.FollowDirection;
+import com.ta2khu75.thinkhub.modules.notification.api.model.NotificationTarget;
 import com.ta2khu75.thinkhub.modules.post.api.event.PostCreatedEvent;
 import com.ta2khu75.thinkhub.modules.quiz.api.event.QuizCreatedEvent;
 import com.ta2khu75.thinkhub.shared.common.api.dto.PageResponse;
@@ -24,15 +24,15 @@ class FollowListener {
 
 	@ApplicationModuleListener
 	void onPostCreated(PostCreatedEvent event) {
-		onCreateNotification(event.userId(), event.targetId(), NotificationTargetType.POST);
+		onCreateNotification(event.userId(), event.targetId(), NotificationTarget.POST);
 	}
 
 	@ApplicationModuleListener
 	void onQuizCreated(QuizCreatedEvent event) {
-		onCreateNotification(event.userId(), event.targetId(), NotificationTargetType.POST);
+		onCreateNotification(event.userId(), event.targetId(), NotificationTarget.POST);
 	}
 
-	private void onCreateNotification(String userId, Long targetId, NotificationTargetType targetType) {
+	private void onCreateNotification(String userId, Long targetId, NotificationTarget targetType) {
 		Search search = new Search();
 		search.setPage(0);
 		search.setSize(1000);

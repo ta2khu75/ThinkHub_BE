@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
-import com.ta2khu75.thinkhub.modules.quiz.api.enums.QuestionType;
+import com.ta2khu75.thinkhub.modules.quiz.api.model.QuestionType;
 
 @Data
 @AllArgsConstructor

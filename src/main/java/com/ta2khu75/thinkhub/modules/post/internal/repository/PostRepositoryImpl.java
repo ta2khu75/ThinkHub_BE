@@ -10,8 +10,8 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ta2khu75.thinkhub.modules.post.api.dto.PostSearch;
-import com.ta2khu75.thinkhub.modules.post.internal.entity.Post;
-import com.ta2khu75.thinkhub.modules.post.internal.entity.QPost;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.Post;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.QPost;
 
 import lombok.RequiredArgsConstructor;
 import java.util.List;

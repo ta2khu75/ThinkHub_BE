@@ -6,7 +6,7 @@ import com.ta2khu75.thinkhub.modules.authProvider.api.AuthProviderApi;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderLocal;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderOAuth2;
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderSummary;
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.ProviderType;
+import com.ta2khu75.thinkhub.modules.authProvider.api.model.ProviderType;
 import com.ta2khu75.thinkhub.modules.authn.required.port.AuthnAuthProviderPort;
 import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 
@@ -38,7 +38,7 @@ class AuthnAuthProviderClient extends BaseClient<AuthProviderApi> implements Aut
 	}
 
 	@Override
-	public AuthProviderSummary readByUserIdAndProvider(String userId, ProviderType provider) {
+	public AuthProviderSummary readByUserIdAndProvider(Long userId, ProviderType provider) {
 		return api.readByUserIdAndProvider(userId, provider);
 	}
 

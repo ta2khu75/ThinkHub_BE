@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ta2khu75.thinkhub.modules.tag.internal.entity.Tag;
+import com.ta2khu75.thinkhub.modules.tag.internal.domain.Tag;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
 	Page<Tag> findByNameContainingIgnoreCase(String name, Pageable pageable);

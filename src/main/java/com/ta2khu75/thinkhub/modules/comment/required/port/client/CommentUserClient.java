@@ -9,8 +9,9 @@ import com.ta2khu75.thinkhub.modules.comment.required.port.CommentUserPort;
 import com.ta2khu75.thinkhub.modules.user.api.UserApi;
 import com.ta2khu75.thinkhub.shared.common.api.controller.BaseClient;
 import com.ta2khu75.thinkhub.shared.common.api.dto.AuthorResponse;
+
 @Component
-public class CommentUserClient extends BaseClient<UserApi> implements CommentUserPort {
+class CommentUserClient extends BaseClient<UserApi> implements CommentUserPort {
 
 	protected CommentUserClient(UserApi api) {
 		super(api);

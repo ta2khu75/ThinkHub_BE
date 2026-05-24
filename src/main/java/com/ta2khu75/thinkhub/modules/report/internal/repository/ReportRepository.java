@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.modules.report.internal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ta2khu75.thinkhub.modules.report.internal.entity.Report;
+import com.ta2khu75.thinkhub.modules.report.internal.domain.Report;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 	

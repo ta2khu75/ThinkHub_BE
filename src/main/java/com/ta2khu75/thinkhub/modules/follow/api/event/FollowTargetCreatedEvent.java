@@ -1,7 +1,7 @@
 package com.ta2khu75.thinkhub.modules.follow.api.event;
 
-import com.ta2khu75.thinkhub.modules.notification.api.NotificationTargetType;
+import com.ta2khu75.thinkhub.modules.notification.api.model.NotificationTarget;
 
-public record FollowTargetCreatedEvent(Long userId, Long targetId, NotificationTargetType targetType) {
+public record FollowTargetCreatedEvent(Long userId, Long targetId, NotificationTarget target) {
 
 }

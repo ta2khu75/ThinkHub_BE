@@ -2,8 +2,8 @@ package com.ta2khu75.thinkhub.modules.report.internal.validator;
 
 import org.springframework.stereotype.Component;
 
-import com.ta2khu75.thinkhub.modules.report.internal.entity.Report;
-import com.ta2khu75.thinkhub.modules.report.internal.entity.ReportStatus;
+import com.ta2khu75.thinkhub.modules.report.internal.domain.Report;
+import com.ta2khu75.thinkhub.modules.report.internal.domain.ReportStatus;
 import com.ta2khu75.thinkhub.shared.exception.BusinessException;
 
 @Component

@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.modules.post.api.dto;
 
 import java.util.Set;
 
-import com.ta2khu75.thinkhub.modules.post.internal.entity.PostStatus;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.PostStatus;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

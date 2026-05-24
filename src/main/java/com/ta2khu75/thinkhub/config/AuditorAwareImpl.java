@@ -6,13 +6,12 @@ import org.springframework.data.domain.AuditorAware;
 
 import com.ta2khu75.thinkhub.shared.util.SecurityUtil;
 
-
-public class AuditorAwareImpl implements AuditorAware<String> {
+public class AuditorAwareImpl implements AuditorAware<Long> {
 
 	@Override
-	public Optional<String> getCurrentAuditor() {
+	public Optional<Long> getCurrentAuditor() {
 		try {
-			return Optional.ofNullable(SecurityUtil.getCurrentUsername());
+			return Optional.ofNullable(SecurityUtil.getCurrentUserIdDecode());
 		} catch (Exception e) {
 			return Optional.empty();
 		}

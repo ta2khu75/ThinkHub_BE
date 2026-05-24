@@ -23,7 +23,7 @@ public class ApplicationConfig implements WebMvcConfigurer {
 	}
 
 	@Bean
-	AuditorAware<String> auditorProvider() {
+	AuditorAware<Long> auditorProvider() {
 		return new AuditorAwareImpl();
 	}
 

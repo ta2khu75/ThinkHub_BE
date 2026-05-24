@@ -8,8 +8,16 @@ public interface IdDecodable {
 		return IdConverterUtil.decode(id, idConfig);
 	}
 
+	default String encodeId(Long id, IdConfig idConfig) {
+		return IdConverterUtil.encode(id, idConfig);
+	}
+
 	default Long decodeId(String id) {
 		return decodeId(id, getIdConfig());
+	}
+
+	default String encodeId(Long id) {
+		return encodeId(id, getIdConfig());
 	}
 
 	IdConfig getIdConfig();

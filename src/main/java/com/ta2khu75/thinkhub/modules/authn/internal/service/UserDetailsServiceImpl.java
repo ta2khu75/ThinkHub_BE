@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ta2khu75.thinkhub.modules.authProvider.api.dto.AuthProviderSummary;
-import com.ta2khu75.thinkhub.modules.authProvider.internal.entity.ProviderType;
+import com.ta2khu75.thinkhub.modules.authProvider.api.model.ProviderType;
 import com.ta2khu75.thinkhub.modules.authn.internal.model.UserPrincipal;
 import com.ta2khu75.thinkhub.modules.authn.required.port.AuthnAuthProviderPort;
 import com.ta2khu75.thinkhub.modules.authn.required.port.AuthnAuthzPort;

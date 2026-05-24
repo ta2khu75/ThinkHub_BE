@@ -20,13 +20,15 @@ import com.ta2khu75.thinkhub.modules.authn.internal.config.TokenType;
 import com.ta2khu75.thinkhub.modules.authn.internal.model.UserPrincipal;
 import com.ta2khu75.thinkhub.modules.authz.api.dto.RoleSummary;
 import com.ta2khu75.thinkhub.modules.user.api.dto.UserSummary;
+import com.ta2khu75.thinkhub.shared.common.infra.id.IdConfig;
 import com.ta2khu75.thinkhub.shared.exception.UnauthorizedException;
+import com.ta2khu75.thinkhub.shared.service.IdDecodable;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtService implements IdDecodable {
 
 	private final JwtProviderFactory jwtProviderFactory;
 	private final JwtProperties jwtProperties;
@@ -40,15 +42,17 @@ public class JwtService {
 		Instant validity = now.plus(tokenConfig.expiration(), ChronoUnit.SECONDS);
 		JwsHeader jwsHeader = JwsHeader.with(JwtProviderFactory.JWT_ALGORITHM).build();
 		JwtClaimsSet claims;
+		String userIdEncoded = encodeId(user.id());
 		switch (tokenType) {
 		case ACCESS: {
-			claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity).subject(user.id())
-					.claim("username", user.username()).claim("scope", "ROLE_" + role.name()).build();
+			claims = JwtClaimsSet.builder().issuer("com.ta2khu75").issuedAt(now).expiresAt(validity)
+					.subject(userIdEncoded).claim("username", user.username()).claim("scope", "ROLE_" + role.name())
+					.build();
 			break;
 		}
 		case REFRESH: {
 			claims = JwtClaimsSet.builder().id(UUID.randomUUID().toString()).issuer("com.ta2khu75").issuedAt(now)
-					.expiresAt(validity).subject(user.id()).build();
+					.expiresAt(validity).subject(userIdEncoded).build();
 			break;
 		}
 		default:
@@ -69,5 +73,10 @@ public class JwtService {
 			throw new UnauthorizedException("Missing claim: " + claimName);
 		}
 		return claim;
+	}
+
+	@Override
+	public IdConfig getIdConfig() {
+		return IdConfig.USER;
 	}
 }

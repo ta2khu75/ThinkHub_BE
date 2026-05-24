@@ -3,7 +3,7 @@ package com.ta2khu75.thinkhub.modules.post.api.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.ta2khu75.thinkhub.modules.post.internal.entity.PostStatus;
+import com.ta2khu75.thinkhub.modules.post.internal.domain.PostStatus;
 import com.ta2khu75.thinkhub.shared.common.api.dto.Search;
 
 import lombok.Data;

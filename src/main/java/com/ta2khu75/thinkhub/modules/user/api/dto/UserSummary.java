@@ -4,6 +4,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public record UserSummary(String id, @NotBlank String firstName, @NotBlank String lastName,
+public record UserSummary(Long id, @NotBlank String firstName, @NotBlank String lastName,
 		@NotBlank @Email String email, String username, @Valid UserStatusSummary status) {
 }

@@ -2,7 +2,7 @@ package com.ta2khu75.thinkhub.modules.comment.internal.validator;
 
 import org.springframework.stereotype.Component;
 
-import com.ta2khu75.thinkhub.modules.comment.internal.entity.Comment;
+import com.ta2khu75.thinkhub.modules.comment.internal.domain.Comment;
 import com.ta2khu75.thinkhub.shared.exception.BaseValidator;
 
 import lombok.RequiredArgsConstructor;
